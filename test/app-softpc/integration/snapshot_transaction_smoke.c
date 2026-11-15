@@ -248,7 +248,7 @@ static int snapshot_run_transaction(void)
 
     /* Fixed-width format identity rejects incompatible raw video layouts. */
     assert(stream.count >= 16u);
-    stream.offset = 4u; /* Legacy format began directly with guest RAM size. */
+    stream.offset = 4u; /* A truncated header must not decode as an image. */
     assert(softpc_snapshot_image_read(&expected,
         softpc_machine_memory_bytes(product), snapshot_read, &stream) ==
         LIB_STATUS_INVALID_ARGUMENT);

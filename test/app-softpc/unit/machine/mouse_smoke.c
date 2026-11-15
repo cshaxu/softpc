@@ -14,10 +14,6 @@
 #include "compat/devices/snapshot.h"
 #include "compat/devices/archive.h"
 
-extern int softpc_device_snapshot_encode_mouse_callback(
-    Q_CALLBACK_FN callback, unsigned long *callback_id);
-extern void c_cpu_q_ev_set_count(unsigned long count);
-
 extern void com_outb IPT2(io_addr, port, half_word, value);
 
 static void make_boot_disk(const char *path)
@@ -93,8 +89,7 @@ int main(void)
     assert(value == 0x09u);
     outb(MOUSE_PORT_0, 0x80u);
 
-    /* Data interrupts use bit 3. Timer enable alone with rate zero must not
-       turn every host input into an IRQ. */
+    /* Original mode writes and HOLD latch incoming movement. */
     outb(MOUSE_PORT_0, 0x87u);
     outb(MOUSE_PORT_1, 0x09u);
     inb(MOUSE_PORT_1, &value);
@@ -150,76 +145,42 @@ int main(void)
         assert(marker == 0xa5u);
     }
 
-    /* One timer survives HOLD/repeated mode writes and snapshot restoration;
-       disabling or resetting removes it. No finite startup burst counter. */
+    /* Original rate selections issue at most five bursts, not recurring events.
+       Preserve the remaining burst count through the actual device archive. */
     {
-        softpc_device_inport_mouse_state state, held;
-        softpc_device_archive *archive = softpc_device_archive_create();
-        unsigned rate;
-        assert(archive != NULL);
-        for (rate = 1; rate <= 4; ++rate) {
-            outb(MOUSE_PORT_0, 0x87u);
-            outb(MOUSE_PORT_1, 0x10u | rate);
-            assert(softpc_device_snapshot_capture_inport_mouse(&state));
-            assert(state.timer_handle != 0);
-            outb(MOUSE_PORT_1, 0x30u | rate);
-            assert(softpc_device_snapshot_capture_inport_mouse(&held));
-            assert(held.timer_handle == state.timer_handle);
-            assert(softpc_device_archive_capture(archive));
-            outb(MOUSE_PORT_1, 0u);
-            assert(softpc_device_archive_restore(archive));
-            assert(softpc_device_snapshot_capture_inport_mouse(&held));
-            assert(held.timer_handle == state.timer_handle);
-            outb(MOUSE_PORT_1, 0u);
-            assert(softpc_device_snapshot_capture_inport_mouse(&held));
-            assert(held.timer_handle == 0);
-        }
-        softpc_device_archive_dispose(archive);
-    }
-    /* Isolate the existing quick-event queue after guest execution. Verify
-       actual scheduled periods/recurrence, not just a nonzero handle. */
-    {
-        static const unsigned long periods[] = {33333, 20000, 10000, 5000};
-        Q_EVENT_SNAPSHOT_STATE queue;
-        Q_EVENT_SNAPSHOT_ENTRY entry;
+        softpc_device_inport_mouse_state state;
         softpc_device_pic_state pic;
-        unsigned rate;
+        Q_EVENT_SNAPSHOT_STATE queue;
+        softpc_device_archive *archive = softpc_device_archive_create();
+        assert(archive != NULL);
         q_event_init();
         tic_event_init();
         mouse_init();
-        for (rate = 1; rate <= 4; ++rate) {
+        for (unsigned rate = 1; rate <= 4; ++rate) {
             outb(MOUSE_PORT_0, 0x87u);
-            outb(MOUSE_PORT_1, 0x10u | rate);
-            assert(q_event_snapshot_capture(&queue, &entry, 1, NULL, 0,
-                softpc_device_snapshot_encode_mouse_callback));
-            assert(queue.quick_entries == 1);
-            assert(entry.original_time == periods[rate - 1]);
-            assert(entry.callback_id == SOFTPC_DEVICE_QUEUE_MOUSE_TIMER);
-            c_cpu_q_ev_set_count(0);
-            dispatch_q_event();
-            assert(softpc_device_snapshot_capture_pic(&pic));
-            assert(pic.adapter[1].count[1] == 1);
-            outb(MOUSE_PORT_1, 0x30u | rate);
-            c_cpu_q_ev_set_count(0);
-            dispatch_q_event();
-            assert(softpc_device_snapshot_capture_pic(&pic));
-            assert(pic.adapter[1].count[1] == 0); /* HOLD suppresses IRQ. */
-            outb(MOUSE_PORT_1, 0x10u | rate);
-            c_cpu_q_ev_set_count(0);
-            dispatch_q_event();
-            assert(softpc_device_snapshot_capture_pic(&pic));
-            assert(pic.adapter[1].count[1] == 1); /* Still periodic. */
+            for (unsigned n = 0; n < 6; ++n) {
+                assert(softpc_device_snapshot_capture_pic(&pic));
+                int pending = pic.adapter[1].count[1];
+                outb(MOUSE_PORT_1, 0x10u | rate);
+                assert(softpc_device_snapshot_capture_inport_mouse(&state));
+                assert(state.startup_interrupt_bursts == (n < 5 ? 4 - n : 0));
+                assert(softpc_device_snapshot_capture_pic(&pic));
+                assert(pic.adapter[1].count[1] == pending + (n < 5 ? 100 : 0));
+                outb(MOUSE_PORT_1, 0u);
+            }
         }
-        outb(MOUSE_PORT_0, 0x87u);
-        mouse_send(2, -2, 1, 0);
-        assert(softpc_device_snapshot_capture_pic(&pic));
-        assert(pic.adapter[1].count[1] == 0); /* Disabled data IRQ. */
-        outb(MOUSE_PORT_1, 0x08u);
-        assert(softpc_device_snapshot_capture_pic(&pic));
-        assert(pic.adapter[1].count[1] == 1);
-        outb(MOUSE_PORT_0, 0x87u);
         q_event_snapshot_measure(&queue);
         assert(queue.quick_entries == 0);
+        outb(MOUSE_PORT_0, 0x87u);
+        outb(MOUSE_PORT_1, 0x11u);
+        assert(softpc_device_archive_capture(archive));
+        outb(MOUSE_PORT_0, 0x87u);
+        assert(softpc_device_archive_restore(archive));
+        assert(softpc_device_snapshot_capture_inport_mouse(&state));
+        assert(state.startup_interrupt_bursts == 4);
+        state.startup_interrupt_bursts = 6;
+        assert(!softpc_device_snapshot_restore_inport_mouse(&state));
+        softpc_device_archive_dispose(archive);
     }
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));

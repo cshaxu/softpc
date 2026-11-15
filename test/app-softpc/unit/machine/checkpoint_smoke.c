@@ -391,7 +391,7 @@ static void verify_snapshot_archive(void)
     unsigned char readback[2];
     half_word cmos_value;
     softpc_device_inport_mouse_state mouse_before, mouse_after;
-    softpc_device_pic_state mouse_pic;
+    softpc_device_pic_state mouse_pic, saved_mouse_pic;
     FPSTACKENTRY fpu_stack[8] = {0};
     unsigned index;
 
@@ -431,7 +431,8 @@ static void verify_snapshot_archive(void)
     outb(MOUSE_PORT_0, 0x87u);
     outb(MOUSE_PORT_1, 0x11u);
     assert(softpc_device_snapshot_capture_inport_mouse(&mouse_before));
-    assert(mouse_before.timer_handle != 0u);
+    assert(mouse_before.startup_interrupt_bursts == 4u);
+    assert(softpc_device_snapshot_capture_pic(&saved_mouse_pic));
     /* Host drive identity is independent of the empty media archive. CMOS
        is intentionally not its source: this simulates a non-default empty A. */
     assert(softpc_machine_set_floppy(probe.machine, NULL, LIB_STORAGE_MEDIUM_OVERLAY) == SOFTPC_MACHINE_OK);
@@ -474,8 +475,8 @@ static void verify_snapshot_archive(void)
     assert(softpc_device_archive_write(image.ccpu.devices,
         checkpoint_write_bytes, &device_stream) == LIB_STATUS_OK);
     assert(device_stream.byte_count != 0u);
-    /* The eight canonical identity bytes are mandatory, not a guessed old
-       format default; a stream without them must fail cleanly. */
+    /* The eight canonical identity bytes are mandatory; a truncated stream
+       must fail cleanly. */
     device_stream.byte_count -= 8u;
     assert(softpc_device_archive_read(&decoded_devices,
         checkpoint_read_bytes, &device_stream) != LIB_STATUS_OK);
@@ -493,12 +494,10 @@ static void verify_snapshot_archive(void)
     outb(MOUSE_PORT_0, 0x87u);
     assert(softpc_device_archive_restore(decoded_devices));
     assert(softpc_device_snapshot_capture_inport_mouse(&mouse_after));
-    assert(mouse_after.timer_handle == mouse_before.timer_handle);
+    assert(mouse_after.startup_interrupt_bursts == mouse_before.startup_interrupt_bursts);
     assert(mouse_after.mode == 0x11u);
-    c_cpu_q_ev_set_count(0);
-    dispatch_q_event();
     assert(softpc_device_snapshot_capture_pic(&mouse_pic));
-    assert(mouse_pic.adapter[1].count[1] == 1);
+    assert(mouse_pic.adapter[1].count[1] == saved_mouse_pic.adapter[1].count[1]);
     outb(MOUSE_PORT_0, 0x87u);
     softpc_device_archive_dispose(decoded_devices);
     lib_release(device_round_trip.bytes);
@@ -507,13 +506,13 @@ static void verify_snapshot_archive(void)
     assert(softpc_snapshot_image_write(&image, checkpoint_write_bytes,
         &image_stream) == LIB_STATUS_OK);
     assert(image_stream.byte_count != 0u);
-    assert(image_stream.bytes[3] == '3');
-    image_stream.bytes[3] = '2';
+    assert(image_stream.bytes[3] == '4');
+    image_stream.bytes[3] ^= 0xffu;
     assert(softpc_snapshot_image_read(&decoded_image,
         image.ccpu.sas.memory_bytes, checkpoint_read_bytes,
         &image_stream) == LIB_STATUS_INVALID_ARGUMENT);
     assert(image_stream.offset == 4u);
-    image_stream.bytes[3] = '3';
+    image_stream.bytes[3] ^= 0xffu;
     image_stream.offset = 0u;
     assert(softpc_snapshot_image_read(&decoded_image,
         image.ccpu.sas.memory_bytes + 4096u, checkpoint_read_bytes,

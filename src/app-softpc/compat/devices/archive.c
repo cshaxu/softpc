@@ -49,8 +49,6 @@ extern int softpc_device_snapshot_encode_serial_callback();
 extern Q_CALLBACK_FN softpc_device_snapshot_decode_serial_callback();
 extern int softpc_device_snapshot_encode_parallel_callback();
 extern Q_CALLBACK_FN softpc_device_snapshot_decode_parallel_callback();
-extern int softpc_device_snapshot_encode_mouse_callback();
-extern Q_CALLBACK_FN softpc_device_snapshot_decode_mouse_callback();
 extern int softpc_device_snapshot_encode_sb_callback();
 extern Q_CALLBACK_FN softpc_device_snapshot_decode_sb_callback();
 extern int softpc_device_snapshot_encode_eoi_callback();
@@ -68,7 +66,6 @@ unsigned long *callback_id;
         softpc_device_snapshot_encode_keyboard_callback(callback, callback_id) ||
         softpc_device_snapshot_encode_serial_callback(callback, callback_id) ||
         softpc_device_snapshot_encode_parallel_callback(callback, callback_id) ||
-        softpc_device_snapshot_encode_mouse_callback(callback, callback_id) ||
         softpc_device_snapshot_encode_sb_callback(callback, callback_id) ||
         softpc_device_snapshot_encode_eoi_callback(callback, callback_id);
 }
@@ -98,8 +95,6 @@ unsigned long callback_id;
     callback = softpc_device_snapshot_decode_serial_callback(callback_id);
     if (callback != NULL) return callback;
     callback = softpc_device_snapshot_decode_parallel_callback(callback_id);
-    if (callback != NULL) return callback;
-    callback = softpc_device_snapshot_decode_mouse_callback(callback_id);
     if (callback != NULL) return callback;
     callback = softpc_device_snapshot_decode_sb_callback(callback_id);
     if (callback != NULL) return callback;
@@ -219,7 +214,6 @@ softpc_device_archive *archive;
 {
     if (archive == NULL || !archive->valid || !device_sound_events_valid(archive) ||
         !softpc_device_snapshot_prepare_sb(&archive->sb) ||
-        !softpc_device_snapshot_restore_pic(&archive->pic) ||
         !softpc_device_snapshot_restore_dma(&archive->dma) ||
         !softpc_device_snapshot_restore_pit(&archive->pit) ||
         !softpc_device_snapshot_restore_cmos(&archive->cmos) ||
@@ -246,7 +240,8 @@ softpc_device_archive *archive;
             &archive->parallel_controller) ||
         !softpc_device_snapshot_restore_parallel_host(&archive->parallel_host))
         return FALSE;
-    return TRUE;
+    /* Register replay may change IRQ lines; restore saved PIC state last. */
+    return softpc_device_snapshot_restore_pic(&archive->pic);
 }
 
 /* The fixed snapshot types deliberately name every transferable field.  This
@@ -498,7 +493,7 @@ static const softpc_device_wire_field inport_mouse_fields[] = {
     DEVICE_U16(softpc_device_inport_mouse_state, last_button_right),
     DEVICE_U16(softpc_device_inport_mouse_state, mode),
     DEVICE_U16(softpc_device_inport_mouse_state, address),
-    DEVICE_U32(softpc_device_inport_mouse_state, timer_handle),
+    DEVICE_U32(softpc_device_inport_mouse_state, startup_interrupt_bursts),
     DEVICE_U32(softpc_device_inport_mouse_state, id_toggle)
 };
 

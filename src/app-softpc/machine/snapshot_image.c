@@ -3,8 +3,8 @@
 
 #include "compat/devices/archive.h"
 
-/* Retired DOS mouse payload removed; older snapshot layouts are incompatible. */
-#define SOFTPC_SNAPSHOT_FORMAT 0x33504353u
+/* Original InPort burst state replaces the retired periodic timer payload. */
+#define SOFTPC_SNAPSHOT_FORMAT 0x34504353u
 
 typedef struct softpc_snapshot_count_stream {
     lib_u64 count;

@@ -58,7 +58,6 @@
 #include "trace.h"
 #include "video.h"
 #include "mouse.h"
-#include "quick_ev.h"
 #include "compat/devices/snapshot.h"
 #include "mouse_io.h"
 
@@ -93,45 +92,12 @@ static half_word
                  mouse_mode_reg          = 0, /* mode register 		*/
 		 address_reg       = 0; /* address pointer register	*/
 
-static q_ev_handle mouse_timer = 0;
+static int
+		loadsainterrupts = 5;
+/* count of how many times we will send bursts of interrupts to please Windows, per reset */
 
 
 static int mouse_inb_toggle = 0;
-
-LOCAL unsigned long mouse_period IFN0()
-{
-    static const unsigned long periods[] = { 0, 33333, 20000, 10000, 5000 };
-    unsigned int rate = mouse_mode_reg & 7;
-
-    return (mouse_mode_reg & 0x10) && rate <= 4 ? periods[rate] : 0;
-}
-
-LOCAL void mouse_timer_tick IFN1(long, unused)
-{
-    unsigned long period = mouse_period();
-
-    UNUSED(unused);
-    mouse_timer = 0;
-    if (period == 0) return;
-    if (!(mouse_mode_reg & HOLD))
-        ica_hw_interrupt(AT_CPU_MOUSE_ADAPTER, AT_CPU_MOUSE_INT, 1);
-    mouse_timer = add_q_event_t(mouse_timer_tick, period, 0);
-}
-
-int softpc_device_snapshot_encode_mouse_callback(callback, callback_id)
-Q_CALLBACK_FN callback;
-unsigned long *callback_id;
-{
-    if (callback != mouse_timer_tick || callback_id == NULL) return FALSE;
-    *callback_id = SOFTPC_DEVICE_QUEUE_MOUSE_TIMER;
-    return TRUE;
-}
-
-Q_CALLBACK_FN softpc_device_snapshot_decode_mouse_callback(callback_id)
-unsigned long callback_id;
-{
-    return callback_id == SOFTPC_DEVICE_QUEUE_MOUSE_TIMER ? mouse_timer_tick : NULL;
-}
 
 int
 softpc_device_snapshot_capture_inport_mouse(state)
@@ -149,7 +115,7 @@ softpc_device_inport_mouse_state *state;
     state->last_button_right = last_button_right;
     state->mode = mouse_mode_reg;
     state->address = address_reg;
-    state->timer_handle = (uint32_t)mouse_timer;
+    state->startup_interrupt_bursts = loadsainterrupts;
     state->id_toggle = mouse_inb_toggle;
     return TRUE;
 }
@@ -165,7 +131,7 @@ const softpc_device_inport_mouse_state *state;
         (state->last_button_right != 0 && state->last_button_right != 1) ||
         state->delta_x < -128 || state->delta_x > 127 ||
         state->delta_y < -128 || state->delta_y > 127 ||
-        state->timer_handle >= 0xffff ||
+        state->startup_interrupt_bursts > 5 ||
         (state->id_toggle != 0 && state->id_toggle != 1))
         return FALSE;
     button_left = state->button_left;
@@ -179,7 +145,7 @@ const softpc_device_inport_mouse_state *state;
     last_button_right = state->last_button_right;
     mouse_mode_reg = state->mode;
     address_reg = state->address;
-    mouse_timer = state->timer_handle;
+    loadsainterrupts = state->startup_interrupt_bursts;
     mouse_inb_toggle = state->id_toggle;
     return TRUE;
 }
@@ -322,15 +288,43 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 				ica_clear_int(AT_CPU_MOUSE_ADAPTER, AT_CPU_MOUSE_INT);
 				break;
 
-#line 385
+#line 369
+	/*
+	 * In the following cases the application code is expecting to see
+	 * interrupts at the requested rate. However in practice this is only
+	 * required during initialisation(mouse_mode_reg = 0), and then a short burst
+	 * appears to be sufficient. The 15 interupts generated comes from
+	 * tests with the "WINDOWS" package, which receives about 15 during
+	 * initialising, but is happy as long as it gets more than 3. The delay
+	 * is necessary otherwise the interupts are generated before the
+	 * application starts looking for them.
+
+	 * Mark 2 bodge:
+	   Windows 1.02 needs the burst of interrupts to occur even when mouse_mode_reg != 0,
+	   but Windows 2.03 needs them not to keep happening even when it asks for them.
+	   So now there's a counter called loadsainterrupts set to 5 on resets, which is
+	   how many bursts will be allowed. This makes both Windows work.
+	 */
 			case 0x1: /* 30 Hz */
 			case 0x2: /* 50 Hz */
 			case 0x3: /* 100 Hz */
 			case 0x4: /* 200 Hz */
-#line 393
+/* used to be if mouse_mode_reg == 0 too, removed to make Windows 1.02 work */
+			    if( (value & 0x10) && loadsainterrupts > 0)	
+			    {
+				loadsainterrupts--;
 #ifndef PROD
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
+#line 398
+				/*
+				** AT version is asking for a 100 interrupts.
+				** The AT ica does not handle delayed ints so
+				** the IRET has been modified to not allow an
+				** int to go off before the next instruction.
+				*/
+				ica_hw_interrupt(AT_CPU_MOUSE_ADAPTER,AT_CPU_MOUSE_INT,100);
+			     }
 #line 406
 				break;
 			case 0x5: /* reserved */
@@ -344,8 +338,7 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 #error "Unsupported SoftPC mirror configuration: !PROD"
 #endif
 #line 419
-				if (value & 0x10)
-					ica_hw_interrupt(AT_CPU_MOUSE_ADAPTER,AT_CPU_MOUSE_INT,1);
+				ica_hw_interrupt(AT_CPU_MOUSE_ADAPTER,AT_CPU_MOUSE_INT,1);
 				break;
 			case 0x7: /* externally controlled */
 				break;
@@ -357,19 +350,7 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 				break;
 
 			}
-		if ((mouse_mode_reg ^ value) & 0x17) {
-			if (mouse_timer != 0) delete_q_event(mouse_timer);
-			mouse_timer = 0;
-		}
 		mouse_mode_reg = value;
-		if (mouse_timer == 0 && mouse_period() != 0)
-			mouse_timer = add_q_event_t(mouse_timer_tick, mouse_period(), 0);
-		if (!(value & 0x18))
-			ica_clear_int(AT_CPU_MOUSE_ADAPTER, AT_CPU_MOUSE_INT);
-		else if ((value & 0x08) && !(value & HOLD) &&
-			(delta_x || delta_y || button_left != last_button_left ||
-			button_right != last_button_right))
-			ica_hw_interrupt(AT_CPU_MOUSE_ADAPTER, AT_CPU_MOUSE_INT, 1);
 
 		/*
 	 	 * Interface control register
@@ -388,9 +369,8 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 	{
 	    if (value & 0x80)  /* is it  a reset */
 	    {
-		if (mouse_timer != 0) delete_q_event(mouse_timer);
-		mouse_timer = 0;
 		mouse_mode_reg = 0;
+		loadsainterrupts = 5;	/* lets Windows initialise its mouse happily */
 		delta_x = delta_y = 0;
 		data1_reg = data2_reg = mouse_status_reg = 0;
 		last_button_left = button_left;
@@ -443,8 +423,7 @@ int	Delta_x,Delta_y,left,right;
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else    //NEC_98
 #line 511
-		if ((mouse_mode_reg & 0x08) && !(mouse_mode_reg & HOLD))
-			ica_hw_interrupt(AT_CPU_MOUSE_ADAPTER,AT_CPU_MOUSE_INT,1);
+		ica_hw_interrupt(AT_CPU_MOUSE_ADAPTER,AT_CPU_MOUSE_INT,1);
 #endif   //NEC_98
 #line 514
 	}
@@ -470,7 +449,6 @@ void mouse_init IFN0()
 #line 550
 
     mouse_inb_toggle = 0;
-    mouse_timer = 0;
     button_left = button_right = 0;
     mouse_outb(MOUSE_PORT_0, 0x80);
 

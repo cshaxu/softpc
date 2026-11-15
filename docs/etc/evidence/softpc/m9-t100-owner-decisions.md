@@ -4920,3 +4920,117 @@ restoration is silently applied. R0464/R0465/R0466 remain separate decisions.
 Only documentation changes; product/media hashes unchanged. Promote this
 bounded evidence and remove task scratch after jobs exit; no raw guest image,
 capture or probe binaries are committed. S4/T100 remain open at mouse.c.
+
+
+## S4 P50: restore original InPort bursts and current snapshot
+
+Owner approves coherent R0463 restoration after P49's real-guest comparison,
+requires no legacy snapshot recognition in production, and separately authorizes
+one-off conversion of the existing package snapshot. R0463 is restored, not an
+approved retained patch. R0464 now archives the original remaining burst budget;
+R0465 default input and R0466 reset-data behavior stay unchanged.
+
+### Actual change and accounting
+
+- Restore XP's five eligible bursts per reset, each requesting 100 PIC events,
+  and original constant-high/input IRQ behavior. Delete periodic scheduling,
+  callback codecs, queue identifier and added enable/HOLD delivery gating.
+- Keep one original counter/state owner. Archive its remaining count with the
+  existing device serializer; validate 0..5. No second timer or compatibility
+  reader. The only supported format is SCP4; malformed-format tests use generic
+  corruption/truncation, not historical format definitions.
+- Production four files: +45/-73, net -28. Tests three files: +38/-78, net -40,
+  measured with `git diff --numstat 8b35181c -- src test`. No public-eight change.
+- mouse.c against pinned XP, excluding excluded bodies/line controls:
+  14 blocks +115/-34 becomes 5 blocks +59/-0: nine fewer text blocks and
+  90 fewer changed mirror lines. Remaining selected content is snapshot +52,
+  default input +1, reset/cold-init +6. Global real-diff inventory remains
+  106 files, now 15,708 blocks, +24,611/-24,012.
+- Preserve XP CRLF and its original trailing tab on the restored burst condition.
+  Normal `git diff --check` flags this exact original whitespace; it is not
+  reformatted into a new mirror deviation. Owned-source whitespace is checked
+  normally; the mirror check excludes end-of-line blank complaints only.
+
+### One-off asset conversion
+
+The owner's existing `assets/binary/snapshot` is converted offline with a
+scratch-only tool using the current canonical image/device reader and writer.
+Its retired timer handle is zero; its one quick/two tick entries have callback
+IDs 2,5,4, below the removed identifier. Therefore no event is removed or
+renumbered. The asset's saved mode is 9. The retired model had no original
+remaining burst budget; conversion initializes that newly restored state to
+its original reset value five without issuing interrupts or changing the PIC.
+
+Exact byte comparison proves two changed bytes out of 18,700,025: offset 3
+(format identity), offset 17,842,181 (zero retired handle to budget five).
+CPU, RAM, all other device state, queue entries and saved media bytes are
+unchanged. Saved HDD mode is overlay; no INI or guest image is modified.
+Original SHA-256: f519bf14842856aefd7209cac6449443ed1d6aab21358d3d6a1279303350519f.
+Converted SHA-256: 9c9e6116e4235c57d48f14a6267bb4b080942b0046a163344146e4a35dd2460f.
+
+Both x86/x64 probes use the actual current Emulator state-write, VM driver,
+media preparation and executor restore path. Each consumes all 18,700,025 bytes,
+returns OK, reaches PAUSED and reads back budget five. Final probes additionally
+confirm both PIC masks/IRR/ISR and all 16 pending request counts match the image.
+Audio is the existing
+mock fixture; this proves real state loading, not fresh visual/manual or native
+sound acceptance. The one-off converter is deleted at delivery, not a product
+legacy API or persisted old-format definition.
+
+### Verification and actual-diff review
+
+Initial background runs fail the two new PIC assertions on both architectures.
+The burst fixture wrongly assumed lowering a PIC line cleared all accumulated
+requests; original SWPIC_clear_int decrements one. Correct its assertion to
+compare the accepted-count delta (+100 for each of five writes, then zero).
+
+The corrected checkpoint comparison identifies a real existing archive-order
+fault, not a second fixture error. An isolated trace shows PIC restore at100;
+VGA controller replay changes it to98; every later restore leaves98. VGA and
+InPort share adapter1/line1. Replaying CRTC11 twice with bit4 clear invokes
+original ica_clear_int twice. Periodic timer replacement previously left no
+burst queued at capture, so that fixture did not expose this loss.
+
+Minimal repair in the existing Compat archive path: move its one PIC restore
+from the front to the final return, after device register replay. No duplicate
+restore, compensation, new state, mirror change or runtime path. Device restores
+run on the existing stopped/paused executor; no guest instruction intervenes.
+Queue/EOI/SB restoration remains in its existing order; their state is not
+rederived from the PIC. The same failing checkpoint assertion must now pass.
+Review also covers serial/parallel/device restore calls that can affect IRQs;
+placing the shared PIC restore last uniformly preserves saved interrupt state.
+
+Existing guest IRQ, movement/HOLD registers and archive checks remain; rate
+selections1..4, exhaustion, invalid budget and absence of recurring events are
+covered. The assertion failures and isolated negative trace are retained as
+results, not silently reclassified as successful first runs.
+
+Final cached dual builds and publication pass. Final full regression passes
+392/392 without retries/skips in that final run: x86 background188/native8
+(187.45s/24.56s), x64 background188/native8 (205.54s/24.20s).
+Both focused checkpoint reruns and converted-asset executor probes pass.
+These final results do not erase the earlier assertion failures above.
+Mirror manifest and documentation gates pass. No public package or new
+owned-code compiler warning is introduced; preserved mirror warnings are not
+claimed eliminated. Final embedded compiler timestamps are Nov15 2026
+00:34:26 (x86), 00:34:33 (x64).
+
+Executor and coordinator actual-diff reviews confirm one original InPort
+state owner, one current-format reader, one device/PIC restore path, no added
+compatibility state or mirror exception. The saved asset differs in exactly
+the two reviewed bytes. User INI/media are unchanged. Task probes/logs are
+promoted to this concise evidence then removed before commit.
+Current artifact SHA-256:
+- x86: 40d94eca40568899935fa32780c98f1048f602ea2135c710a5a6274222f57306.
+- x64: b3bddab000df773a060e3b2e7ad46afdc611b8458e5a18b4b1f82fc7cc6db10c.
+
+Similar-issue sweep covers all production/test references to the retired mouse
+callback, event ID and state field; no consumer remains. The unrelated original
+MOUSE_TIMER_INTERRUPTS_PER_SECOND constant in mouse_io.h is retained. Enum followers are
+intentionally renumbered under the new format and no old reader is retained.
+Existing audio queue archive tests exercise current IDs. Retained snapshot
+capture/restore checks the original budget rather than creating new policy.
+No additional mirror restoration, guest patch or public package change is made.
+P49 remains the separately identified historical real-guest comparison;
+this delivery does not claim every guest/driver's timing was validated.
+S4/T100 remain open awaiting owner acceptance of P50.
