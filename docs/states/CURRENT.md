@@ -29,13 +29,20 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P64 reviews order414 unexp_nt.c at1caff181: one real diff +0/-1, R0508
+terminal Ctrl-Z omission. Whole handler matches pinned XP. Fresh x86/x64
+compiler controls pass; restoring only0x1a fails both with stray-byte errors.
+Recommend retain R0508, pending owner decision. No production/test/artifact
+change. Own scratch build/t100-s4-p64 is retired after verification; concurrent
+Win95 investigation remains untouched. See [P64 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p64-approved-pit-and-unexpected-interrupt-file-review).
+
 S4 P63 reviews order412 timer.c at b95ccba1: eight real diff blocks +371/-2.
 Snapshot support accounts for +360/-0; four device corrections account for
 +11/-2, including already accepted S2 D005. Fresh PIT/checkpoint/sound tests
-pass6/6 across x86/x64. Recommend retaining R0502-R0505; no safe restoration
+pass6/6 across x86/x64. Owner approves R0502-R0505; no safe restoration
 candidate established. No production/test/artifact change. Own disposable
 scratch build/t100-s4-p63 is isolated from Win95 investigation; S4/T100 remain
-open awaiting owner review. See [P63 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p63-accepted-p62-and-pit-file-review).
+open. See [P63 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p63-accepted-p62-and-pit-file-review).
 
 S4 P62 restores the owner-approved original display_string brace pair; R0499
 is approved and unchanged. Production +2/-0, tests unchanged; rom.c becomes

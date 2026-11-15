@@ -5953,3 +5953,35 @@ scratch has a two-hour/fifteen-minute no-progress budget and is removed after
 owned jobs finish; Win95 investigation scratch and processes are untouched.
 Recommend retention pending owner review of R0502-R0505. Next file is
 unexp_nt.c; do not advance before the owner's decision.
+
+## S4 P64: approved PIT and unexpected-interrupt file review
+
+Owner approves R0502-R0505 retention. D005 remains the accepted S2 repair.
+At baseline1caff181, next literal order414 base/system/unexp_nt.c has exactly
+one nonexcluded difference, R0508 +0/-1: remove XP's trailing standalone Ctrl-Z
+(0x1a, no final newline). Existing excluded bodies/line controls are not counted.
+Byte comparison confirms the entire unexpected_int function is identical to
+pinned XP after removing only that terminal byte. No snapshot extension or
+interrupt behavior repair exists here.
+
+Actual consumers: compat/device_bop.c registers unexpected_int at
+BIOS_UNEXP_INT; original illegalp.c also calls it. Both production compile
+commands include this translation unit. Original ISR inspection, masks,
+cascade handling, command-port EOI and BIOS cause storage are unchanged.
+
+Fresh compiler controls use each existing compile_commands entry with only
+source/output redirected into build/t100-s4-p64. The positive copy is byte-exact
+current source; the negative adds only0x1a at EOF. Both x86/x64 controls compile;
+both restored-byte negatives fail at line96 with error: stray '\32' in program.
+This is direct current-toolchain evidence for the one-byte omission, not merely
+historical convention and not a runtime guest-bug reproduction. No compiler
+flags, source interface or original handler are changed to work around it.
+Recommend retain R0508; restoring the exact XP byte breaks supported builds.
+No other real difference or safe restoration candidate is found.
+
+Only documentation changes. No full runtime rerun or EXE publication is needed
+for this read-only review. Scratch is own build/t100-s4-p64, hidden CMD with
+two-hour/fifteen-minute no-progress budget, removed after compiler/gate jobs
+exit. Win95 investigation files/processes untouched. Global real-diff inventory
+is unchanged. Next real-difference file is base/video/egawrtm0.c; wait owner
+review before advancing.
