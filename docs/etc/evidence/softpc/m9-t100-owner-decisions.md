@@ -5481,3 +5481,48 @@ three repairs and snapshot capability; do not delete production functionality
 or move identical serialization into Compat merely to hide mirror differences.
 All five groups await owner disposition in this fresh audit; next file is cmos.c.
 No source/test/EXE/snapshot changes or runtime runs in P54.
+
+## S4 P55: restore DMA accessor placement
+
+Owner approves P54 findings and the usual dual build/publication/full regression,
+commit/push/self-review delivery. R0476-R0480 necessary functionality is approved;
+restore only R0479's unnecessary accessor/frame relocation. Original XP positions
+are verified directly: accessor starts at859, internal-functions heading866,
+do_transfer872. Preserve CRLF and exclusions, correct accessor line control to859
+and reset to864 before original blank lines/heading. No DMA expression, signature,
+function body, snapshot layout, guest or shared component is changed. No new test
+is needed for source placement; run existing DMA/SB-DMA/checkpoint coverage in
+full regression. Scratch ownership and budgets remain build/t100-s4, two hours
+with fifteen-minute no-progress limit; background CMD only.
+
+Actual fixed-XP excluded-body comparison verifies P54's estimate: 16 blocks
++115/-19 becomes 15 blocks +112/-17, five fewer changed lines. Current global
+inventory is 106 files, 15,708 blocks, +24,614/-24,016. Existing excluded bodies
+are not newly audited/bookkept. Non-comment/non-line-control token comparison
+before/after is identical (including the remaining conditional directives).
+Bounded placement review confirms the original heading is at XP866 and
+original function entry at859; do_transfer stays at872. The only extra line
+control restores heading diagnostics after moving the selected accessor.
+No new declarations, state, callbacks, path, tests or public API are introduced.
+
+Final cached x86/x64 test builds and package publication pass. Full tests pass
+392/392 first run (188 background plus eight native per architecture), no skips
+or retries; DMA, SB-DMA, checkpoint, package and native Console tests included.
+Published compiler timestamps: x86 Nov 15 2026 09:54:19; x64 Nov 15 2026 09:58:46.
+Existing preserved-mirror compiler warnings remain; no owned/public code changed.
+- softpc32.exe SHA-256: 7921ca65d4bd30a0429ecf9d92d53ebf4819b1a4091a0a58d9f9e2122e077502.
+- softpc64.exe SHA-256: fcff886d6229eae965b64f96e4e76126a00471b090e026c853016f82da588e6c.
+
+Actual tracked production diff against cf30439b: one file +9/-9, net0; test
+code unchanged. This is distinct from the five-line reduction against XP.
+Coordinator self-review checks the actual source diff, conditional ownership,
+line mapping, selected accessor caller and approved retention of R0476-R0480.
+Only existing declaration/body placement and line controls change; one original
+DMA state owner and original DSP access remain. No second path, new framework,
+resource lifetime change or additional repair is present. The bounded similar-
+issue review rechecks this file's full retained-content differences: no other
+unnecessary location change is established; other files remain at their existing
+audit dispositions. Snapshot SHA-256 remains
+ff7c9db73fcb4d1aacfa11b0b11d9f8863aa5c4fe97ca0382cacc83b962cb44f;
+INI/media are unchanged. Final normalized manifest and CRLF checks pass.
+P55 awaits owner acceptance; S4/T100 remain open.

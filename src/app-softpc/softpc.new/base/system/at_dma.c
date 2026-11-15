@@ -863,6 +863,15 @@ GLOBAL  void dma_enquire        IFN3(half_word, channel,
                     channel, *address, *length);
 }
 
+#ifdef NTVDM
+#error "Unsupported SoftPC mirror configuration: NTVDM"
+#endif  /* NTVDM */
+#line 859
+DMA_ADAPT *dmaGetAdaptor(void)
+{
+  return &adaptor;
+}
+#line 864
 
 
 /*
@@ -870,15 +879,6 @@ GLOBAL  void dma_enquire        IFN3(half_word, channel,
  * Internal functions
  * ============================================================================
  */
-
-#ifdef NTVDM
-#error "Unsupported SoftPC mirror configuration: NTVDM"
-#endif  /* NTVDM */
-#line 858
-DMA_ADAPT *dmaGetAdaptor(void)
-{
-  return &adaptor;
-}
 
 #line 872
 LOCAL void do_transfer  IFN6(int, type, int, decrement,
