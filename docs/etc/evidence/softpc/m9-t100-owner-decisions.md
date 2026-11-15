@@ -6295,3 +6295,79 @@ identifiers. Next real file is base/video/gfx_updt.c.
 Documentation/whitespace gates apply. Own hidden CMD gate scratch is
 build/t100-s4-p70 with two-hour/fifteen-minute no-progress budget, removed after
 completion. S4/T100 remain open. Prior Win95 qualification is not changed.
+
+## S4 P71: approved CHAIN2 writers and graphics updater review
+
+Owner approves R0519-R0528; D006 was already accepted. At66b60b87, literal
+order424 base/video/gfx_updt.c has131 Git Myers zero-context blocks,+231/-211
+against fixed XP SP1. Matched conditional arms whose local body is #error are
+omitted on both sides; #line controls are removed separately, preserving blank
+lines. This reproduces the current inventory. A preliminary generic alignment
+count was discarded in favor of this established counting method. No excluded
+body is newly inventoried. All remaining blocks classify as follows:
+
+| Decision group | Blocks | Added | Deleted | Current anchors / purpose |
+| --- | ---: | ---: | ---: | --- |
+| R0530 | 1 | 9 | 0 | 1145: text stride, backing spans and dirty-array capacity guard. |
+| R0531 and R0534 together | 68 | 149 | 138 | 268-492,1859-2418: dirty byte residue, panning dependencies, wrapped split painting and clear order. Shared call-site edits are counted once, not arbitrarily split between the two semantic IDs. |
+| R0532 | 59 | 70 | 70 | 534-591,784-1204,1494-1627,2545-2808: CHAIN2 text/CGA/scroll reader stride and mapping. |
+| R0533 | 1 | 1 | 1 | 617: old-cursor painter's missing fifth argument height1. |
+| R0535 | 1 | 1 | 1 | 3866: select existing EGA marker for CHAIN2 graphics. |
+| Original stream declaration omission | 1 | 1 | 1 | 4118 / XP5967: original extern replaced by a blank line. Recommend restore. |
+| Total | 131 | 231 | 211 | All nonexcluded blocks included. |
+
+R0530 source proof: original row calculation divides by get_offset_per_line;
+text copy/visible final-row accesses use video_copy with real EGA_PLANE_SIZE,
+and dirty[] has finite record capacity. Historical P127 real CRTC offset0
+plus update ticks caused division faults with the guard removed on both widths.
+Tests also distinguish161 columns and400/768 valid rows from769 invalid rows.
+The final guard checks both full-copy and last-visible-row spans; earlier
+unsafe intermediate candidates are not accepted proof. No arbitrary public
+text-size cap or new state owner is introduced.
+
+R0531 preserves the byte residue lost by early division into four-byte dirty
+groups, through scanning, paint coordinates and final-group clearing. R0534
+marks predecessor groups used by pel panning, including bank wrap; ascending
+mark traversal avoids recursively expanding new marks. The wrapped split helper
+uses the existing bitmap and painter, painting both portions before clearing
+shared marks, with original scanline/host units distinguished. These are coupled
+changes to the original update path, not a parallel renderer. Historical P127
+whole dirty-group restoration fails stride80/residue1/address320 assertions on
+both widths. Grouped panning/split evidence is not an independent negative for
+every one of the68 blocks. No claim of exhaustive controller-state coverage.
+
+R0532 uses the same CHAIN2 storage layout as the approved writers: WORD pointers
+advance4 elements and DWORD pointers2. Both CGA banks, text split/wrap and scroll
+sources/destinations must agree. Historical complete-group original restoration
+fails incremental mode04/05 colour assertions on both widths. Zero-offset
+get_chain2_screen_ptr calls are retained for the owner's uniform mapping rule;
+replacing only those equal-base calls would create a mixed pattern without
+simplifying the algorithm. No new mapping owner is introduced.
+
+R0533's real old-cursor body with the original four-argument call failed a
+five-argument recording painter's height assertion on both widths; the current
+fifth argument is1. R0535's actual BIOS mode3 to V7 mode63 transition and SAS
+write at a0100 set bitmap40 and dirty bounds64 with the existing EGA marker.
+Original assert-only restoration leaves the bitmap clear and invalid bounds
+although dirty_total changes. This is actual selector wiring evidence, not
+merely directly installing a test marker. Recommend retain R0530-R0535.
+
+The extra declaration omission is not covered by those six IDs. T99 S30 records
+its intentional omission with NT Console stream exclusion. Later T100 S1 P144
+restored the original uncalled host_stream_io_update function in nt_graph.c,
+but this declaration remained absent. No macro override or remaining caller
+was found; signature half_word*,word matches the original function. An extern
+prototype alone creates neither a call nor linker reference. There is no
+current semantic reason to keep its deletion; recommend restoring exactly
+`extern void host_stream_io_update(half_word *, word);` at the original spot.
+Expected mirror result130 blocks,+230/-210 (two fewer changed lines), with
+production +1/-1. No production restoration/build has been performed in P71.
+
+Fresh work is source/caller/count review; behavioral negatives above are recorded
+historical P127 evidence. P69 full392/392 passed the current production fixture;
+this is reused evidence, not a new P71 run or guest acceptance. No source,
+test, manifest or EXE change; all six retention decisions and the one restoration
+candidate are presented for owner review. Next real file is base/video/v7_ports.c
+(gvi.c has no real difference). Own hidden CMD gate and count scratch is
+build/t100-s4-p71, two-hour/fifteen-minute no-progress budget, removed after
+completion. Documentation/whitespace gates apply; S4/T100 remain open.

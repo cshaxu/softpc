@@ -29,12 +29,19 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P71 reviews order424 gfx_updt.c at66b60b87:131 blocks,+231/-211. Recommend
+retain R0530-R0535's six functional groups; one extra original stream prototype
+omission lacks current necessity and is recommended for restoration, pending
+owner decision. Restoring it would yield130 blocks,+230/-210. No production or
+artifact change. Historical negative controls and P69 full392/392 are reused,
+not rerun. Own build/t100-s4-p71 scratch is retired. See [P71 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p71-approved-chain2-writers-and-graphics-updater-review).
+
 S4 P70 reviews order423 egwrtm12.c at825ca42d: eleven real replacements
 +11/-11. R0519-R0528 are CHAIN2 writer address corrections; D006 is the
 already accepted plane2 enable fix. Fresh source tracing and historical
 individual/whole-group dual-width negatives support retention. P69 full392/392
 is reused, not freshly rerun. No safe restoration candidate or source/artifact
-change. Await owner review of R0519-R0528. Own gate scratch build/t100-s4-p70
+change. Owner approves R0519-R0528. Own gate scratch build/t100-s4-p70
 is retired. See [P70 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p70-mode1-and-mode2-chain2-writer-review).
 
 S4 P69 repairs conditional fall-through EIP truncation in the main worktree.
