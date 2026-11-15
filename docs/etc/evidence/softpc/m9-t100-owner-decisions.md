@@ -3815,3 +3815,18 @@ Recommendation: retain the three points as native ABI/structure ownership
 adaptation, pending owner approval. No production changes or fresh runtime run.
 Next real-diff file is order 283 base/cvidc/sevid000.c. This review does not
 approve that generated-code family or assert its every patch is minimal.
+
+
+## S4 P28: approved ev_glue.c and remove zero-diff files from current list
+
+Owner explicitly approves retaining ev_glue.c R0254, R0255 and R0263, then
+requires removing all no-longer-existing differences from the current list.
+The current real-difference Markdown inventory now contains 114 files and
+P25's reconciled per-file counts. Remove the seven zero-real-diff rows:
+printer_.c, rs232_io.c, gfi.c, gfi_mpty.c, keybd_io.c, dummy_nt.c and host_hfx.h.
+Original directory ordinals remain; frozen TSV evidence is historical, not a
+pending task list. Existing excluded bodies receive no new entries. This does
+not approve unreviewed differences or remove files merely because retention
+has been approved. Next real-diff file remains order 283 sevid000.c.
+Documentation-only; no source/build/runtime changes. Documentation and
+whitespace checks pass, with no disposable build work.

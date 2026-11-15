@@ -12,7 +12,7 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 | --- | --- |
 | Identifier Mode | Continuation |
 | Admission And Approval | Owner: 好 准入新s 再次对比和审计所有镜像diff按照dir顺序来进行. Fresh audit authorized; owner subsequently approves all reviewed points in files 1-14 through fpu.c. No approval of unreviewed files. |
-| Objective | Screen the frozen 472 files in literal dir /a /b /s order; exclude 254 identical and 97 exclusion-scaffolding-only files. List the 121 real-difference files first, then audit their differences and report purpose, evidence, size and decision status. |
+| Objective | Screen the frozen 472 files in literal dir /a /b /s order; exclude 254 identical and 97 exclusion-scaffolding-only files. The frozen list began with 121 real-difference files; the current list removes zero-diff files and now contains 114. Audit their differences and report purpose, evidence, size and decision status. |
 | Non-goals | No excluded-body bookkeeping, new bug repairs, guest changes, sibling writes, unapproved semantic patches or claims that historical tests are fresh. Owner authorizes S4 P6 limiter removal and S4 P7 event-dispatch consolidation; retain all three dispatch sites and the interrupt-map accessor. P8 owner authorizes removing finite budgets and migrating tests to existing DEBUG trace/breakpoint plans. Owner accepts P8, authorizes deleting its unused executor-event declaration, and now authorizes P9 original-stack depth unification, safe TLS teardown, minimal regressions, dual publication and full tests. No snapshot schema change or duplicate depth owner. Owner now authorizes restoring the three original ntstubs empty functions with static linkage (P15); keep external original owners and verify dual artifact equivalence. P22 owner authorizes relocating the added com.c snapshot block and deleting its three added declarations; original mirror duplicates must remain unchanged. P24 owner approves printer.c cleanup and a mirror-wide sweep of the same added-diff classes: extracted excluded notices and redundant added forward declarations. No original duplicate cleanup or unrelated behavior changes. |
 | Reference Baseline | SoftPC 6ff24aee, final S3 production cda2d427; XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
 | Candidate Proposal | [S4 ordered re-audit](../proposals/m9-xp-mirror-original-first-audit.md#s4-fresh-ordered-re-audit). |
@@ -28,6 +28,12 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 | Similar-Issue Sweep | Audit the actual current universe rather than only historical patch IDs; read coupled consumers without advancing later files' audit status. |
 
 ## Current Technical Baseline
+
+S4 P28 records owner approval of ev_glue.c R0254/R0255/R0263 and updates the
+[current real-diff list](../etc/evidence/softpc/m9-t100-s4-real-diff-files.md)
+to 114 files, removing all seven now-zero-diff rows and using P25 current counts.
+Frozen TSVs remain historical; original ordinals are retained. Next is order
+283 sevid000.c. Documentation-only; S4/T100 remain open.
 
 S4 P27 records owner retention approval of printer.c's five pieces, skips
 printer_.c/rs232_io.c now without real selected differences, and presents

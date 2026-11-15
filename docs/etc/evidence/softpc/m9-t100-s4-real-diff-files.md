@@ -1,43 +1,36 @@
-# T100 S4 real-difference file list
+# T100 S4 current real-difference file list
 
-Frozen SoftPC: `6ff24aee` (production `cda2d427`). XP SP1:
-`a2f6d7c93aa4f11efc51147566d5961c59a8ef89`.
-All paths below are relative to `src/app-softpc/softpc.new/`.
+Current production: `327f996099cfd6b6851dfa40dad5220abee47e95` (P24).
+Fixed XP SP1: `a2f6d7c93aa4f11efc51147566d5961c59a8ef89`.
+All paths are relative to `src/app-softpc/softpc.new/`.
 
-## Screening result
+This is the current actionable inventory: files without real retained-content
+differences are removed, not left as pending reviews. Original literal dir
+ordinals are preserved; gaps do not imply an unfinished review.
+The [frozen file ledger](m9-t100-s4-files.tsv) and
+[frozen P2 counts](m9-t100-s4-diff-counts.tsv) remain historical evidence,
+not the current pending list. P25 reconciles all 472 identities and current
+counts in the [audit record](m9-t100-s4-audit.md#p25-accepted-p24-and-current-aggregate).
+
+## Current screening result
 
 | Disposition | Files |
 | --- | ---: |
-| Identical after CRLF/LF normalization; do not re-audit | 254 |
-| Only existing excluded bodies and line-control scaffolding differ; do not re-audit | 97 |
-| Remaining actual differences; retained for ordered review | 121 |
+| Identical after CRLF/LF normalization | 254 |
+| Only excluded-body and line-control scaffolding differences | 104 |
+| Real retained-content differences listed below | 114 |
 | Total | 472 |
 
-The [frozen file ledger](m9-t100-s4-files.tsv) records each disposition and both
-raw hashes. These are file counts, not semantic points or diff-line counts.
-The original literal dir ordering is retained, with gaps for excluded files.
+## Counting convention
 
-## Comparison boundary
-
-For text, only CRLF/LF is normalized. Binary identity uses exact bytes.
-Within the other 218 files, match conditional parent/arm positions and omit
-bodies replaced by an existing single #error; retain the surrounding conditions,
-else/endif spelling, comments and all other content for exact comparison.
-Line-control scaffolding is separated from retained content. No blanket
-whitespace/comment normalization or semantic equivalence is used.
-
-All 97 excluded files have identical retained content and conditional framing
-under that comparison. No unmatched conditional mapping is classified as equal.
-Every one of the 121 listed files has a retained-content difference, even when
-ignoring line controls; none is present solely because of a conservative
-line-control or unmatched-branch warning. Added/changed conditional frameworks
-remain real differences. gvi.h, ppi.c and nt_cga.c also need line-control review;
-that does not remove their independently confirmed retained differences.
-
-A real difference can be a historical notice, spelling/compiler accommodation,
-ABI boundary, product choice or behavioral fix. This list does not approve
-retention or declare 121 bugs. The 254+97 files are removed from the subsequent
-semantic audit workload unless their frozen bytes change.
+Counts are Git Myers zero-context text blocks, not semantic problems or approval
+counts. Omit existing #error bodies and their original counterparts; handle
+necessary #line controls separately. Keep added/changed conditional framing,
+comments, spacing and other retained-content differences. Normalize CRLF/LF
+only. Changed TLS conditions remain counted; unmatched branches are not silently
+removed. See the P2/P25 evidence for original and reconciled count methodology.
+Retained files can contain already-approved points; this list tracks existence,
+while the owner decision ledger tracks approval. No new runtime claim is made.
 
 ## Directory totals
 
@@ -45,46 +38,21 @@ semantic audit workload unless their frozen bytes change.
 | --- | ---: |
 | base/bios | 3 |
 | base/ccpu386 | 14 |
-| base/comms | 4 |
+| base/comms | 2 |
 | base/cvidc | 36 |
-| base/disks | 5 |
+| base/disks | 3 |
 | base/inc | 15 |
-| base/keymouse | 4 |
+| base/keymouse | 3 |
 | base/support | 1 |
-| base/system | 8 |
+| base/system | 7 |
 | base/video | 12 |
-| host/inc | 7 |
+| host/inc | 6 |
 | host/src | 12 |
 
-## Difference counting convention
+## Current list in original literal dir file order
 
-P2 adds exact selected-content text counts at the same frozen source hashes.
-[Machine-readable counts](m9-t100-s4-diff-counts.tsv) match the table below.
-A counted location is one Git Myers zero-context hunk (`--unified=0`), not an
-already-reviewed semantic cause. Added/deleted lines are relative to pinned XP;
-comments, blanks and unchanged conditional framing spellings are not normalized.
-Existing #error bodies and their original counterparts are omitted. Line-control
-directives are handled separately, consistently with the screening list.
-
-Modified TLS condition framing in c_main.c is matched to its original NTVDM
-branch only to identify the excluded body; the changed condition remains counted.
-For added local guards with no XP counterpart, omit only the local error body;
-keep the new framing and every original-code difference visible. No unmatched
-branch is silently removed. Both raw SHA-256 values are checked against the
-frozen ledger for every file before comparing. LF normalization is the only
-line-ending transformation; original final-newline presence is preserved.
-
-Reproduction uses selected texts and
-`git -c core.autocrlf=false diff --no-index --no-ext-diff --no-textconv --diff-algorithm=myers --unified=0`.
-Count each `@@` hunk header and its added/deleted payload lines, excluding file
-headers. Necessary-difference judgments and semantic-point totals remain subject
-to the subsequent manual file-by-file review. This read-only delivery changes no
-production, tests or artifacts and claims no new runtime qualification.
-
-## Complete list in literal dir file order
-
-| Original order | File | Diff blocks | Added | Deleted |
-| ---: | --- | ---: | ---: | ---: |
+| Order | File | Text blocks | Added | Deleted |
+| --- | --- | ---: | ---: | ---: |
 | 6 | `base/bios/reset.c` | 1 | +0 | -2 |
 | 8 | `base/bios/slave_bs.c` | 1 | +1 | -1 |
 | 9 | `base/bios/tape_io.c` | 1 | +1 | -1 |
@@ -95,17 +63,15 @@ production, tests or artifacts and claims no new runtime qualification.
 | 73 | `base/ccpu386/c_bsic.h` | 1 | +1 | -0 |
 | 74 | `base/ccpu386/c_debug.c` | 2 | +45 | -0 |
 | 78 | `base/ccpu386/c_intr.c` | 1 | +2 | -0 |
-| 80 | `base/ccpu386/c_main.c` | 29 | +136 | -16 |
+| 80 | `base/ccpu386/c_main.c` | 27 | +110 | -16 |
 | 88 | `base/ccpu386/c_page.c` | 14 | +20 | -6 |
 | 98 | `base/ccpu386/c_tlb.c` | 2 | +58 | -0 |
 | 121 | `base/ccpu386/fpu.c` | 5 | +8 | -5 |
-| 182 | `base/ccpu386/ntstubs.c` | 2 | +1 | -12 |
-| 183 | `base/ccpu386/ntthread.c` | 3 | +23 | -2 |
+| 182 | `base/ccpu386/ntstubs.c` | 4 | +4 | -4 |
+| 183 | `base/ccpu386/ntthread.c` | 5 | +36 | -3 |
 | 265 | `base/ccpu386/zfrsrvd.c` | 1 | +17 | -0 |
-| 267 | `base/comms/com.c` | 6 | +126 | -3 |
-| 268 | `base/comms/printer.c` | 3 | +74 | -0 |
-| 269 | `base/comms/printer_.c` | 1 | +1 | -0 |
-| 270 | `base/comms/rs232_io.c` | 1 | +1 | -0 |
+| 267 | `base/comms/com.c` | 5 | +122 | -3 |
+| 268 | `base/comms/printer.c` | 2 | +71 | -0 |
 | 275 | `base/cvidc/ev_glue.c` | 3 | +3 | -2 |
 | 283 | `base/cvidc/sevid000.c` | 408 | +492 | -497 |
 | 284 | `base/cvidc/sevid001.c` | 366 | +448 | -447 |
@@ -142,11 +108,9 @@ production, tests or artifacts and claims no new runtime qualification.
 | 315 | `base/cvidc/sinit012.c` | 92 | +700 | -699 |
 | 316 | `base/cvidc/sinit013.c` | 171 | +719 | -718 |
 | 318 | `base/cvidc/vglfunc.c` | 1 | +5 | -0 |
-| 319 | `base/disks/diskbios.c` | 4 | +5 | -4 |
+| 319 | `base/disks/diskbios.c` | 3 | +4 | -4 |
 | 320 | `base/disks/fdisk.c` | 2 | +120 | -0 |
-| 321 | `base/disks/fla.c` | 4 | +99 | -0 |
-| 324 | `base/disks/gfi.c` | 1 | +1 | -0 |
-| 325 | `base/disks/gfi_mpty.c` | 1 | +1 | -0 |
+| 321 | `base/disks/fla.c` | 3 | +97 | -0 |
 | 333 | `base/inc/config.h` | 2 | +2 | -2 |
 | 335 | `base/inc/cpu_vid.h` | 2 | +3 | -0 |
 | 337 | `base/inc/dma.h` | 1 | +3 | -0 |
@@ -162,19 +126,17 @@ production, tests or artifacts and claims no new runtime qualification.
 | 383 | `base/inc/sndblst.h` | 2 | +2 | -1 |
 | 386 | `base/inc/tape_io.h` | 1 | +0 | -1 |
 | 394 | `base/inc/video.h` | 1 | +4 | -0 |
-| 398 | `base/keymouse/keyba.c` | 11 | +126 | -4 |
-| 399 | `base/keymouse/keybd_io.c` | 1 | +1 | -0 |
-| 400 | `base/keymouse/mouse.c` | 15 | +116 | -34 |
-| 401 | `base/keymouse/ppi.c` | 7 | +30 | -13 |
-| 403 | `base/support/time_day.c` | 3 | +2 | -1 |
+| 398 | `base/keymouse/keyba.c` | 10 | +125 | -4 |
+| 400 | `base/keymouse/mouse.c` | 14 | +115 | -34 |
+| 401 | `base/keymouse/ppi.c` | 6 | +29 | -13 |
+| 403 | `base/support/time_day.c` | 2 | +1 | -1 |
 | 404 | `base/system/at_dma.c` | 16 | +115 | -19 |
 | 405 | `base/system/cmos.c` | 4 | +122 | -4 |
-| 406 | `base/system/dummy_nt.c` | 1 | +1 | -0 |
-| 407 | `base/system/ica.c` | 8 | +121 | -9 |
-| 410 | `base/system/quick_ev.c` | 2 | +231 | -0 |
+| 407 | `base/system/ica.c` | 7 | +120 | -9 |
+| 410 | `base/system/quick_ev.c` | 1 | +230 | -0 |
 | 411 | `base/system/rom.c` | 3 | +1 | -3 |
-| 412 | `base/system/timer.c` | 13 | +376 | -6 |
-| 414 | `base/system/unexp_nt.c` | 2 | +1 | -1 |
+| 412 | `base/system/timer.c` | 12 | +375 | -6 |
+| 414 | `base/system/unexp_nt.c` | 1 | +0 | -1 |
 | 416 | `base/video/egawrtm0.c` | 4 | +4 | -4 |
 | 419 | `base/video/ega_prts.c` | 3 | +7 | -1 |
 | 420 | `base/video/ega_read.c` | 2 | +1 | -1 |
@@ -190,7 +152,6 @@ production, tests or artifacts and claims no new runtime qualification.
 | 433 | `host/inc/cfpu_def.h` | 13 | +13 | -8 |
 | 436 | `host/inc/host_cpu.h` | 2 | +4 | -1 |
 | 437 | `host/inc/host_def.h` | 2 | +0 | -2 |
-| 440 | `host/inc/host_hfx.h` | 1 | +1 | -0 |
 | 444 | `host/inc/insignia.h` | 3 | +10 | -1 |
 | 453 | `host/inc/nt_graph.h` | 1 | +2 | -1 |
 | 455 | `host/inc/nt_sb.h` | 4 | +52 | -2 |
@@ -200,10 +161,10 @@ production, tests or artifacts and claims no new runtime qualification.
 | 460 | `host/src/nt_keycd.c` | 4 | +2 | -173 |
 | 461 | `host/src/nt_munge.c` | 6 | +25 | -1 |
 | 462 | `host/src/nt_sb.c` | 24 | +147 | -376 |
-| 463 | `host/src/nt_sbdsp.c` | 60 | +524 | -1000 |
+| 463 | `host/src/nt_sbdsp.c` | 60 | +523 | -1000 |
 | 464 | `host/src/nt_sbfm.c` | 4 | +20 | -102 |
 | 465 | `host/src/nt_sbmid.c` | 33 | +285 | -399 |
 | 466 | `host/src/nt_sbmxr.c` | 6 | +48 | -0 |
 | 467 | `host/src/nt_sound.c` | 12 | +7 | -80 |
 | 468 | `host/src/nt_vga.c` | 13 | +37 | -16 |
-| **Total** | **121 files** | **15778** | **+24764** | **-24069** |
+| **Total** | **114 files** | **15761** | **+24728** | **-24062** |
