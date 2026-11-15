@@ -5242,3 +5242,77 @@ gates pass in both suites. Review covers the actual five changed C files and
 both apply_display consumers, not only test summaries. No new manual guest
 acceptance or exhaustive Console-host/version coverage is claimed.
 S4/T100 remain open; this P waits for owner acceptance.
+
+## S4 P52: PPI file review
+
+Owner accepts P51 and requests the next file, ppi.c, with all differences,
+size, purpose, strong evidence and restoration candidates. P51 is accepted;
+this review does not approve ppi.c retention or a snapshot schema change.
+Fixed source is XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89,
+base/keymouse/ppi.c; current source is unchanged from 17bccc35.
+Existing #error bodies and necessary #line controls are excluded without a
+new exclusion ledger. R0468's extracted notice is already gone.
+
+Six actual text blocks, +27/-13 (net +14), form three semantic groups:
+
+| Point | Current physical line / change | Size | Purpose and disposition |
+| --- | --- | --- | --- |
+| R0471a | 45, snapshot.h include | +1/-0 | Declaration owner for private PPI archive access; retain with that capability. |
+| R0469a | 68, remove SPKRDATA_was_low | +0/-1 | Remove the state of the unused legacy speaker-notification route. |
+| R0469b | 141, remove legacy speaker edge body | +0/-11 | Avoid invoking the bit-1-only path before timer_gate. |
+| R0469c | 162, extend original HostPpiState selector | +1/-1 | Use original complete post-gate host sound route in the supported standalone build. |
+| R0470 | 195, reset gate history | +1/-0 | Cold/repeated initialization consistency; retain recommendation. |
+| R0471b | 200-224, capture/restore | +24/-0 | Snapshot capability; two lines associated with derived speaker_data_was_low are not independently needed. |
+
+R0469 total +1/-13 is host-boundary selection, not a claim that original XP's
+NTVDM configuration was defective. Both cached compile commands compile this
+file with SOFTPC_STANDALONE=1 and without NTVDM/NEC_98; CMakeLists.txt lists
+ppi.c and original nt_sound.c. Port 61h reaches registered ppi_outb. Its
+selected HostPpiState runs after timer_gate; nt_sound.c:243 records bit 0 and
+bit 1, and PlaySound:173 uses both with FreqT2. Original non-NTVDM callbacks
+only occur on bit-1 edges and have no port-value argument. A 3->2 transition
+changes bit 0 without a bit-1 edge: the legacy-only route cannot notify this
+host owner of that changed bit. Compat audio.c:29 retains disable only for
+BIOS reset.c:636. Restoring the legacy body/selector without changing the
+sound host architecture loses this full-state notification; implementing another
+interpreter in Compat would duplicate the original owner. The empty non-NTVDM
+frameworks intentionally retain selected-content omissions, not #error branches.
+No source-based case for an equivalent local restoration was found.
+
+R0470 is a repeated cold-initialization boundary, not a new device reset
+protocol. BIOS reset.c:724 calls ppi_init. A prior bit-0-high write leaves
+gate_2_was_low false; XP ppi_init zeros ppi_register but leaves that history.
+The next high write then skips timer_gate(RISE). S1 P103 records paired actual
+PPI objects: current passes direct register/gate assertions on x86/x64;
+removing only this line fails the gate assertion on both. The timing-bearing
+sound failure in that investigation was not its decisive proof. Current
+sound_smoke still checks reset register/gate and runs two real guest sound
+program executions separated by Machine reset. P51 full tests passed these
+fixtures; no fresh ablation is claimed by P52.
+
+R0471 is snapshot capability, not an original defect. archive.c:154/222 uses
+both accessors; ppi_inb toggles 0x30 and ppi_outb masks the register, changes
+gate history and triggers side effects. Those ports cannot non-destructively
+capture and restore the same private phase. Restore notifies existing original
+HostPpiState after restoring the fields; archive restores PIT before PPI.
+Current checkpoint_smoke:706-713 exercises the actual roundtrip after port
+writes. This establishes the capability's need, not every serialized field.
+
+Fresh whole-src/test search finds speaker_data_was_low only in this capture,
+its range check, the struct, wire map and roundtrip assertion. Capture derives
+it from register bit 1; restore does not consume it for device behavior.
+Therefore its assignment and the extra validation operand lack independent
+runtime necessity. Recommend a separately approved coherent removal of the
+field, wire entry and assertion with the corresponding two mirror lines; keep
+register/gate capture and HostPpiState. That reduces real XP additions by two,
+not restoration of the complete snapshot block. It changes serialized layout;
+do not leave an uninitialized wire byte, add old-format recognition, or silently
+invalidate/convert the user snapshot in this read-only audit. Current schema
+and asset remain unchanged. Prior blanket necessity reasoning for this field
+is superseded; an existing format alone is not semantic necessity evidence.
+
+Evidence boundaries: fresh pinned-source/caller/compile-command review, S1
+P103 historical negative controls, and accepted P51 full 392/392 are distinct.
+P52 adds no new runtime test, manual guest claim, production diff or binary.
+All three groups await owner disposition. Next real-difference file is order
+404 base/system/at_dma.c; ios.c has no real diff and is not reintroduced.

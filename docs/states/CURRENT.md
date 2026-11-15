@@ -29,6 +29,15 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P52 reviews order 401 ppi.c against pinned XP: six text blocks +27/-13,
+three semantic groups. Original-host speaker selection and cold gate reset
+have caller/state evidence; snapshot private-state access is needed, but its
+derived speaker_data_was_low wire field is redundant and is a cleanup candidate.
+No source/test/artifact changes; P51 full 392/392 remains historical qualification.
+No retention or schema-change approval is inferred. See the
+[P52 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p52-ppi-file-review).
+
+
 S4 P51 narrows owner-approved R0466 to cold initialization and restores XP
 guest device-reset data behavior. Owner also approves correcting Console
 metadata endpoints and removing helper re-expansion; cooked restoration rejects
@@ -40,7 +49,7 @@ retry or skip in this final run. Earlier failures and isolated comparisons
 remain recorded as investigation evidence. Production +10/-16 (net -6), tests
 +47/-21 (net +26); fixed-XP mirror diff decreases two lines. Actual-diff
 self-review finds no added API, state, recovery path or snapshot change.
-P51 awaits owner acceptance after commit/push; S4/T100 remain open at mouse.c.
+Owner accepts P51 (17bccc35). P52 reviews ppi.c; S4/T100 remain open.
 See [P51 evidence](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p51-confine-r0466-data-reset-to-cold-initialization).
 
 S4 P50 restores owner-approved R0463 to original finite InPort bursts,
@@ -54,7 +63,7 @@ Final cached dual publication and full tests pass 392/392 after correcting the
 recorded fixture assumption and restore-order defect. Production +45/-73
 (net -28), tests +38/-78 (net -40); real XP diff decreases 90 changed lines.
 Self-review and gates pass. See [P50 evidence](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p50-restore-original-inport-bursts-and-current-snapshot).
-P50 is owner accepted. P51 is active; S4/T100 remain open at mouse.c.
+P50/P51 are owner accepted. P52 is the current ppi.c review; S4/T100 remain open.
 
 S4 P49 completes owner-requested isolated x64 coherent-original/current
 R0463 comparison: identical cold-boot overlay media, real Win1.01/Win3.1
