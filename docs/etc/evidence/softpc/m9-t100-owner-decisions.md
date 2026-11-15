@@ -3777,3 +3777,41 @@ Recommendation: retain all five functional pieces. The include plus four
 functions form one existing snapshot path; no remaining same-class duplicate
 forward declarations or extracted notice. No further behavior-preserving
 reduction is established by this review. No production changes or runtime rerun.
+
+
+## S4 P27: printer approved; ev_glue.c ordered review
+
+Owner explicitly approves retaining all five printer.c pieces in P26 (R0207,
+remaining R0212). R0206 and the removed added declarations stay removed.
+Skip frozen reviews 20/21, printer_.c and rs232_io.c: P24 removed their only real
+selected differences. Next substantive file is frozen review 22 / order 275,
+base/cvidc/ev_glue.c. Compare current source to pinned XP: three text points,
++3/-2, unchanged since the frozen count. Existing excluded body is not audited.
+
+| ID / current anchor | + / - | Purpose | Evidence / limit |
+| --- | --- | --- | --- |
+| R0254 line 30 gdp_slots.h include | 1 / 0 | Native-width GDP access contract | setup_vga_globals uses mapped VGAGlobals and three SubrRing slots. Original fixed offsets 8/12/16 overlap eight-byte pointers. Must be assessed with R0263. |
+| R0255 line 35 angle-bracket Evid_c.h | 1 / 1 | One existing CCPU aggregate layout | Current compile include order selects base/ccpu386 before base/cvidc; quotes instead select the adjacent C-VID header. video_base_ls0 is a pointer while video_base_lin_addr is IU32. Historical actual x64 VGA control crashes when only quoted selection is restored. |
+| R0263 line 793 softpc_gdp_create | 1 / 1 | Construct the same GDP owner consumed by mapped slots | Original 64 KiB allocation is not this slot carrier. Historical coherent raw-allocation plus direct-macro restoration fails two of three ring pointer checks on x64; x86 passes. |
+
+Fresh source inspection checks actual dual compile flags/include order, original
+ring offsets, current slot mappings/create/destroy, EGA_CPU.globals assignment,
+and machine teardown's softpc_gdp_destroy_global. The owner stores native-width
+slots separately and has matching destruction; it is not an extra tracing or
+CHAIN2 implementation. Original Gdp/j_Gdp declarations/definitions remain.
+
+Historical S1 extended controls used actual initialization bodies, restoring
+both allocation and original direct macros together: x86 current/original all
+three pointers match; x64 current 1/1/1, original ptr/low/high 0/0/1. This proves
+initialization ABI overlap, not a full original guest run. Header measurements:
+x64 CCPU/CVID aggregate size 240/232, later offsets 168/160 and 236/228; x86
+both 156. Quoted-header actual VGA test passes x86, x64 exits 3221225477.
+Those negative controls were not rerun this review. Current P24 392/392 includes
+current video tests; it does not prove every generated rule or hypothetical
+coherent rewrite. No evidence justifies restoring one consumer inconsistently,
+or duplicating/changing the aggregate family merely to remove an include diff.
+
+Recommendation: retain the three points as native ABI/structure ownership
+adaptation, pending owner approval. No production changes or fresh runtime run.
+Next real-diff file is order 283 base/cvidc/sevid000.c. This review does not
+approve that generated-code family or assert its every patch is minimal.

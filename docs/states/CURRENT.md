@@ -29,6 +29,14 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P27 records owner retention approval of printer.c's five pieces, skips
+printer_.c/rs232_io.c now without real selected differences, and presents
+base/cvidc/ev_glue.c (frozen review 22 / order 275): three points +3/-2.
+GDP include/allocation and CCPU aggregate selection are native ABI adaptations;
+actual callers/flags and historical independent controls support retention with
+stated limits. No source change or fresh runtime test. Owner decision pending;
+next real-diff file is order 283 sevid000.c. S4/T100 remain open.
+
 S4 P26 rechecks current printer.c: two selected text blocks +71/-0, comprising
 one include and four snapshot functions (65 function lines plus five separators).
 All are snapshot integration, with actual callers, current P24 checkpoint proof
