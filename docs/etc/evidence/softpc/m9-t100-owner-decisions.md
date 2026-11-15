@@ -3660,3 +3660,49 @@ old/new symbol tables confirm changed function positions. For example x64
 com_recv_char moves 0x2530 ->0x1da0 while snapshot encode moves 0x1da0 ->0x2300.
 No behavior proof is inferred from layout alone; full runtime qualification is
 recorded in the P22 audit evidence.
+
+
+## S4 P23: com.c accepted; printer.c review 19 / order 268
+
+Owner says "好 批准 下一个文件" after P22 delivery: com.c reviewed retained
+points R0174/R0178/R0181/R0186/R0199 and P22 cleanup are accepted. Removed
+notice/declarations remain removed. Advance presentation to printer.c only.
+
+Fresh comparison against pinned XP SP1 finds three nonexcluded text points,
++74/-0 (line-control directives excluded), matching the frozen row:
+
+| Point | Current anchor | Size | Purpose and disposition |
+| --- | --- | --- | --- |
+| R0206 | printer.c:69 | +1/-0 | Extracted SCCSID notice outside excluded branch; same issue as com.c P20. Recommend removal under owner's existing excluded-content rule; not a runtime capability. |
+| R0207 | printer.c:106 | +1/-0 | Snapshot declaration include, consumed by four functions below. Retain recommendation pending review. |
+| R0212 | printer.c:228-299 | +72/-0 | Private parallel controller snapshot and semantic event callback mapping, including two added forward declarations. Retain capability; two declarations can be avoided by moving extension after original definitions within PRINTER scope. |
+
+The actual root CMake compiles printer.c; host/inc/host_def.h defines PRINTER.
+Original selected lpr_state_outa_event/lpr_state_out_event definitions are at
+current lines 374/380 (XP 351/357). The added declarations are not original
+mirror duplicates. Relocation must remain within the original PRINTER guard;
+no original definition or original duplicate declaration should be removed.
+Candidate reduction: one extracted notice plus two added declarations, reducing
+selected XP +74/-0 to +71/-0. No production modification in this review.
+
+The original controller owns output/control/status, READY/OUT/OUTA, event handles
+and retryErrorCount. Compat parallel.c instead owns host output buffering and
+resource state. archive.c actually calls both layers and registers the two
+callback mappings. Reading status advances ACK/state; writing control can schedule
+output, so port replay cannot restore the private state without side effects.
+Moving these static arrays to Compat or duplicating them is not a simplification.
+
+Current checkpoint fixture first mutates/restores controller and host state,
+then writes 33h, captures a pending printer ACK, changes data to 00h, clears the
+queue, restores archive, asserts actual data-port 33h and dispatches the event.
+Historical S1 P23 independent controls showed missing callback mapping fails
+capture and missing controller restore fails the data assertion on both widths.
+Those negative controls were read, not freshly rerun. Current P22 full 392/392
+qualification includes this checkpoint test. No physical printer, exhaustive
+ACK-state/timing matrix or manual guest print-job proof is claimed.
+
+Source review finds no original-device bug repair here: remaining functional
+diff implements snapshot capability, not printer emulation replacement. Four
+function bodies need no new abstraction or second path. No new runtime test or
+source change for this documentation-only review. Frontier 19/121, 102 remain;
+next is order 269 comms/printer_.c. Candidate cleanup awaits this file's review.

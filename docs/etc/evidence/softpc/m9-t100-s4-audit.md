@@ -658,3 +658,14 @@ combination proof is claimed. Actual-change self-review finds no blocking issue.
 Documentation, fixed-XP manifest and whitespace checks pass. Owned jobs completed;
 concise evidence is retained here and disposable task scratch is removed before
 delivery, preserving reusable caches. S4/T100 stay open at review file 18.
+
+
+## P23 printer.c ordered review
+
+Owner accepts com.c after P22. Fresh pinned-XP comparison and current caller,
+compile-definition, original callback and checkpoint-fixture review covers
+printer.c (19/121, order 268), +74/-0 in three text points. Decision ledger
+records snapshot necessity, historical negative controls, limits and a three-line
+reduction candidate (notice plus two added declarations). No production change,
+new runtime proof or general approval of unreviewed files. Documentation,
+manifest and whitespace gates pass; no disposable build work is created.

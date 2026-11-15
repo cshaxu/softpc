@@ -29,6 +29,14 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P23 records owner acceptance of com.c and presents printer.c, review 19 /
+order 268: three selected text points +74/-0. Snapshot include/controller/event
+mapping have actual production callers and historical negative-control evidence.
+One extracted notice and two added declarations can be removed by the same
+minimal cleanup approach, yielding +71/-0; no source change yet. Details and
+proof limits are in the owner decision ledger. 19/121 presented, 102 remain;
+printer_.c is next. S4/T100 remain open.
+
 S4 P22 implements the owner-approved com.c declaration cleanup: move the added
 snapshot block after original declarations and remove only its three added
 forward declarations. Original mirror duplicates remain untouched. Production
@@ -38,7 +46,7 @@ or skips. Function placement changes prevent using the binary-equivalence
 exception. Exact source reconstruction and actual-diff self-review confirm no
 other source change, snapshot-format change or new path. See
 [P22 evidence](../etc/evidence/softpc/m9-t100-s4-audit.md#p22-added-uart-declaration-cleanup).
-Await owner review; S4/T100 and the file-18 frontier remain open.
+Owner accepts P22 and the reviewed com.c points; S4/T100 remain open.
 
 S4 P21 rechecks the five remaining com.c points. A concrete source-only
 candidate relocates the added snapshot block after original declarations,
