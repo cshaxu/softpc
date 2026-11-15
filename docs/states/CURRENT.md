@@ -29,6 +29,14 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P38 records owner approval of egaports.h R0428 and reviews order 359
+gvi.h R0434: one block +2/-0 excluding necessary diagnostic line control.
+The lane-preserving CHAIN2 offset macro serves the real painter/update paths;
+historical dual-architecture direct-offset controls fail the text-cell oracle.
+No equivalent restoration identified; R0434 awaits approval. No production
+change or fresh runtime test. Next real-diff file is order 367 ica.h.
+S4/T100 remain open.
+
 S4 P37 records owner approval of egacpu.h R0426 and reviews order 342
 base/inc/egaports.h: one declaration, R0428, +1/-0. Current production
 painters and dirty-neighbour marking consume the original-register query;

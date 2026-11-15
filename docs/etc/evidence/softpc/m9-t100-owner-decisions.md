@@ -4211,3 +4211,59 @@ Production/test/manifest/EXE changes: none. Documentation, mirror-manifest and
 whitespace gates apply. Next real-diff file is order 359 base/inc/gvi.h;
 order 358 gmi.h has no real difference after P34 and remains excluded from
 the actionable list. S4/T100 remain open.
+
+
+## S4 P38: owner approves panning declaration; gvi.h review
+
+Owner explicitly approves retaining R0428; P37's pending decision is resolved.
+Order 359 base/inc/gvi.h has one real retained block, R0434, +2/-0: the
+reason comment and get_chain2_screen_ptr macro at physical lines 292-293.
+The adjacent #line 491 restores the XP diagnostic position and is excluded
+from current real-diff accounting. Historical P85's +3 count included this
+line; it is not an additional semantic point or a new source reduction.
+A fresh complete comparison against pinned XP SP1 confirms every other
+change is an existing excluded body or diagnostic line control, not a new
+selected-content difference. Those exclusions are not reopened or inventoried.
+
+Category: CHAIN2/odd-even display layout correctness, not snapshot machinery
+or an x64-only compilation adaptation. The original get_screen_ptr remains
+unchanged. The additional macro maps the group address to the four-plane
+backing while preserving the low two lane bits: offsets 0,1,4,5,12,13 become
+0,1,8,9,24,25. Blind multiplication by two would map attribute 13 to 26,
+which is incorrect. The operation derives an address, with no additional
+state, allocation, rendering path or guest modification.
+
+Fresh source tracing finds all production references in nt_cga.c and
+gfx_updt.c only. nt_text at nt_cga.c:228 translates the initial offset,
+then copies four-byte cells at an eight-byte source step. gfx_updt applies
+the same address contract to dirty-region origins, wrapping/split paths,
+cursor attributes (1204), and selected display operations. These are real
+production files; no equivalent Compat-owned mapping is available to remove
+this declaration. Keeping zero-offset uses in the same pattern preserves
+one addressing contract even though their numerical result is unchanged.
+
+Current verify_text_stride in vga_frame_smoke.c uses widths 40/80/100/132,
+multiple pitches, full and partial regions, and one/three rows. Its expected
+buffer is independently assembled from source cell indices with an eight-byte
+stride, not through this macro. Partial origin x=3 exercises logical offset
+12 and backing offset 24. Historical S1 P85 recompiled BOTH actual consumers
+with their real Ninja flags and the macro changed to original direct
+get_screen_ptr; both architectures compiled/linked, then failed the same
+full-cell assertion. Unchanged controls passed. This is dynamic real-painter
+proof, not merely evidence that new callers require a new symbol. P85 also
+links the independent BIOS/C-VID layout evidence including R0362. It is not
+a fresh guest reproduction or a coherent reversal of every coupled layout
+patch. This P rechecks source and historical records, not a new runtime run.
+
+Counter-review: deleting the macro breaks its callers; mapping it directly
+to get_screen_ptr restores the demonstrated wrong address. Changing the
+original generic accessor would affect non-CHAIN2 consumers. Inlining the
+conversion across the two files increases repetition and diff. The one-line
+reason records why lane bits must be preserved; no redundant explanation or
+format-only difference was found. Recommend retain R0434 with its established
+layout contract, pending owner approval. Later implementation files retain
+their own separate ordered reviews.
+
+Production/tests/EXEs unchanged. Documentation, mirror and whitespace gates
+apply. Next actionable file is order 367 base/inc/ica.h; intervening files
+have no current real diff. S4/T100 remain open.
