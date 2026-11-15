@@ -12,27 +12,30 @@ This section records the fresh 121-file manual review, in frozen directory
 order. Historical IDs below identify locations, not inherited approvals.
 After each file is presented, append its point classifications, XP-relative
 added/deleted lines, evidence limits and explicit owner disposition here.
-A request for the next file advances presentation only; it does not approve
-retention. Only reset.c has explicit fresh retention approval so far.
+Owner now explicitly approves all points already reviewed in files 1-11
+(through ccpu386/c_main.c): "之前所有diff点位记得标记为批准".
+This supersedes their earlier recommendation/pending status, not their evidence
+limits. Restored/deleted points remain restored/deleted; they are not reinstated.
+File 12 onward remains pending until reviewed and explicitly approved.
 Existing #error bodies and separately counted line controls remain excluded.
 
 | Review / order | File under base/ | Points | Actual purpose | + / - | Fresh disposition / evidence limit |
 | --- | --- | --- | --- | --- | --- |
 | 1 / 6 | bios/reset.c | R0006 | Product boundary: retired software mouse-driver lifecycle calls | 0 / 2 | Retain approved by owner; hardware mouse initialization remains. |
-| 2 / 8 | bios/slave_bs.c | R0008 | Original device defect: slave PIC EOI command port | 1 / 1 | Retain recommended; actual BOP/PIC path checked; fixture read, not rerun. |
-| 3 / 9 | bios/tape_io.c | R0010 | Selected CPU interface declaration: descriptor limit sys_addr pointer | 1 / 1 | Retain recommended; provider/caller agree; no demonstrated runtime truncation. |
-| 4 / 41 | ccpu386/c-files | R0014 (nine entries) | Product build subset: six SPC486 workers, two PIG workers, unused NOP | 0 / 9 | Retain recommended; actual CMake consumer and XP guards checked. Not an algorithm repair. |
-| 5 / 42 | ccpu386/call.c | R0015 | Original CPU defect: destination SS determines stack address width | 1 / 1 | Retain recommended; source proof; no fresh executed call-gate transition test. |
-| 6 / 47 | ccpu386/ccpusas4.c | R0018, R0021, R0022 | Snapshot: private SAS state declaration/capture/restore | 56 / 0 | Retain recommended; archive callers checked; not exhaustive snapshot-state proof. |
-| 6 / 47 | ccpu386/ccpusas4.c | R0019, R0020 | Host pointer ABI: typed RAM init/term declarations | 2 / 0 | Retain recommended; pointer-return provider verified; x64 truncation risk, not every allocation reproduced. |
-| 6 / 47 | ccpu386/ccpusas4.c | R0024 | Original memory defect: complete physical read span bound | 1 / 1 | Retain recommended; terminal-span source example; no fresh test run. |
-| 6 / 47 | ccpu386/ccpusas4.c | R0026, R0027, R0030, R0033-R0035 | Original permission defect: six CPL3 user-access predicates | 6 / 6 | Retain recommended; controlled existing fixture is not exhaustive paging/V86 proof. |
-| 6 / 47 | ccpu386/ccpusas4.c | R0028, R0029, R0031, R0032 | Original data-width defect: four WORD/DWORD fallback casts | 4 / 4 | Retain recommended; original IU8 truncation verified; existing tests not rerun. |
-| 7 / 64 | ccpu386/cpu4gen.h | R0038-R0041 | C declaration consistency: four segment setter returns | 4 / 4 | Retain recommended; original ISM32 providers verified; not a reproduced guest failure. |
-| 7 / 64 | ccpu386/cpu4gen.h | R0042-R0050 | C declaration consistency: nine flag getter returns | 9 / 9 | Retain recommended; equal storage width does not make C types identical. |
-| 8 / 73 | ccpu386/c_bsic.h | R0051 | C declaration completeness: internal EFLAGS getter | 1 / 0 | Retain recommended; actual IU32 provider/callers checked; no proven EFLAGS truncation. |
-| 9 / 74 | ccpu386/c_debug.c | R0053-R0055 | Snapshot: private instruction/data breakpoint caches | 45 / 0 | Retain recommended; DR7 alone cannot preserve observed cache state; fixture read, not rerun. |
-| 10 / 78 | ccpu386/c_intr.c | R0057 | Interrupt delivery boundary: reject PIC no-vector sentinel | 2 / 0 | Retain recommended; independent NPX caller checked; no traced guest NPX incident. |
+| 2 / 8 | bios/slave_bs.c | R0008 | Original device defect: slave PIC EOI command port | 1 / 1 | Retain approved by owner; actual BOP/PIC path checked; fixture read, not rerun. |
+| 3 / 9 | bios/tape_io.c | R0010 | Selected CPU interface declaration: descriptor limit sys_addr pointer | 1 / 1 | Retain approved by owner; provider/caller agree; no demonstrated runtime truncation. |
+| 4 / 41 | ccpu386/c-files | R0014 (nine entries) | Product build subset: six SPC486 workers, two PIG workers, unused NOP | 0 / 9 | Retain approved by owner; actual CMake consumer and XP guards checked. Not an algorithm repair. |
+| 5 / 42 | ccpu386/call.c | R0015 | Original CPU defect: destination SS determines stack address width | 1 / 1 | Retain approved by owner; source proof; no fresh executed call-gate transition test. |
+| 6 / 47 | ccpu386/ccpusas4.c | R0018, R0021, R0022 | Snapshot: private SAS state declaration/capture/restore | 56 / 0 | Retain approved by owner; archive callers checked; not exhaustive snapshot-state proof. |
+| 6 / 47 | ccpu386/ccpusas4.c | R0019, R0020 | Host pointer ABI: typed RAM init/term declarations | 2 / 0 | Retain approved by owner; pointer-return provider verified; x64 truncation risk, not every allocation reproduced. |
+| 6 / 47 | ccpu386/ccpusas4.c | R0024 | Original memory defect: complete physical read span bound | 1 / 1 | Retain approved by owner; terminal-span source example; no fresh test run. |
+| 6 / 47 | ccpu386/ccpusas4.c | R0026, R0027, R0030, R0033-R0035 | Original permission defect: six CPL3 user-access predicates | 6 / 6 | Retain approved by owner; controlled existing fixture is not exhaustive paging/V86 proof. |
+| 6 / 47 | ccpu386/ccpusas4.c | R0028, R0029, R0031, R0032 | Original data-width defect: four WORD/DWORD fallback casts | 4 / 4 | Retain approved by owner; original IU8 truncation verified; existing tests not rerun. |
+| 7 / 64 | ccpu386/cpu4gen.h | R0038-R0041 | C declaration consistency: four segment setter returns | 4 / 4 | Retain approved by owner; original ISM32 providers verified; not a reproduced guest failure. |
+| 7 / 64 | ccpu386/cpu4gen.h | R0042-R0050 | C declaration consistency: nine flag getter returns | 9 / 9 | Retain approved by owner; equal storage width does not make C types identical. |
+| 8 / 73 | ccpu386/c_bsic.h | R0051 | C declaration completeness: internal EFLAGS getter | 1 / 0 | Retain approved by owner; actual IU32 provider/callers checked; no proven EFLAGS truncation. |
+| 9 / 74 | ccpu386/c_debug.c | R0053-R0055 | Snapshot: private instruction/data breakpoint caches | 45 / 0 | Retain approved by owner; DR7 alone cannot preserve observed cache state; fixture read, not rerun. |
+| 10 / 78 | ccpu386/c_intr.c | R0057 | Interrupt delivery boundary: reject PIC no-vector sentinel | 2 / 0 | Retain approved by owner; independent NPX caller checked; no traced guest NPX incident. |
 
 Classification totals for these ten files only:
 
@@ -52,8 +55,10 @@ claimed. The following entry advances the presentation frontier; the ten-file ca
 
 ### Review 11 / order 80: ccpu386/c_main.c
 
-Frozen selected-content diff: 29 text hunks, +136/-16. All previous approvals
-remain revoked; this file is presented, not approved. The current 11-file total
+Frozen selected-content diff: 29 text hunks, +136/-16. Owner now approves
+all surviving points after P6-P9; restored points stay removed. Current
+selected-content diff is +110/-16. The following table is the original review
+classification; subsequent P6-P9 dispositions supersede removed entries. The current 11-file total
 is 70 text hunks, +269/-54 (323 added+deleted lines). The table below classifies
 all remaining historical point IDs without counting shared includes twice.
 It does not assign text hunk boundaries to semantic categories or replace the
@@ -61,17 +66,17 @@ frozen count ledger with historical anchored line estimates.
 
 | Points | Actual classification | Current evidence / disposition |
 | --- | --- | --- |
-| R0059, R0085, R0106, R0109, R0111, R0112 | Selected-host execution ABI: original TLS simulation stack; two jmp_buf pointer dereferences | ntthread.c supplies jmp_buf pointers. Six NTVDM condition extensions select the existing TLS path without enabling all NTVDM. Recommend retain; no exhaustive longjmp proof. |
-| R0060, R0062-R0064, R0066-R0067 | C declaration consistency/completeness | c_addr/c_seg/ica/timer headers and force_yoda/TakeNpxExceptionInt declarations; actual original providers, no new algorithms. Recommend retain. |
-| R0061 | Lifecycle interface declaration (also used by snapshot continuation) | Shared include for the existing lifecycle owner; counted once. Recommend retain with represented hooks. |
-| R0065, R0078-R0079, R0084, R0086, R0091, R0104 | Snapshot state and continuation | Save DR/TR, interrupt map and sampled trap; restore HLT/fetch phase rather than restart at arbitrary instruction boundary. Existing archive/lifecycle consumers; recommend retain. |
-| R0068, R0070-R0075, R0093-R0094, R0097, R0099, R0101-R0102 | Executor integration: queued clock/control, HLT wait, quick-loop escape, pacing | platform.c owns the queue/wait/timing functions. Three consumption positions have distinct incoming paths. Recommend preserving required integration; do not claim pacing is polling-free or proven minimal. |
+| R0059, R0085, R0106, R0109, R0111, R0112 | Selected-host execution ABI: original TLS simulation stack; two jmp_buf pointer dereferences | ntthread.c supplies jmp_buf pointers. Six NTVDM condition extensions select the existing TLS path without enabling all NTVDM. Owner-approved retention; no exhaustive longjmp proof. |
+| R0060, R0062-R0064, R0066-R0067 | C declaration consistency/completeness | c_addr/c_seg/ica/timer headers and force_yoda/TakeNpxExceptionInt declarations; actual original providers, no new algorithms. Owner-approved retention. |
+| R0061 | Lifecycle interface declaration (also used by snapshot continuation) | Shared include for the existing lifecycle owner; counted once. Owner-approved retention with represented hooks. |
+| R0065, R0078-R0079, R0084, R0086, R0091, R0104 | Snapshot state and continuation | Save DR/TR, interrupt map and sampled trap; restore HLT/fetch phase rather than restart at arbitrary instruction boundary. Existing archive/lifecycle consumers; owner-approved retention. |
+| R0068, R0070-R0075, R0093-R0094, R0097, R0099, R0101-R0102 | Executor integration: queued clock/control, HLT wait, quick-loop escape, pacing | platform.c owns the queue/wait/timing functions. Three consumption positions have distinct incoming paths. Owner approves preserving required integration; do not claim pacing is polling-free or proven minimal. |
 | R0103 | Finite-run product capability | NEXT_INST consumes budget, preserves reset priority and requests outer exit. Entry-boundary consumption is not proof of exact retired-instruction counting. Keep this limitation explicit. |
-| R0076, R0087-R0090, R0095-R0096 | Host debugger capability | debug.c begin/refetch plus five retirement edges (POP SS, MOV SS, IRET, STI, ordinary). Separate from guest DR snapshot state. Recommend retain; no full instruction-edge matrix executed this round. |
+| R0076, R0087-R0090, R0095-R0096 | Host debugger capability | debug.c begin/refetch plus five retirement edges (POP SS, MOV SS, IRET, STI, ordinary). Separate from guest DR snapshot state. Owner-approved retention; no full instruction-edge matrix executed this round. |
 | R0077 | Private-state exposure for product integration | Writable interrupt-map address used by lifecycle clear and Compat keymouse/cpu4.h for original keyboard wiring. Earlier clear-only rationale is incomplete. Do not infer smallest possible API solely from callers. |
-| R0107 | PIC deassertion integration | c_cpu_clearHwInt clears the existing CPU_HW_INT_MASK; platform.c consumes it. Recommend retain; not a second IRQ model. |
-| R0108, R0110 | Lifecycle nesting ownership | Enter/leave hooks track original nested simulation frames for safe outer return/checkpoint. Recommend retain with existing owner. |
-| R0100 | Interrupt-boundary correction | Reject PIC sentinel before EXT/SYNCH_TICK/interrupt delivery; callee guard is later. Recommend retain. |
+| R0107 | PIC deassertion integration | c_cpu_clearHwInt clears the existing CPU_HW_INT_MASK; platform.c consumes it. Owner-approved retention; not a second IRQ model. |
+| R0108, R0110 | Lifecycle nesting ownership | Enter/leave hooks track original nested simulation frames for safe outer return/checkpoint. Owner-approved retention with existing owner. |
+| R0100 | Interrupt-boundary correction | Reject PIC sentinel before EXT/SYNCH_TICK/interrupt delivery; callee guard is later. Owner-approved retention. |
 
 Fresh inspection covered current source differences, ntthread pointer providers,
 lifecycle.c, platform.c, machine/debug.c and the keymouse map adapter. Historical

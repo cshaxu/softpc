@@ -511,3 +511,8 @@ and narrow test updates. Include P8's leftover unused declaration cleanup.
 Snapshot schemas and guest data remain unchanged. Verify real nested/exception/
 outer exit and HLT paths, old/new snapshot interoperability, dual cached builds,
 publication and full regression. Wait for owner acceptance; no S4 closure.
+
+S4 owner subsequently approves all already-reviewed points in files 1-11,
+through c_main.c after P6-P9. Record retention approval in the current
+file-by-file decision ledger without reviving removed differences or upgrading
+evidence strength. Continue with c_page.c; unreviewed points remain pending.

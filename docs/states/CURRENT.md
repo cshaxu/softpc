@@ -3,15 +3,15 @@
 ## Current Work
 
 Owner admits M9 T100 S4 for a fresh ordered audit of all current mirror
-differences. T100 remains open; S1-S3 stay closed. No previous retention
-approval or automatic small-diff delegation is restored.
+differences. T100 remains open; S1-S3 stay closed. Owner explicitly approves all points reviewed in files 1-11 through c_main.c.
+Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## M9 T100 S4 Packet
 
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner: 好 准入新s 再次对比和审计所有镜像diff按照dir顺序来进行. Fresh audit authorized; no inherited retention approvals. |
+| Admission And Approval | Owner: 好 准入新s 再次对比和审计所有镜像diff按照dir顺序来进行. Fresh audit authorized; owner subsequently approves all reviewed points in files 1-11 through c_main.c. No approval of unreviewed files. |
 | Objective | Screen the frozen 472 files in literal dir /a /b /s order; exclude 254 identical and 97 exclusion-scaffolding-only files. List the 121 real-difference files first, then audit their differences and report purpose, evidence, size and decision status. |
 | Non-goals | No excluded-body bookkeeping, new bug repairs, guest changes, sibling writes, unapproved semantic patches or claims that historical tests are fresh. Owner authorizes S4 P6 limiter removal and S4 P7 event-dispatch consolidation; retain all three dispatch sites and the interrupt-map accessor. P8 owner authorizes removing finite budgets and migrating tests to existing DEBUG trace/breakpoint plans. Owner accepts P8, authorizes deleting its unused executor-event declaration, and now authorizes P9 original-stack depth unification, safe TLS teardown, minimal regressions, dual publication and full tests. No snapshot schema change or duplicate depth owner. |
 | Reference Baseline | SoftPC 6ff24aee, final S3 production cda2d427; XP SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89. |
@@ -39,7 +39,9 @@ Production +18/-25 (net -7), tests +24/-5 (net +19); total XP mirror diff increa
 one-line declaration cleanup. Self-review corrected independent registration
 cleanup on TLS failure; final qualification includes that correction. See
 [S4 P9 evidence](../etc/evidence/softpc/m9-t100-s4-audit.md#p9-original-simulation-stack-depth-unification).
-Await owner acceptance; no S4/T100 closure or file-frontier advance.
+Owner accepts the reviewed c_main.c dispositions and requests the next file,
+c_page.c (review 12 / order 88). All reviewed points in files 1-11 are approved;
+S4/T100 remain open. Evidence limits and restored/deleted dispositions remain.
 
 S4 P8 removes the owner-approved finite-budget implementation and parameter.
 Production keeps continuous execution and existing DEBUG/lifecycle paths;
