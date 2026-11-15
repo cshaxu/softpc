@@ -29,6 +29,13 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P37 records owner approval of egacpu.h R0426 and reviews order 342
+base/inc/egaports.h: one declaration, R0428, +1/-0. Current production
+painters and dirty-neighbour marking consume the original-register query;
+historical paired pixel/compiler controls support retention. No further safe
+restoration identified; R0428 awaits owner approval. No source/runtime change
+or fresh runtime test. Next real-diff file is order 359 gvi.h; S4/T100 stay open.
+
 S4 P36 records owner approval of dma.h R0424 and reviews egacpu.h R0426:
 one block +4/-1, matching the globals pointer to its actual generated provider.
 Original/current assignment and historical compiler controls support retention;

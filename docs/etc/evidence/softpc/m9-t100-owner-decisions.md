@@ -4160,3 +4160,54 @@ classify it as a proved guest-display bug repair or snapshot-only capability.
 
 Documentation/manifest/whitespace gates apply; production/tests/EXEs unchanged.
 Next real-diff file is order 342 base/inc/egaports.h. S4/T100 remain open.
+
+
+## S4 P37: owner approves generated carrier; egaports.h review
+
+Owner explicitly approves retaining R0426; the P36 pending decision is resolved.
+Order 342 base/inc/egaports.h has one real text block, +1/-0, R0428:
+extern int ega_get_pel_panning IPT1(int,line), physical line 29. Fresh pinned
+XP SP1 comparison confirms no other retained-content difference. Existing
+excluded bodies and necessary line controls are skipped without accounting.
+R0429's historical explanatory comment was already removed in S1 P80.
+
+Purpose: declaration supporting the VGA horizontal pixel-panning repair, not
+snapshot state, a second renderer or a second register owner. Current provider
+vga_prts.c:2605 reads attribute_controller.horizontal_pel_panning (low three
+bits), with the existing split/pan-mode rule returning zero below the split.
+Actual nt_ega.c consumers at 621, 1065 and 1301 use the per-line result to
+compose panned plane groups. gfx_updt.c:1863 uses the same query for dirty
+neighbour marking. Root CMake includes all three files (203, 210, 218).
+Whole-source search finds one declaration and one implementation, not a
+redundant Compat declaration that could replace this one.
+
+Current fixture source corroborates actual behavior: verify_panning_refresh
+writes 3C0h to set pan=1 and compares rendered pixels with unpanned pixels
+1..8. verify_panning_pixels covers three painters, shifts 0..7, bank/wrap
+variants and split cancellation. These are source observations this P, not
+newly executed tests. Historical S1 P80 used the same fixture and actual
+Ninja compile commands with an isolated provider returning zero: both widths
+failed the port-written pixel assertion; unchanged providers passed. This
+proves the consumed panning effect, not a coherent XP restoration of all
+coupled implementation patches or a freshly observed guest failure.
+
+Historical declaration-removal controls emitted the specific implicit-query
+diagnostic in both consumers/architectures under an explicit additional
+-Werror=implicit-function-declaration. Current-header nt_ega passed that check;
+gfx_updt also failed for unrelated setMarkPointers with BOTH headers, so its
+exit code alone is not evidence against removal. Do not claim that the normal
+production compiler policy necessarily rejects the original header.
+
+Counter-review: simply deleting the declaration loses the explicit cross-file
+function contract; moving it into a consumer or Compat relocates the same diff
+and duplicates ownership. Returning zero removes behavior with an actual pixel
+counterexample. The current single declaration is the smallest shared contract;
+no further equivalent XP restoration identified. The provider and painter
+implementation differences retain their own later ordered reviews. Recommend
+retain R0428, awaiting owner approval. S1 P80's full 392/392 run is historical;
+this documentation-only review does not rerun it or claim fresh guest coverage.
+
+Production/test/manifest/EXE changes: none. Documentation, mirror-manifest and
+whitespace gates apply. Next real-diff file is order 359 base/inc/gvi.h;
+order 358 gmi.h has no real difference after P34 and remains excluded from
+the actionable list. S4/T100 remain open.
