@@ -87,6 +87,42 @@ they are not silently declared optimal or approved by this presentation.
 Next file: order 88, ccpu386/c_page.c, verified against the frozen list.
 110 files remain to present. No production changes.
 
+### Review 12 / order 88: ccpu386/c_page.c
+
+Fresh fixed-XP comparison confirms +20/-6 selected-content lines, 14 text
+hunks and 15 historical point IDs R0115-R0129. Excluded bodies receive no
+review entries. All surviving changes serve host DEBUG operand observation;
+none is a paging repair or snapshot feature. Retention is recommended, pending
+owner approval of this newly reviewed file.
+
+| Points | Purpose and exact size | Evidence / limitation |
+| --- | --- | --- |
+| R0115-R0116 | Two observer declarations, +3/-0 | Signatures match machine/debug.c; no extra memory read. |
+| R0117, R0125 | Preserve original bulk pointer/count/linear address, +6/-0 | Original loops mutate all three; callback needs the initial values. |
+| R0118, R0126 | Completed bulk read/write notifications, +2/-0 | Original x87 callers use reversed buffers; reversed=1 preserves address/value association. |
+| R0119-R0124 | Six scalar read result wrappers, +6/-6 | BYTE/WORD/DWORD, cached-physical and supervisor routes; helper returns its input unchanged. |
+| R0127-R0129 | Three completed scalar write notifications, +3/-0 | Shared placement after either original write branch avoids duplicate notifications. |
+
+Current CMake explicitly selects c_page.c for production. Original c_oprnd.h
+calls these operand functions for ordinary and x87 operands. machine/debug.c
+owns the observation state: accepts records only in an instruction, records
+copied values, and retirement requests a stop after a watch hit. Guest DR
+checks in c_debug.c instead update guest architectural debug state; using them
+as the host observer would conflate independent debugger ownership.
+
+The S1 file-88 comparison recorded both architectures compiling with the whole
+observer route removed, then failing command-provider's wait for PAUSED after
+a watch run; current/no-yoda controls passed. This historical negative control
+proves a real consumer of the route, not every individual hook or fault edge.
+Fresh source review of the existing command-provider fixture confirms WORD
+read/write overlap, returned data/width and debugger-inspection non-triggering
+assertions. This round does not rerun tests or claim exhaustive BYTE/DWORD,
+x87, cross-page fault or partial-write coverage. No newly established safe
+restoration candidate; no source, test, binary or guest change.
+
+Progress: 12/121 files presented, 109 remain. Files 1-11 retain the owner's
+explicit approval; this file remains pending. Next: order 98, ccpu386/c_tlb.c.
+
 ### S4 P5: c_main.c necessity counter-review
 
 Owner requests proof of necessity rather than consumer existence. No source is

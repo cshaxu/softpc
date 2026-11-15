@@ -485,3 +485,15 @@ Documentation, XP manifest and whitespace gates pass. Owned jobs are complete;
 temporary probes, old test binaries and generated snapshot/media are cleaned
 with the task scratch, leaving reusable Ninja/ccache roots only. P9 awaits owner
 acceptance; S4/T100 remain open at file 11, with 110 ordered files remaining.
+
+## P11 c_page.c ordered review
+
+Review 12 / order 88 is recorded in the current file-by-file decision ledger.
+Fixed-XP selected-content diff remains +20/-6: 15 points, 14 text hunks, all
+host DEBUG operand observation. Actual CMake, operand callers, observer owner,
+guest DR machinery and existing command-provider assertions were read. No new
+production changes or runtime verification. S1 route-removal negative controls
+remain historical evidence with their original coverage limits. Recommend
+retention, pending owner decision. Frontier: 12/121, 109 remain, c_tlb.c next.
+Owner's P10 approval covers files 1-11 only and supersedes their earlier
+pending dispositions above; it does not cover this newly presented file.

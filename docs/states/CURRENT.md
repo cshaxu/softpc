@@ -29,6 +29,12 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P11 presents review 12 / order 88, c_page.c: +20/-6, 15 points, all
+host DEBUG operand-observation integration. Recommend retention; owner
+approval pending. Fresh source/caller review and historical negative-control
+evidence are recorded separately in the decision ledger; no new runtime test.
+12/121 files presented, 109 remain; next is c_tlb.c, order 98.
+
 S4 P9 implements the owner-approved original simulation-depth authority.
 Compat's second counter and c_main entry/leave hooks are removed; ntthread
 provides a read-only query and safe TLS detachment. Snapshot format is unchanged.
