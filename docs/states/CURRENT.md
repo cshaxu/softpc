@@ -29,6 +29,12 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P76 records owner approval of R0543-R0548 and reviews order431 video.c:
+15 blocks,+15/-19 including the already-approved P46-A stream omission.
+R0550/R0551 are recommended for retention pending owner review; no safe
+restoration candidate or code/artifact change. Historical guest/negative proof
+is distinguished from fresh source review. See [P76 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p76-approved-vga-controller-and-bios-video-review).
+
 S4 P75 records approval of R0539-R0541 and reviews order429 vga_prts.c:
 11 blocks,+188/-23; R0543-R0548 await owner review. Recommend retain based on
 source/caller review and historical negatives. Only a missed comment identifier

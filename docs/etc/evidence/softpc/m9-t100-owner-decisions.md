@@ -6561,3 +6561,58 @@ apply. Prior P69 full392/392 and P72 equivalent publication remain evidence.
 Concurrent clock work is excluded. Own scratch build/t100-s4-p75 has two-hour
 job/fifteen-minute no-progress budgets and is retired after gates. Next real
 file is video.c; vga_vide.c has no real retained diff. S4/T100 remain open.
+
+## S4 P76: approved VGA controller and BIOS video review
+
+Owner approves R0543-R0548. At b98d05f4, order431 base/video/video.c has
+15 real blocks,+15/-19 against fixed XP SP1. Conditional-arm-path comparison
+omits existing #error bodies and #line only; retained text and formatting
+are compared exactly. No new restoration candidate is found.
+
+| Point | Current anchors | Blocks | Added | Removed | Classification |
+| --- | --- | --- | --- | --- | --- |
+| R0550 | 302,886,1083,1162,1164,1336,1505,1634,1795,1889,2375,2515 | 12 | 12 | 11 | Active BIOS caller text aperture correctness. |
+| R0551 | 2034,2054 | 2 | 2 | 2 | CGA-on-EGA/VGA plane-layout integration. |
+| P46-A | 2242 | 1 | 1 | 6 | Previously approved unused NTVDM stream omission. |
+
+R0549 formatting restoration is already complete and has no residual point.
+R0550 adds one pure vd_text_mode expression using the original BDA mode table;
+nine text origins and two clear limits use it. Root CMake includes video.c in
+the device implementation. Existing BIOS BOP42 dispatch calls these operations.
+Physical cache assignments in ega_vide.c follow actual display programming;
+Win3.1 can keep that display in graphics while its DOS VM has text BDA state.
+Historical T99 S33 observed VM=1,BDA mode3,physical cache A0000 during typing;
+using B8000 from BDA restored visible text. The retained original SAS path,
+not a guest-version branch, performs access. Graphics and mode setters retain
+the physical cache. V7 extended text uses original BDA mode1 and extension state.
+Original text functions already consult BDA; the change unifies the address
+source without duplicating VM state or changing memory translation.
+
+Historical P134 coherently restored all eleven uses and removed the macro:
+both-width actual-source VGA fixture negatives failed the B8000 character
+oracle. Current verify_text_bios_aperture drives real BIOS calls for character,
+attribute, readback and full-width clear with deliberately stale physical bounds.
+That fixture is not a complete paged-V86 model; real guest evidence is historical.
+
+R0551 changes both XOR and replacement branches of vd_write_dot from
+(dotpos >> 1) << 2 to (dotpos & ~1u) << 2, retaining the low plane bit. For
+offset2, old physical offset4 becomes8, consistent with the retained spaced
+CHAIN2 representation. Both branches reuse original drawing and dirty logic;
+native CGA and mode6 paths are unchanged. Historical coherent restoration of
+both expressions fails real BIOS write/read-dot tests on x86/x64. Existing
+verify_bios_cga_pixel_handoff covers modes4..6,x0..19,y0..2; mode6 is a control.
+No separate XOR-only dynamic negative or exhaustive coordinates are claimed.
+The XOR address equivalence is source proof, not falsely expanded test coverage.
+
+P46-A is already owner-approved: source-subset omission of the six-line disabled
+stream runtime branch and one reason comment. It cannot be #error because the
+containing selected code compiles, unlike a disabled preprocessor arm. Restoring
+it alone requires removed stream symbols and reverses the approved simplification.
+It must remain counted as a real difference, not hidden among exclusions.
+
+Recommend retain R0550/R0551, awaiting this file's owner decision. This P only
+records review/approval, changes no production/tests/assets and reruns no guest
+or historical negative tests. Documentation/whitespace gate applies. Current
+concurrent clock changes and EXEs are excluded. Owned hidden gate scratch is
+build/t100-s4-p76, two-hour job/fifteen-minute no-progress budget, retired after
+completion. Next file is base/video/video_io.c. S4/T100 remain open.
