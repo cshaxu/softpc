@@ -29,6 +29,14 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P41 records owner approval of ios.h R0440 and reviews order 377 quick_ev.h:
+R0442, two blocks +35/-0, defines the real pending-event snapshot contract.
+Private queue ownership and original add semantics rule out equivalent restore
+through existing add/delete APIs; historical dual checkpoint tests support the
+contract. No unused declaration or safe equivalent restoration found. R0442
+awaits owner approval. No source/runtime changes or fresh runtime tests.
+Next real-diff file is order 381 sas.h; S4/T100 remain open.
+
 S4 P40 records owner approval of R0438/R0439 and removes only ica.h's
 replacement EOF blank. Its real diff is now +2/-1; aggregate is 107 files,
 15,716 blocks, +24,669/-24,033. Reviews ios.h R0440, one block +1/-1:

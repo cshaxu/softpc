@@ -4385,3 +4385,58 @@ Published Nov 14 2026:
 
 - softpc32.exe: 22:49:29; SHA-256 e1ba6e7fc52d85b7aef13991e649e8a98dd5497d97677b20ca2bbcbc3b41a480.
 - softpc64.exe: 22:49:47; SHA-256 7cbae63b28ee6ce4cecd703ccd0a8d33ec6c3190c4ec6934d583fd60f6a8395e.
+
+
+## S4 P41: owner approves full I/O map; quick_ev.h review
+
+Owner explicitly approves retaining R0440; P40's pending decision is resolved.
+Fresh complete pinned XP comparison of order 377 base/inc/quick_ev.h confirms
+one retained semantic point, R0442, in two insertion blocks: +26/-0 at physical
+21-46 (two record types, two callback types and spacing), +9/-0 at 55-63
+(measure/capture/restore declarations). Total +35/-0. All other retained text
+matches XP; existing excluded-body/line controls are skipped without accounting.
+R0441's five redundant explanation lines were already removed in S1 P92 and
+are not a current decision. No additional formatting-only restoration found.
+
+Category: supported snapshot capability, not an original CPU/device bug repair
+or an x64-only compiler adaptation. Actual root CMake includes quick_ev.c;
+Machine snapshot_image.c and Compat CCPU/device archives reach the added API.
+Current compat/devices/archive.c:144 measures entries, 149 captures, 235
+restores. Its queue writer/reader at 686-750 serializes all record members
+explicitly as u32 values rather than copying native structs or function pointers.
+Original quick_ev.c remains sole owner of the live queues and scheduler.
+
+Fresh field/ownership verification: quick_ev.c capture (1001 onward) reads
+relative/original time, handle, parameter and event type from original nodes;
+encode converts the function pointer to a stable callback ID. Hash head and
+next indices represent the original linked lookup chains without persisting
+addresses. State records retain next-handle positions, quick/tick countdowns
+and entry counts. Restore uses the reverse decoding and existing private
+queue state. None of these members or declarations is unused. Snapshot record
+arrays are archival copies, not a second active scheduler.
+
+Necessity: XP's interface offers add/delete/init/dispatch, but not enumeration
+or restoration of private heads, hashes, allocation handles and countdowns.
+Original add_event allocates handles and adjusts timing; its zero-time path
+calls the callback immediately. Replaying add calls cannot preserve the saved
+handle/countdown contract or guarantee callback-free load. Exposing private
+nodes or reproducing the scheduler in Compat would weaken ownership and expand
+diff. Moving these declarations merely relocates an interface still required
+by both provider and archive; it does not eliminate its need. This is source
+proof for the supported snapshot contract, not proof from missing declarations
+alone or a claim that no alternative architecture could ever be designed.
+
+Historical S1 P92 ran the existing checkpoint fixture on both architectures,
+1/1 each. Its verify_event_queue_archive (currently 973 onward) captures two
+quick events plus one tick event; rejects an invalid late callback while
+preserving the live queue; clears/restores without running callbacks; checks
+the saved countdown; then verifies event order 41,42,51. Current source still
+contains those assertions. This review does not rerun them or claim a fresh
+Windows guest session, exhaustive hash collisions or every malformed archive.
+Later quick_ev.c implementation differences remain separately reviewable.
+
+Recommend retain R0442, pending owner approval. No safe equivalent XP restore,
+unused API, duplicated declaration or redundant added comment identified.
+Production/tests/EXEs unchanged. Documentation, mirror and whitespace gates
+apply. Next actionable file is order 381 base/inc/sas.h; intervening headers
+have no current real diff. S4/T100 remain open.
