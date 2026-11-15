@@ -5416,3 +5416,68 @@ and R0470 does not imply they are XP bug fixes. L001 repairs a local snapshot
 omission. No new correction candidate or extra production path is introduced.
 P53 is delivered for owner acceptance; S4/T100 remain open at the current audit
 frontier rather than automatically moving to the next mirror file.
+
+## S4 P54: at_dma file review
+
+Owner accepts P53 (908f6803), then requests the next real-difference file,
+order404 base/system/at_dma.c. P53 and its snapshot conversion are accepted;
+S4/T100 stay open. Fresh comparison uses fixed XP SP1 a2f6d7c9 and current
+908f6803, omitting excluded bodies and line controls, retaining conditional
+framing and whitespace. All 16 text blocks reconcile to +115/-19:
+
+| Point/current line | Text blocks | Added/deleted | Category and evidence |
+| --- | ---: | ---: | --- |
+| R0476, 192/223 | 2 | +2/-2 | Correctness: decode address/count port into channel before sampling SB DMA progress. |
+| R0477, 743/746 | 2 | +2/-2 | Correctness: decrement wrap includes offset zero, so offset+1 units precede wrap. |
+| R0478, 67/70/936/947/964/967/976/979 | 8 | +24/-13 | Correctness: existing helpers take unit size, decrement guest address and advance device buffer by a unit. |
+| R0479, 874-882 and original position | 2 | +7/-2 | Integration: original dmaGetAdaptor made selected for DSP, plus unnecessary position change. |
+| R0480, 46/1037-1114 | 2 | +80/-0 | Snapshot: header +1; existing controller/page capture/restore +79. |
+
+R0478's complete mechanical breakdown: to-memory declaration +2/-1,
+from-memory declaration +2/-2, two callers each +1/-1, two definitions each
++2/-2, two loop bodies each +7/-2. No other retained difference remains.
+R0473-R0475 are already restored/removed, not newly pending points.
+
+Production CMakeLists.txt:166 compiles at_dma.c for both widths. Compat
+GFI's data/ID paths call dma_request (gfi_image.c:139/146/188). Original DSP
+SbInitializeDMA calls dmaGetAdaptor at nt_sbdsp.c:747, then QueryDMA and
+SetDMACountAddr operate on that exact controller, not a duplicate engine.
+Archive capture/restore and wire map use the DMA snapshot extension at
+archive.c:150/217/377/833/863. Port reads toggle first_last and can acknowledge
+status; port replay cannot enumerate original base/current/temporary arrays.
+Snapshot fields preserve original state, not additional device authority.
+
+R0476 example: channel1 address/count ports2/3 must sample once on low-byte
+read; XP compares address port to1 and count port to3, so address progress is
+missed. Current test verify_sb_dma_read_ports covers channels1/3, direction,
+low/high reads, other channels and disabled DSP. R0477: offset0 still permits
+one transfer before wrap; XP splits zero units. R0478: byte reads originally
+advance guest and retreat destination; word writes originally step individual
+bytes. Both conflict with do_transfer's original documented unit/direction.
+Existing verify_dma_transfers independently derives expected memory/device
+bytes for two controllers, both directions, three transfer types, five starts,
+guards and ROM protection. verify_dma checks completion and auto-init. XP
+already restores auto-init address/count; that is not another local diff.
+
+Historical S1 P106 actual-object negative controls restored each of the three
+repair groups coherently: both widths failed respectively SB query-count,
+DMA memory-data and returned-data assertions, while current fixtures passed.
+This round freshly verifies source/callers and unchanged relevant assertions;
+it does not relabel those negative executions as new. Accepted P53 full392/392
+includes current DMA, SB-DMA and checkpoint tests. Checkpoint covers base/count/
+page roundtrip; no exhaustive corrupt-archive or real-guest timing claim.
+DMA restore's per-controller validation can partially mutate before rejecting
+controller2; Machine's failed restore does not resume execution. No transactional
+rollback contract or new recovery mechanism is proposed here.
+
+Counter-review finds one restoration candidate in R0479: XP places its NTVDM
+frame/accessor before the Internal functions heading; current moves both after
+that heading. Exposure outside the excluded NTVDM body remains necessary, but
+this location change is not. An in-memory, source-unmodified comparison moving
+the frame/accessor back and restoring original surrounding whitespace reduces
+16 blocks +115/-19 to 15 blocks +112/-17: five fewer changed lines. This is a
+proposal, not implemented or dynamically validated. Retain the actual accessor,
+three repairs and snapshot capability; do not delete production functionality
+or move identical serialization into Compat merely to hide mirror differences.
+All five groups await owner disposition in this fresh audit; next file is cmos.c.
+No source/test/EXE/snapshot changes or runtime runs in P54.

@@ -29,6 +29,16 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P54 reviews order 404 at_dma.c against fixed XP: 16 retained-content
+blocks +115/-19, five semantic groups R0476-R0480. Three repairs have existing
+dual-width original-restoration negatives and current production/test callers;
+accessor and archive serve actual DSP/state paths. No new runtime result is
+claimed beyond accepted P53 392/392. One nonsemantic relocation is unnecessary:
+restore the accessor/conditional frame before the original internal-functions
+heading, preserving its selected definition. In-memory comparison predicts
+15 blocks +112/-17 (five fewer changed lines). No source change yet; reviewed
+points await owner disposition. See [P54 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p54-at-dma-file-review).
+
 S4 P53 implements owner-approved PIC phase archiving and removes the redundant
 PPI derived field. R0469/R0470 remain approved and unchanged; R0471 retains
 only register/gate snapshot state. SCP5 is the sole reader format. The existing
@@ -39,7 +49,7 @@ phase negative controls fail as expected. Production +20/-15 (net +5), tests
 +61/-2 (net +59). Relative to fixed XP, mirror changed lines increase 14 across
 the same two files; the current total is 106 files, 15,709 blocks, +24,617/-24,018.
 Actual-diff self-review finds one original phase owner, no replay/state machine,
-legacy reader or shared-component change. P53 awaits owner acceptance; S4/T100
+legacy reader or shared-component change. Owner accepts P53 (908f6803); S4/T100
 remain open. See [P53 evidence](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p53-pic-phase-and-ppi-snapshot-correction).
 
 
