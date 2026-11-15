@@ -182,6 +182,36 @@ int main(void)
         assert(!softpc_device_snapshot_restore_inport_mouse(&state));
         softpc_device_archive_dispose(archive);
     }
+    /* Device reset retains XP data semantics; a new cold run must not inherit
+       the previous run's pending movement, latches or button transitions. */
+    mouse_init();
+    outb(MOUSE_PORT_0, 7u);
+    assert(softpc_machine_mouse_input(machine, 11, -7, 1u, 0u) ==
+        SOFTPC_MACHINE_OK);
+    outb(MOUSE_PORT_1, 0x20u);
+    assert(softpc_machine_mouse_input(machine, 9, 4, 0u, 1u) ==
+        SOFTPC_MACHINE_OK);
+    outb(MOUSE_PORT_0, 0x80u);
+    outb(MOUSE_PORT_0, INTERNAL_DATA1_REG);
+    inb(MOUSE_PORT_1, &value);
+    assert(value == 11u);
+    outb(MOUSE_PORT_0, 7u);
+    outb(MOUSE_PORT_1, 0x20u);
+    outb(MOUSE_PORT_0, INTERNAL_DATA1_REG);
+    inb(MOUSE_PORT_1, &value);
+    assert(value == 9u);
+    assert(softpc_machine_mouse_input(machine, 5, 6, 1u, 0u) ==
+        SOFTPC_MACHINE_OK);
+    assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
+    for (unsigned hold = 0; hold < 2; ++hold) {
+        for (unsigned reg = 0; reg < 3; ++reg) {
+            outb(MOUSE_PORT_0, reg);
+            inb(MOUSE_PORT_1, &value);
+            assert(value == 0u);
+        }
+        outb(MOUSE_PORT_0, 7u);
+        outb(MOUSE_PORT_1, 0x20u);
+    }
     softpc_machine_destroy(machine);
     assert(softpc_test_remove_image(path));
     return 0;

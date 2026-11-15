@@ -371,10 +371,6 @@ void mouse_outb IFN2(io_addr, port, half_word, value)
 	    {
 		mouse_mode_reg = 0;
 		loadsainterrupts = 5;	/* lets Windows initialise its mouse happily */
-		delta_x = delta_y = 0;
-		data1_reg = data2_reg = mouse_status_reg = 0;
-		last_button_left = button_left;
-		last_button_right = button_right;
 		address_reg = value & 0x7F;	/* clear reset bit*/
 		ica_clear_int( AT_CPU_MOUSE_ADAPTER, AT_CPU_MOUSE_INT );
 	    }
@@ -449,7 +445,9 @@ void mouse_init IFN0()
 #line 550
 
     mouse_inb_toggle = 0;
-    button_left = button_right = 0;
+    button_left = button_right = last_button_left = last_button_right = 0;
+    delta_x = delta_y = 0;
+    data1_reg = data2_reg = mouse_status_reg = 0;
     mouse_outb(MOUSE_PORT_0, 0x80);
 
     io_define_inb(MOUSE_ADAPTOR, mouse_inb);

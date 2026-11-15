@@ -5034,3 +5034,211 @@ No additional mirror restoration, guest patch or public package change is made.
 P49 remains the separately identified historical real-guest comparison;
 this delivery does not claim every guest/driver's timing was validated.
 S4/T100 remain open awaiting owner acceptance of P50.
+
+## S4 P51: confine R0466 data reset to cold initialization
+
+Owner request: 审计466 去试着找到过硬证据; after the evidence and the
+four-line cold-only proposal, owner authorizes 批准 老规矩五件套.
+P50 is accepted. This is a bounded implementation, not closure of S4/T100.
+
+### Evidence and decision
+
+The prior audit used five isolated controller variants on both x86 and x64,
+linked to the actual Machine reset, original BIOS/controller and CCPU IN8.
+All ten runs completed. The fixture supplied movement/buttons, issued guest
+reset, then repeated public cold reset without new host input. Current code
+and cold-only initialization returned clean state. Removing all six R0466
+lines left latched X=11, Y=249 (-7), status=108 readable through IN8 after cold
+reset. Removing only four guest-reset assignments left pending movement 9,4
+readable after the new HOLD. Removing only the two init lines also retained
+old state. These are controlled production-function/port-path observations,
+not a manually reproduced Windows cursor symptom or hardware reset oracle.
+
+The actual production chain is machine/machine.c softpc_machine_reset ->
+original BIOS reset -> mouse_init. Public cold start reuses process-static
+controller state. Guest port writes instead reach mouse_outb through the
+original registered adapter. No authoritative hardware or guest-negative
+proof was found for extending the latter reset to clear data. Therefore the
+four assignments are restored out of guest reset; cold initialization alone
+zeros buttons/prior buttons, pending movement and latches, then reuses the
+original reset for mode, address, interrupt and burst budget. No new state,
+callback, API, mode condition, compatibility path or snapshot format appears.
+R0466 is owner-approved as this narrower standalone cold-run boundary; it is
+not classified as a proven XP hardware-reset defect. P48's blanket reset-data
+retention rationale is superseded. R0464/R0465 remain separate decisions.
+
+### Implementation and focused regression
+
+Production mouse.c +3/-5 (net -2); existing mouse_smoke.c +30/-0.
+The regression uses real public input, registered ports and Machine cold reset:
+old latch survives guest reset, pending movement becomes the next HOLD data,
+then cold reset clears status/X/Y both before and after HOLD despite prior
+pending movement and button transitions. Existing archive/burst and real CPU
+IRQ-handler checks remain. No test-only production interface or new fixture.
+
+Similar-issue sweep: rg over production mouse_init/mouse_outb and mouse-related
+snapshot/reset tests confirms BIOS reset is the cold initialization caller,
+registered mouse_outb is the guest path, and snapshot restore remains direct
+state restoration. No second reset-data owner is introduced or changed. Other
+controllers and excluded bodies are outside this bounded restoration.
+
+XP-relative retained difference: R0466 +6/-0 becomes +4/-0; mouse.c five
+blocks +59/-0 becomes four blocks +57/-0. The file count remains 106; current
+global aggregate becomes 15,707 blocks, +24,609/-24,012. Excluded bodies and
+necessary line controls are not counted. The frozen S4 ledgers stay historical.
+Source CRLF and owned-source LF are preserved. User INI/media/snapshot and all
+public-eight trees are unchanged.
+
+Cached dual build and publication completed. Both background suites pass
+188/188, including mouse, checkpoint and XP manifest checks. Each native suite
+passes 7/8: audio, MIDI, package and Window checks pass; console_broker_display
+fails at line 431 (written == 80 * 25). An unchanged x86 single-case rerun fails
+at the same assertion. A scratch-only diagnostic copy records size=31,30 and
+written=930; an additional sample proves size=31,30 immediately after the test's
+prepare_output_surface, before broker creation. This is independent of the
+changed mouse path; it does not establish the exact native resize cause.
+No shared-source or test-standard change is authorized or made to bypass it.
+Current aggregate is 390/392, not full qualification. Owner was asked to enlarge
+the active RDP desktop before another native validation. Commit/push and
+acceptance remain pending that qualification; task-owned scratch is retained
+only while this active packet needs it.
+
+The initial direct manifest check caught use of a raw CRLF hash; corrected to
+the existing LF-normalized text hash before both full suites passed that gate.
+Production remains CRLF. No product/compiler fix was needed for this ledger
+error. Known original mirror macro-redefinition warnings remain; no new owned
+source warning was found. Whitespace checks pass.
+
+Actual-diff self-review confirms exactly one cold-state initialization owner,
+no guest-reset override and no new ABI/snapshot/guest/public-tree change. The
+selected guest-reset body matches fixed XP byte-for-byte after line-ending
+normalization. Existing asset snapshot SHA-256 is unchanged from P50.
+Published EXEs: x86 Nov15 2026 08:05:27,
+85f1357675431a28fc0f21069e1a92fb3a3a2aef7ee79c303678fb5b18a2e9b4;
+x64 Nov15 2026 08:11:00,
+3b74c6fd950d8a0ffc85fe906eed1ebca032660dc128feb73b89a6935965262b.
+
+Owner follow-up: rdp桌面无法扩大 这是你集成测试的缺陷 请你在桌面宽度不合适的时候 正确设定预期好吗.
+The native fixture now clears its queried buffer capacity, places its history
+marker within that capacity, fits the ordinary switch frame to the visible
+extent and bounds visible-row assertions by the captured columns (+11/-5).
+It does not skip large-frame extent tests, remove retained-frame checks, or
+change the requirement to preserve content before redraw. Its manifest follows.
+Attempting to re-expand fixture capacity alone was experimentally rejected:
+subsequent native metadata operations still shrink it. No such workaround remains.
+
+With the size assumptions corrected, an isolated diagnostic observes the
+specific native call SetConsoleScreenBufferInfoEx changing 31x30 to 31x29,
+with the first cell changing from 'h' (history) to 'M' (Monitor). Growing the
+buffer later cannot recover that line. This is not a smaller visible-width
+expectation. Microsoft Console's SetConsoleScreenBufferInfoExImpl in
+https://github.com/microsoft/terminal/blob/main/src/host/getset.cpp#L647
+interprets the input viewport as exclusive, while the queried Ex rectangle is
+inclusive. A scratch-only wrapper adding one to Right and Bottom preserves
+size/content and completes the full existing Console test on x86 and x64.
+This is a candidate native API-boundary conversion, not an RDP-specific branch.
+No external source was imported; no formal public production edit is made yet.
+Owner approval was requested for the two-line public production correction,
+which exceeds the just-authorized fixture-only correction. Do not report the
+candidate's success as qualification of the unmodified production backend.
+
+### P51 follow-up research: remove compensation, retain frame preparation
+
+Owner asks whether the earlier restoration code should be withdrawn, then
+requests investigation only. No formal public production edit is made.
+History eaf05bff (T86 S1 P4) added capacity re-expansion after a successful
+metadata call left one fewer row; its historical evidence does not isolate the
+endpoint error or prove a separate need after correcting that error.
+
+Controlled native comparisons use the unchanged current integration fixture
+with its owner-authorized narrow-desktop expectations and task-local backend
+copies. Exclusive-endpoint conversion with old repair passes x86/x64. Conversion
+with every metadata size mismatch rejected fails both widths during palette
+application: saved=80x25, actual=80x10, temporary viewport=20x10. Thus rejecting
+all mismatches is not correct for a call that is about to draw a complete frame.
+Conversion with capacity rejection only for restore_cursor (actual handoff),
+and no re-expansion inside apply_display, passes the full native Console test on
+both widths. Palette updates already invalidate old frame cells and subsequently
+call the existing ensure_text_surface before drawing; that is the single needed
+frame-capacity owner. Actual handoff must reject lost capacity rather than grow
+it back and report content restoration. Keep cursor placement, final viewport
+restoration and final handoff capacity checks.
+
+The existing unit stub was reused in isolated dual-architecture observations:
+- Normal restore: both variants return OK, zero resize calls, 120x60 capacity.
+- Injected metadata truncation to 120x29: old compensation returns OK after one
+  resize and one cursor operation; proposed handoff returns IO_ERROR (5), zero
+  resize/cursor operations, leaving the failure observable.
+- Palette truncation to 80x24: proposed helper returns to its existing caller;
+  ensure_text_surface grows once to the new 80x25 frame, instead of restoring
+  obsolete 80x30 capacity. No new path, state or recovery callback.
+The complete existing Console unit fixture with corresponding contract updates
+also passes x86/x64, exit zero. The redundant resize-fails-after-compensation
+case is removed; real frame-growth failure tests remain.
+
+Candidate production diff +7/-11 (net -4, including endpoint comment). Unit
+fixture excluding scratch include-path changes +6/-16 (net -10); already
+prepared native fixture +11/-5 (net +6). Console source plus tests total net -8,
+excluding manifests/docs. Candidate tests are isolated evidence, not final
+full-package qualification. No all-host guarantee or new guest acceptance is
+claimed. Both apply_display consumers were rechecked: select_output requests
+cooked handoff restoration (true); raw selection passes false and retains its
+existing complete-frame restoration; write_text_frame_bound requests palette application then
+uses existing surface preparation. Recommendation is this narrowed removal,
+not wholesale deletion of display restoration or rejection of palette resizing.
+
+### P51 approved implementation and final review
+
+Owner: 批准执行 老规矩五件套. The researched backend and fixture changes
+are now formal source. No additional public API or state is introduced.
+The restore_cursor check applies to cooked native-history restoration;
+raw selection already uses false and restores its retained complete frame.
+That existing raw path is unchanged, not a newly introduced recovery route.
+The metadata endpoint conversion is common to both callers. New-frame
+capacity remains owned by ensure_text_surface, with its existing failure checks.
+
+Similar-issue scan: rg for set_console_screen_buffer_info_ex and
+console_broker_apply_display across src and test/lib finds one production
+native setter, its Types declaration alias, two production helper call sites,
+and the existing unit/native test wrappers. No second production setter or
+unconverted metadata path exists. Dedicated SetConsoleWindowInfo continues
+to receive inclusive endpoints. Bounds from fit_viewport keep the converted
+exclusive endpoints within the signed native buffer dimensions.
+
+Actual-change self-review: no replay/retry/state is added, saved cooked content
+is not declared recovered merely because capacity was regrown, and raw frame
+preparation remains unchanged. Existing tests retain real resize failure,
+no-redraw content/cursor retention, palette growth and wide-buffer coverage.
+The narrow desktop fixture derives its initial capacity/visible extent from
+the actual host rather than treating 80 columns as a desktop prerequisite.
+Final build/test results and artifact identities follow below.
+
+Final qualification: cached x86/x64 configuration, test/product builds and
+package publication succeed. Each architecture passes all 188 background tests
+and all eight native desktop/audio/package tests: 392/392, with no retries or
+skips in this final formal-source run. Earlier 390/392 and candidate outcomes
+above are investigation history, superseded by this complete qualification.
+The final incremental build log has no warning/error diagnostics; this is not
+a claim that all unchanged original mirror sources were freshly recompiled.
+
+Accounting against P50 HEAD 13987f6b (git diff --numstat):
+- Production: mouse.c +3/-5 and Console backend +7/-11; total +10/-16, net -6.
+- Tests: mouse +30/-0, Console unit +6/-16, native +11/-5;
+  total +47/-21, net +26. No new fixture or production test API.
+- Three manifest entries follow the changed source/tests; mirror inventory
+  changes only for the two-line reduction already recorded above.
+- No build configuration changes or source import. Shared tree changes are
+  limited to src/lib and test/lib; no downstream synchronization is claimed.
+
+Published compiler timestamps: x86 Nov 15 2026 08:59:46,
+x64 Nov 15 2026 09:03:59; package checks verified the freshly built timestamp.
+softpc32.exe SHA-256: f02b74596c6d4e09d3876c4193be3be8804837f8f78760a0001d25c9fa8d840f.
+softpc64.exe SHA-256: 0372e5c192577a04180d228a146869a69724d51cc8067024383acf7b2a611e04.
+snapshot SHA-256: 9c9e6116e4235c57d48f14a6267bb4b080942b0046a163344146e4a35dd2460f.
+
+The snapshot identity equals P50; user INI and media are unchanged. Public
+source/test manifests, Types/dependency/naming/test-boundary and XP mirror
+gates pass in both suites. Review covers the actual five changed C files and
+both apply_display consumers, not only test summaries. No new manual guest
+acceptance or exhaustive Console-host/version coverage is claimed.
+S4/T100 remain open; this P waits for owner acceptance.

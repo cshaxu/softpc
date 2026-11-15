@@ -1,6 +1,6 @@
 # T100 S4 current real-difference file list
 
-Current source: S4 P50 owner-approved InPort restoration from `8b35181c`.
+Current source: S4 P51 owner-approved cold-only InPort initialization from `13987f6b`.
 Fixed XP SP1: `a2f6d7c93aa4f11efc51147566d5961c59a8ef89`.
 All paths are relative to `src/app-softpc/softpc.new/`.
 
@@ -127,7 +127,7 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 383 | `base/inc/sndblst.h` | 2 | +2 | -1 |
 | 386 | `base/inc/tape_io.h` | 1 | +0 | -1 |
 | 398 | `base/keymouse/keyba.c` | 4 | +121 | -0 |
-| 400 | `base/keymouse/mouse.c` | 5 | +59 | -0 |
+| 400 | `base/keymouse/mouse.c` | 4 | +57 | -0 |
 | 401 | `base/keymouse/ppi.c` | 6 | +27 | -13 |
 | 404 | `base/system/at_dma.c` | 16 | +115 | -19 |
 | 405 | `base/system/cmos.c` | 4 | +122 | -4 |
@@ -164,4 +164,4 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 466 | `host/src/nt_sbmxr.c` | 6 | +48 | -0 |
 | 467 | `host/src/nt_sound.c` | 12 | +7 | -80 |
 | 468 | `host/src/nt_vga.c` | 13 | +37 | -16 |
-| **Total** | **106 files** | **15708** | **+24611** | **-24012** |
+| **Total** | **106 files** | **15707** | **+24609** | **-24012** |
