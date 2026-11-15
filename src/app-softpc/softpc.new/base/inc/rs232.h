@@ -79,9 +79,9 @@ typedef union {
 #ifdef BIT_ORDER1
 #error "Unsupported SoftPC mirror configuration: BIT_ORDER1"
 #endif
-#endif /* NTVDM */
-#line 326
 
+#endif  /* ifdef NTVDM */
+#line 327
 
 #ifdef BIT_ORDER2
 typedef union {
@@ -306,11 +306,11 @@ extern void com_save_txbyte IPT1(CHAR,value);
 #endif	/* PS_FLUSHING */
 #line 297
 
-
 #line 645
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
-#endif /* NTVDM */
+#endif
+
 #line 649
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"

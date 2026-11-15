@@ -173,8 +173,8 @@ Glue_set_vid_wrt_ptrs IFN1(WRT_POINTERS *, handler )
 #endif 	/* CPU_40_STYLE - EVID */
 #line 443
 }
-
 #endif /* !(NTVDM && MONITOR) */
+
 #line 446
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"

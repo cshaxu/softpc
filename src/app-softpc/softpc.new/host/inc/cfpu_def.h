@@ -31,7 +31,7 @@ IU32	sign:1;
 typedef struct {
 IU32	mant_hi:20;
 IU32	exp:11;
-IU32	sign:1;
+IU32 	sign:1;
 #line 28
 } FP64HI;
 

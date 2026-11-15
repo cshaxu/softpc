@@ -1272,8 +1272,8 @@ if (!keyboard_disabled)
 			    break;
 		    }
 
-
 #ifndef NTVDM	/* JonLe NTVDM Mod */
+
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
 #else     //NEC_98
@@ -2161,8 +2161,8 @@ else
 	waiting_for_next_8042_code=FALSE;
 	}
 
-	
 #endif    //NEC_98
+	
 #line 2868
 /*Is there a valid code to put in the 8042 output buffer? Values written
   to the 8042 output buffer as a conseqence of a 8042 command do not
@@ -2508,7 +2508,7 @@ GLOBAL VOID kbd_inb IFN2(io_addr,port,half_word *,val)
 #line 3175
 #ifdef JOKER
 #error "Unsupported SoftPC mirror configuration: JOKER"
-#endif /* JOKER */
+#endif	/* JOKER */
 #line 3174
 		ica_clear_int(KEYBOARD_INT_ADAPTER, KEYBOARD_INT_LINE);
 
@@ -2606,8 +2606,8 @@ GLOBAL VOID kbd_outb IFN2(io_addr,port,half_word,val)
 #endif // NEC_98
 #line 3276
 
-
 #ifndef NTVDM	/* JonLe NTVDM Mod */
+
 #line 3280
 	if (free_6805_buff_size < BUFF_6805_VMAX)
 		codes_to_translate();

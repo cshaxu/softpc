@@ -288,11 +288,11 @@ void disk_post IFN0()
 #endif  /* !(NTVDM && MONITOR) */
 #line 267
 
-
 #line 441
-#ifdef NTVDM
+#ifdef NTVDM	/* True for all NT VDMs */
 #error "Unsupported SoftPC mirror configuration: NTVDM"
-#endif /* NTVDM */
+#endif	/* NTVDM */
+
 #line 453
 	/*
 	 * read cmos disk byte for configured drives. Note we don't

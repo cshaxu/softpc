@@ -3400,9 +3400,9 @@ boolean v7vga_graph_scroll_up IFN6(int, start, int, width, int, height,
 {
 	int start_offset,tlx,tly;
 	boolean status;
-
 #line 3309
 #ifndef NEC_98
+
 #line 3311
 	UNUSED(dummy);
 	
@@ -3433,9 +3433,9 @@ boolean v7vga_graph_scroll_down IFN6(int, start, int, width, int, height,
 {
 	int start_offset,tlx,tly;
 	boolean status;
-
 #line 3337
 #ifndef NEC_98
+
 #line 3339
 	UNUSED(dummy_arg);
 	
@@ -3787,9 +3787,9 @@ GLOBAL VOID screen_refresh_required IFN0()
 
 LOCAL MARKING_TYPE curr_mark_type;
 
-
 #line 3746
 #if !defined(NTVDM) || (defined(NTVDM) && !defined(X86GFX) )	/* remove uneeded code */
+
 #line 3748
 GLOBAL VOID
 set_mark_funcs IFN0()
@@ -3894,8 +3894,8 @@ set_mark_funcs IFN0()
 #line 3861
 	}
 }
-
 #endif	/* !NTVDM | (NTVDM & !X86GFX) */
+
 #line 3865
 #ifdef SEGMENTATION 		/* See note with first use of this flag */
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"

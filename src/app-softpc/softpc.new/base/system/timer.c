@@ -1749,11 +1749,11 @@ LOCAL unsigned long clocksSinceCounterActivated IFN1(struct host_timeval *, now)
     struct host_timeval *first;
     register unsigned long usec_val, nclocks;
     register unsigned int secs;
-
 #line 1804
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#endif
+#endif   //NEC_98
+
 #line 1808
     first = &pcu->activationTime;
     (*pcu->getTime)(now);
@@ -2180,11 +2180,11 @@ LOCAL void setLastWrap IFN2(unsigned int, nclocks, struct host_timeval *, now)
 {
         struct host_timeval *stamp;
         unsigned long usecs;
-
 #line 2585
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"
-#endif
+#endif   //NEC_98
+
 #line 2589
         stamp  = &pcu->activationTime;
         *stamp = *now;

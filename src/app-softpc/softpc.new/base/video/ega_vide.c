@@ -125,11 +125,11 @@ DESCRIPTION       :     describe what (not how) function does
 #error "Unsupported SoftPC mirror configuration: GISP_SVGA"
 #endif          /* GISP_SVGA */
 #line 123
-
 #line 126
 #if defined(JAPAN) || defined(KOREA)
 #error "Unsupported SoftPC mirror configuration: defined(JAPAN) || defined(KOREA)"
-#endif
+#endif // JAPAN || KOREA
+
 #line 130
 /* [3.1.2 DECLARATIONS]                                                 */
 

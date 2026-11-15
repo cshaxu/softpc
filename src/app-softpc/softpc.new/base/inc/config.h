@@ -269,12 +269,12 @@ WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING WARNING
 #define C_CMOS			135
 #endif
 
-
-
 #line 273
 #if defined(NTVDM)
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif
+
+
 #line 282
 /* Host-specific entries in the message catalogue start at
  * the following number plus 1 - note that the value must

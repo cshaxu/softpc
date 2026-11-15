@@ -741,9 +741,9 @@ word *low, *hi;		/* outputs */
 #endif   //NEC_98
 #line 942
 
-
-
 #endif  /* ifndef NTVDM */
+
+
 #line 948
 void time_of_day_init()
 {

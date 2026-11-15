@@ -498,7 +498,7 @@ Return Value:
         return SendMidiRequest();
     }
 
-    if (RunningStatus == 0xf0) {
+    if (RunningStatus == 0xf0) {  // We are in a sysex message.
         if (data == 0xf7) {
             RunningStatus = 0;
             if (DiscardSysEx) {
@@ -537,7 +537,7 @@ Return Value:
             LastCommandLength = 0;
 
             switch (data) {
-            case 0xf0:
+            case 0xf0: // System Exclusive message
                 RunningStatus = data;
                 MidiBuffer[NextData++] = data;
                 return LIB_STATUS_OK;

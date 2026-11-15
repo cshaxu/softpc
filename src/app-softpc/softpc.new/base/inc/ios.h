@@ -26,11 +26,11 @@
 #define PC_IO_MEM_SIZE  0x400   /* Must be a power of two! */
 #endif
 
-
-
 #ifdef NTVDM
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif /* NTVDM */
+
+
 #line 38
 #if defined(NEC_98)
 #error "Unsupported SoftPC mirror configuration: NEC_98"

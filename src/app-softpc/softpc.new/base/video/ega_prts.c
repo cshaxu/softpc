@@ -1386,9 +1386,9 @@ init_vga_globals IFN0()
 #line 1916
 	SetMarkPointers(0);
 #endif	/* CPU_40_STYLE - EVID */
-
-
 #endif
+
+
 #line 1921
 	update_banking();
 #endif  //NEC_98

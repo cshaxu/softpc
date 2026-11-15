@@ -21,6 +21,8 @@ Owner subsequently approves file 13 (c_tlb.c), all four points R0135-R0138.
 Owner subsequently approves file 14 (fpu.c), both points R0146-R0147.
 Owner subsequently approves ntthread.c R0160-R0162 at review 16; its P9
 items were already approved. Review 15 retains the dispositions recorded below.
+Owner approves vglfunc.c R0412 and diskbios.c R0414. Diskbios directive-only
+differences are restored under P30, not retained approval candidates.
 Unreviewed points remain pending until explicitly approved.
 Existing #error bodies and separately counted line controls remain excluded.
 
@@ -3868,3 +3870,19 @@ Current review proves source/caller consistency, not a fresh guest boot or
 exhaustive BIOS test. P24 full 392/392 remains historical regression evidence.
 Documentation-only P; no production, tests, EXEs, media or snapshot changes.
 Next file after owner review is order 320 base/disks/fdisk.c.
+
+
+## S4 P30: approved R0414 and bounded nonsemantic sweep
+
+Owner approves R0414 retention (+2/-2), authorizes restoring diskbios.c's
+nonsemantic directive differences, and extends that cleanup class to all 114
+current real-diff files. R0414 is approved; no other semantic decision is
+inferred from this batch. The current inventory removes five newly zero-diff
+files and updates all changed counts. Restored formatting points are no longer
+pending decisions; frozen counts and older narratives remain historical.
+
+The [P30 audit](m9-t100-s4-audit.md#p30-nonsemantic-restoration-across-114-files)
+records coverage, restored groups, retained semantic-context indentation,
+verification and delivery. Source bodies under existing #error remain outside
+scope. The generated cvidc family is scanned for this formatting class only;
+its outstanding semantic review has not been approved or completed.

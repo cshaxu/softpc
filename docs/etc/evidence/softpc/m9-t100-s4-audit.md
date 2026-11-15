@@ -831,3 +831,104 @@ deleted lines, net +666. Frozen S4 totals were 121 files, 15,778 blocks,
 semantic-point total is asserted before the outstanding manual review.
 This documentation-only accounting makes no new runtime claim and does not
 close S4/T100. Documentation/manifest/whitespace checks pass; scratch removed.
+
+
+## P30 nonsemantic restoration across 114 files
+
+Owner approves diskbios.c R0414 and authorizes a bounded sweep of all 114
+current real-difference files against fixed XP SP1. Freeze input at 24e0964a;
+retain the original dir ordinals. Audit only the nonsemantic cleanup class,
+not renewed approval of every semantic patch. Existing #error bodies receive
+no accounting. Compare paired conditional arms and retained text, including
+comments/blank lines on their outer directives. Local added conditional
+frameworks remain visible; they are not silently treated as original branches.
+
+All 114 files were scanned. Candidate generation compares retained-text Git
+Myers differences, joins nearby blocks, and checks whitespace/comment-neutral
+matches inside mixed blocks. Such matches are candidates only: string contents,
+preprocessor structure, real control-flow context and ownership are reviewed
+before restoration. The generated family has no independent restorable text
+candidate in this sweep; this does not approve its remaining semantic patches.
+
+Production change is +34/-34, net zero; tests are unchanged.
+Restore 24 groups across 15 mirror files: original directive comments/spacing,
+blank-line placement, one field's original whitespace, and two still-accurate
+MIDI inline comments. Keep the new scope indentation around actual semantic
+changes: guarded interrupt delivery, TLS release, mouse interrupt guards,
+new video loops/cursor handling, audio allocation/transfer and MIDI parsing.
+Unrelated identical braces/return lines matched by text are not evidence that
+they represent the same original statement. Do not restore an obsolete memory
+release comment onto a replacement callback/snapshot body. Added explanations
+of real fixes remain; no semantic implementation or excluded body is changed.
+The two MIDI comments are restored without reverting the current necessary
+nesting. They and the field-spacing restoration improve textual fidelity but
+do not reduce line-based counts because their surrounding semantic hunk remains.
+
+| File | Restored groups | Before text blocks / + / - | After text blocks / + / - |
+| --- | ---: | --- | --- |
+| `base/disks/diskbios.c` | 1 | 3 / +4 / -4 | 1 / +2 / -2 |
+| `base/inc/config.h` | 1 | 2 / +2 / -2 | 0 / +0 / -0 |
+| `base/inc/ios.h` | 1 | 3 / +3 / -3 | 1 / +1 / -1 |
+| `base/inc/rs232.h` | 2 | 4 / +3 / -3 | 0 / +0 / -0 |
+| `base/keymouse/keyba.c` | 4 | 10 / +125 / -4 | 4 / +121 / -0 |
+| `base/support/time_day.c` | 1 | 2 / +1 / -1 | 0 / +0 / -0 |
+| `base/system/ica.c` | 1 | 7 / +120 / -9 | 5 / +118 / -7 |
+| `base/system/timer.c` | 2 | 12 / +375 / -6 | 8 / +371 / -2 |
+| `base/video/ega_prts.c` | 1 | 3 / +7 / -1 | 1 / +6 / -0 |
+| `base/video/ega_read.c` | 1 | 2 / +1 / -1 | 0 / +0 / -0 |
+| `base/video/ega_vide.c` | 1 | 3 / +15 / -2 | 1 / +13 / -0 |
+| `base/video/ega_writ.c` | 1 | 2 / +1 / -1 | 0 / +0 / -0 |
+| `base/video/gfx_updt.c` | 4 | 139 / +235 / -215 | 131 / +231 / -211 |
+| `host/inc/cfpu_def.h` | 1 | 13 / +13 / -8 | 13 / +13 / -8 |
+| `host/src/nt_sbmid.c` | 2 | 33 / +285 / -399 | 33 / +285 / -399 |
+
+The 13 files with numerical deltas were recounted by structural XP pairing and
+zero-context Git Myers; their before counts exactly match the published P25
+inventory. The two other changed files have zero count delta. Other 99 source
+bodies remain byte-identical to the batch start. Preserve all frozen TSVs.
+
+Current totals: 109 real-diff files, 15,721 textual blocks, +24,699/-24,033,
+48,732 added-plus-deleted lines. Compared with P25: five fewer files, 40 fewer
+text blocks and 58 fewer diff lines (-29 added/-29 deleted). Net source length
+is not the measure of this improvement. Text blocks are not semantic points.
+Remove config.h, rs232.h, time_day.c, ega_read.c and ega_writ.c from the current
+real-diff list: only exclusion/line scaffolding remains. Whole-mirror classes
+are now 254 identical, 109 exclusion-only, 109 real-diff, total 472.
+
+All changed full-file C token streams (including directive expressions and
+string contents, excluding comments/whitespace/line controls) are identical
+before/after. CRLF remains intact. Existing #error text/order is unchanged;
+rs232.h's moved boundary anchor is corrected from 326 to 327 so BIT_ORDER2
+continues to map to XP line 328. Other necessary line controls remain.
+One moved original tab-only line is retained exactly as XP; ordinary Git
+blank-at-EOL diagnostics there are an original-whitespace restoration, not a
+compiler warning or new nonmirror style exception. Review mirror whitespace
+under its preserved-source policy and other changed paths with normal checks.
+
+Cached production/package and complete test-target builds pass on both
+architectures. tools/build.cmd remains CMD-only; the owned background runner
+captured completion without interactive timeout cancellation. Full regression:
+
+| Architecture | Background | Desktop / native audio / package | Seconds |
+| --- | ---: | ---: | --- |
+| x86 | 188/188 | 8/8 | 190.54 + 23.29 |
+| x64 | 188/188 | 8/8 | 226.62 + 24.59 |
+
+All 392 tests passed on their first run, with no retries or skips. Compared
+with the cached pre-change 1,088 object identities, only the two intentional
+build-timestamp composition objects change; all 1,086 others remain byte-equal.
+Both complete EXEs equal the previous published artifacts after normalizing
+only PE timestamp/checksum and the single embedded compiler time string.
+No other executable bytes differ. This is artifact equivalence evidence,
+separate from the completed full runtime tests.
+
+- softpc32.exe: 3477387 bytes; Nov 14 2026 21:20:39; SHA-256 c3dd1ea9fe09111ce0c55f5d4dec096164d32a39043414c6c20634f3ab026d84.
+- softpc64.exe: 3095066 bytes; Nov 14 2026 21:24:31; SHA-256 098a06ff4a8815d98af996419bc34053b5b2bb3400710072960aab4afe4c3eb7.
+
+Actual-change self-review confirms the only production modifications are the
+listed original-text restorations and the corrected line anchor. No test,
+Compat/shared implementation, configuration, media or snapshot is modified.
+Build warnings are confined to the preserved mirror; no nonmirror warning
+was emitted in these logs. Documentation, mirror manifest and applicable
+whitespace checks pass. Owned scratch is removed after promoting this evidence;
+only reusable build caches remain. S4/T100 remain open, not closed by this P.

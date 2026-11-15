@@ -1,6 +1,6 @@
 # T100 S4 current real-difference file list
 
-Current production: `327f996099cfd6b6851dfa40dad5220abee47e95` (P24).
+Current source: S4 P30 nonsemantic cleanup of `24e0964a` (production P24).
 Fixed XP SP1: `a2f6d7c93aa4f11efc51147566d5961c59a8ef89`.
 All paths are relative to `src/app-softpc/softpc.new/`.
 
@@ -11,14 +11,16 @@ The [frozen file ledger](m9-t100-s4-files.tsv) and
 [frozen P2 counts](m9-t100-s4-diff-counts.tsv) remain historical evidence,
 not the current pending list. P25 reconciles all 472 identities and current
 counts in the [audit record](m9-t100-s4-audit.md#p25-accepted-p24-and-current-aggregate).
+P30 removes five further zero-diff rows and applies verified per-file deltas;
+see [the cleanup audit](m9-t100-s4-audit.md#p30-nonsemantic-restoration-across-114-files).
 
 ## Current screening result
 
 | Disposition | Files |
 | --- | ---: |
 | Identical after CRLF/LF normalization | 254 |
-| Only excluded-body and line-control scaffolding differences | 104 |
-| Real retained-content differences listed below | 114 |
+| Only excluded-body and line-control scaffolding differences | 109 |
+| Real retained-content differences listed below | 109 |
 | Total | 472 |
 
 ## Counting convention
@@ -41,11 +43,10 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | base/comms | 2 |
 | base/cvidc | 36 |
 | base/disks | 3 |
-| base/inc | 15 |
+| base/inc | 13 |
 | base/keymouse | 3 |
-| base/support | 1 |
 | base/system | 7 |
-| base/video | 12 |
+| base/video | 10 |
 | host/inc | 6 |
 | host/src | 12 |
 
@@ -108,10 +109,9 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 315 | `base/cvidc/sinit012.c` | 92 | +700 | -699 |
 | 316 | `base/cvidc/sinit013.c` | 171 | +719 | -718 |
 | 318 | `base/cvidc/vglfunc.c` | 1 | +5 | -0 |
-| 319 | `base/disks/diskbios.c` | 3 | +4 | -4 |
+| 319 | `base/disks/diskbios.c` | 1 | +2 | -2 |
 | 320 | `base/disks/fdisk.c` | 2 | +120 | -0 |
 | 321 | `base/disks/fla.c` | 3 | +97 | -0 |
-| 333 | `base/inc/config.h` | 2 | +2 | -2 |
 | 335 | `base/inc/cpu_vid.h` | 2 | +3 | -0 |
 | 337 | `base/inc/dma.h` | 1 | +3 | -0 |
 | 339 | `base/inc/egacpu.h` | 1 | +8 | -1 |
@@ -119,31 +119,27 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 358 | `base/inc/gmi.h` | 2 | +3 | -0 |
 | 359 | `base/inc/gvi.h` | 1 | +2 | -0 |
 | 367 | `base/inc/ica.h` | 3 | +3 | -1 |
-| 369 | `base/inc/ios.h` | 3 | +3 | -3 |
+| 369 | `base/inc/ios.h` | 1 | +1 | -1 |
 | 377 | `base/inc/quick_ev.h` | 2 | +35 | -0 |
-| 379 | `base/inc/rs232.h` | 4 | +3 | -3 |
 | 381 | `base/inc/sas.h` | 1 | +1 | -1 |
 | 383 | `base/inc/sndblst.h` | 2 | +2 | -1 |
 | 386 | `base/inc/tape_io.h` | 1 | +0 | -1 |
 | 394 | `base/inc/video.h` | 1 | +4 | -0 |
-| 398 | `base/keymouse/keyba.c` | 10 | +125 | -4 |
+| 398 | `base/keymouse/keyba.c` | 4 | +121 | -0 |
 | 400 | `base/keymouse/mouse.c` | 14 | +115 | -34 |
 | 401 | `base/keymouse/ppi.c` | 6 | +29 | -13 |
-| 403 | `base/support/time_day.c` | 2 | +1 | -1 |
 | 404 | `base/system/at_dma.c` | 16 | +115 | -19 |
 | 405 | `base/system/cmos.c` | 4 | +122 | -4 |
-| 407 | `base/system/ica.c` | 7 | +120 | -9 |
+| 407 | `base/system/ica.c` | 5 | +118 | -7 |
 | 410 | `base/system/quick_ev.c` | 1 | +230 | -0 |
 | 411 | `base/system/rom.c` | 3 | +1 | -3 |
-| 412 | `base/system/timer.c` | 12 | +375 | -6 |
+| 412 | `base/system/timer.c` | 8 | +371 | -2 |
 | 414 | `base/system/unexp_nt.c` | 1 | +0 | -1 |
 | 416 | `base/video/egawrtm0.c` | 4 | +4 | -4 |
-| 419 | `base/video/ega_prts.c` | 3 | +7 | -1 |
-| 420 | `base/video/ega_read.c` | 2 | +1 | -1 |
-| 421 | `base/video/ega_vide.c` | 3 | +15 | -2 |
-| 422 | `base/video/ega_writ.c` | 2 | +1 | -1 |
+| 419 | `base/video/ega_prts.c` | 1 | +6 | -0 |
+| 421 | `base/video/ega_vide.c` | 1 | +13 | -0 |
 | 423 | `base/video/egwrtm12.c` | 11 | +11 | -11 |
-| 424 | `base/video/gfx_updt.c` | 139 | +235 | -215 |
+| 424 | `base/video/gfx_updt.c` | 131 | +231 | -211 |
 | 426 | `base/video/v7_ports.c` | 1 | +1 | -1 |
 | 427 | `base/video/v7_video.c` | 1 | +1 | -1 |
 | 428 | `base/video/vga_mode.c` | 3 | +3 | -3 |
@@ -167,4 +163,4 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 466 | `host/src/nt_sbmxr.c` | 6 | +48 | -0 |
 | 467 | `host/src/nt_sound.c` | 12 | +7 | -80 |
 | 468 | `host/src/nt_vga.c` | 13 | +37 | -16 |
-| **Total** | **114 files** | **15761** | **+24728** | **-24062** |
+| **Total** | **109 files** | **15721** | **+24699** | **-24033** |

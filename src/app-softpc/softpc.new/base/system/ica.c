@@ -1635,11 +1635,11 @@ cancel_action_interrupt IFN2(IU32, adapter, IU32, line)
 
 
 
-
-
 #if defined(NTVDM)
 #error "Unsupported SoftPC mirror configuration: NTVDM"
 #endif   /* NTVDM */
+
+
 #line 1863
 #ifdef HOOKED_IRETS
 #ifndef  GISP_CPU           /* GISP has own version of this routine */

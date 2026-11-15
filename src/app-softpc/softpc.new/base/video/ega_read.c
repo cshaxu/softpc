@@ -509,8 +509,8 @@ Glue_set_vid_rd_ptrs IFN1(READ_POINTERS *, handler )
 #endif  //NEC_98
 #line 711
 }	
-
 #endif /* !(NTVDM && MONITOR) */
+
 #line 714
 #ifdef SEGMENTATION
 #error "Unsupported SoftPC mirror configuration: SEGMENTATION"
