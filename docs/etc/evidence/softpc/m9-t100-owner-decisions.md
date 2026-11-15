@@ -6029,3 +6029,45 @@ approval. No source/test/artifact changes or new diff points. Own hidden CMD
 scratch build/t100-s4-p65 (two-hour/fifteen-minute no-progress budget) is removed
 after test/gate completion; Win95 investigation untouched. Next real file is
 ega_prts.c; original/no-real-diff intervening files remain excluded from review.
+
+## S4 P66: approved mode0 writers and EGA reset snapshot review
+
+Owner approves R0510-R0513. Next literal order419 base/video/ega_prts.c at
+c6bdd276 has one real insertion +6/-0 against fixed XP SP1. Existing excluded
+bodies and line controls are ignored. R0514 is snapshot state access, not a
+new emulated-device algorithm or a separately demonstrated guest bug repair.
+Current anchor1654 / XP insertion2174 adds the read-only getter
+`ega_snapshot_seq_reset()`, returning `sequencer.reset.as.abyte`. The current
+six-line count supersedes the historical seven-line description of this block.
+
+The actual original owner is ega_seq_reset in this file. VGA initialization
+registers that same receiver for reset writes (vga_prts.c:682), and the receiver
+updates its own private register plus the original asynchronous/synchronous
+display-disable bits. Compat devices/archive.c calls the video-controller
+capture; vga_prts.c:3165 obtains sequencer[0] through this getter, and restore
+at3243 calls the original ega_seq_reset. VGA's separate sequencer object is
+not the reset write owner. Its ordinary register-zero port read returns the
+constant3 (vga_prts.c:1207), so reading that port cannot save states0,1,2.
+Saving3 in place of an asserted reset would restore different display-disable
+state. This consequence is source proof, not a newly observed guest failure.
+
+The permanent vga_frame_smoke.c reset loop writes0..3 through the real receiver,
+captures and asserts the saved byte, changes the live reset value, restores,
+and checks display-disabled bits against the saved state. P65 ran this existing
+VGA fixture successfully on x86/x64 (2/2); source and artifacts are unchanged
+and P66 reuses that evidence rather than rerunning it. No new original-readback
+negative, exhaustive register-byte test or guest desktop validation is claimed.
+
+Recommend retain R0514 pending owner review. Deleting only the getter breaks
+its real capture caller; substituting port readback loses reset state. Exporting
+the private structure or maintaining a Compat copy would broaden ownership
+rather than simplify it. There is no new state, alternate reset path, mutation,
+polling or lifetime mechanism in these six lines. No safe restoration candidate
+was established. Next real-difference file is base/video/ega_vide.c.
+
+Only CURRENT and this decision record change; production/test/EXE and global
+inventory remain unchanged (106 files,15706 blocks,+24610/-24014). Documentation
+and whitespace verification apply; no build/publication is needed. Own hidden
+CMD gate scratch build/t100-s4-p66 has a two-hour/fifteen-minute no-progress
+budget and is removed after completion. Concurrent Win95 scratch remains
+untouched. S4/T100 stay open for sequential owner review.

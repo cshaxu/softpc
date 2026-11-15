@@ -29,12 +29,21 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P66 reviews order419 ega_prts.c at c6bdd276: one real insertion +6/-0,
+R0514 read-only snapshot access to the original EGA reset owner. VGA writes
+use that receiver while register-zero readback returns constant3. Existing
+reset0..3 capture/restore assertions passed on both widths in P65; this review
+reuses that unchanged-source evidence, without claiming fresh runtime tests.
+No safe restoration candidate or production/artifact change. Await R0514
+review. Own gate scratch build/t100-s4-p66 is retired; Win95 investigation
+untouched. See [P66 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p66-approved-mode0-writers-and-ega-reset-snapshot-review).
+
 S4 P65 reviews order416 egawrtm0.c at030a5e6e: four real replacements +4/-4,
 R0510-R0513 CHAIN2 BIOS byte/word mapping. Fresh producer/reader wiring review
 and historical per-line dual-width negatives support retention. Existing VGA
 regression freshly passes2/2; no new source/artifact changes or safe restoration
 candidate. Own scratch build/t100-s4-p65 is retired after verification, Win95
-investigation untouched. Await owner review. See [P65 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p65-approved-unexpected-interrupt-omission-and-mode0-writer-review).
+investigation untouched. Owner approves R0510-R0513. See [P65 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p65-approved-unexpected-interrupt-omission-and-mode0-writer-review).
 
 S4 P64 reviews order414 unexp_nt.c at1caff181: one real diff +0/-1, R0508
 terminal Ctrl-Z omission. Whole handler matches pinned XP. Fresh x86/x64
