@@ -4321,3 +4321,67 @@ Documentation, mirror and whitespace checks apply. Production/tests/EXEs
 unchanged. R0438 retention, R0439 byte removal and its one-line cleanup remain
 pending owner decision. Next real-diff file is order 369 base/inc/ios.h;
 idetect.h has no current real diff. S4/T100 remain open.
+
+
+## S4 P40: owner approves PIC contracts; EOF cleanup and ios.h review
+
+Owner approves R0438/R0439's necessary changes and explicitly directs removal
+of ica.h's replacement EOF blank. Removed exactly one trailing CRLF blank;
+retained #line 263's terminating CRLF, the name-collision guard and absence of
+Ctrl-Z. Production +0/-1; tests unchanged. Current mirror manifest updated.
+Real ica.h diff changes +3/-1 to +2/-1, still three text blocks. Current
+inventory changes to 107 files, 15,716 blocks, +24,669/-24,033; frozen evidence
+is unchanged. This is one fewer real added diff line, not one fewer point.
+
+Order 369 base/inc/ios.h: fresh complete pinned XP SP1 comparison finds one
+retained difference at line 23, R0440, one block +1/-1. Add
+ defined(SOFTPC_STANDALONE) ||
+to the existing NTVDM/GISP_SVGA/SFELLOW condition. The original 0x10000 and
+0x400 branches and their implementations remain unchanged. Existing excluded
+bodies/line controls are skipped without accounting. Category: standalone
+I/O address-space integration with an observable aliasing defect if restored;
+not snapshot, x64 ABI, new device implementation or duplicate dispatch path.
+
+Fresh callers: base/support/ios.c owns both adapter tables and masks dispatch
+and registration with PC_IO_MEM_SIZE-1. Original CCPU in.c:55/74 and out.c
+use that same mask directly. com.c registers COM1 at 03F8-03FF using ios.h's
+original ranges and decodes the selected UART register. Restoring the condition
+in this product selects 0x400 entries: 07FD & 03FF equals 03FD. Thus a port
+not registered as COM1 can hit COM1's status handler. This is global dispatch
+aliasing, distinct from a device intentionally registering a hardware alias.
+
+Historical S1 P90 extended the real serial fixture to create/reset the machine
+and call actual CCPU IN8 at 03FD and 07FD. Current x86/x64 controls returned
+60/FF and passed; a coherent private original-header restoration rebuilt ALL
+three affected original C objects (ios.c, in.c, out.c) with real Ninja flags,
+then linked the same fixture. Both compiled and linked, returned 60/60, and
+failed the isolation assertion. Expected high-port FF was independent of the
+table implementation. This is an actual CPU-I/O-worker/UART counterexample,
+not a freshly run guest, decoded guest instruction or exhaustive port matrix.
+Current source matches the recorded failure mechanism. No new dynamic test
+of ios.h is claimed in this P; ios.h remains unmodified.
+
+Counter-review: using NTVDM/GISP_SVGA/SFELLOW merely to select the table changes
+unrelated profile branches. Enlarging tables without matching CPU masks is
+inconsistent. Moving this selection into new tables, wrappers or Compat adds
+complexity; unconditional 0x10000 would discard original branch behavior and
+structure. The existing single condition term selects original implementation
+consistently. No safe equivalent restoration found. Recommend retain R0440,
+pending owner approval. Later implementation differences retain their own
+ordered reviews. Next real-diff file: order 377 base/inc/quick_ev.h.
+
+Cached tools/build.cmd --no-pause completed x86/x64 package builds with exit
+0; both EXEs published. Full before/after byte comparisons are identical after
+normalizing ONLY PE TimeDateStamp, PE CheckSum and the unique compiler time
+string. No code/data/debug difference remains. Runtime tests are skipped under
+the owner's complete-artifact-equivalence exception, not claimed passed.
+Existing original-mirror compiler warnings were emitted; no warning-free claim.
+Documentation, mirror manifest and git diff --check pass. Initial sandbox
+background launch exited without starting the script; the authorized hidden
+background rerun completed normally. No timeout/termination is test evidence.
+Disposable copies/logs are removed after promoting this result.
+
+Published Nov 14 2026:
+
+- softpc32.exe: 22:49:29; SHA-256 e1ba6e7fc52d85b7aef13991e649e8a98dd5497d97677b20ca2bbcbc3b41a480.
+- softpc64.exe: 22:49:47; SHA-256 7cbae63b28ee6ce4cecd703ccd0a8d33ec6c3190c4ec6934d583fd60f6a8395e.

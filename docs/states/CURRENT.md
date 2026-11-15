@@ -29,6 +29,16 @@ Unreviewed files and automatic small-diff delegation remain unapproved.
 
 ## Current Technical Baseline
 
+S4 P40 records owner approval of R0438/R0439 and removes only ica.h's
+replacement EOF blank. Its real diff is now +2/-1; aggregate is 107 files,
+15,716 blocks, +24,669/-24,033. Reviews ios.h R0440, one block +1/-1:
+selecting the existing full I/O map prevents unregistered high ports from
+aliasing COM1. Historical paired CPU I/O controls support retention, pending
+owner approval. Cached dual builds/publication pass; complete artifacts are
+equivalent except PE timestamp/checksum and compiler time. Runtime suites are
+skipped under the approved equivalence rule; mirror/documentation checks pass.
+Next actionable file is order 377 quick_ev.h; S4/T100 remain open.
+
 S4 P39 records owner approval of gvi.h R0434 and reviews order 367 ica.h:
 three blocks +3/-1, two semantic/compiler decisions. R0438's two guard lines
 prevent PIC/CCPU name collision; R0439 removes a compiler-rejected Ctrl-Z.

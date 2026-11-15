@@ -225,4 +225,3 @@ extern void (*ica_clear_int_func) IPT2(IU32, adapter, IU32, line_no);
 #error "Unsupported SoftPC mirror configuration: GISP_CPU"
 #endif /* GISP_CPU */
 #line 263
-

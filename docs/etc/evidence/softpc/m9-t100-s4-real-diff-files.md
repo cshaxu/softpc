@@ -1,6 +1,6 @@
 # T100 S4 current real-difference file list
 
-Current source: S4 P34 conditional-wrapper cleanup of `ccee5c80`.
+Current source: S4 P40 trailing-blank cleanup of `f2cc1ffc`.
 Fixed XP SP1: `a2f6d7c93aa4f11efc51147566d5961c59a8ef89`.
 All paths are relative to `src/app-softpc/softpc.new/`.
 
@@ -120,7 +120,7 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 339 | `base/inc/egacpu.h` | 1 | +4 | -1 |
 | 342 | `base/inc/egaports.h` | 1 | +1 | -0 |
 | 359 | `base/inc/gvi.h` | 1 | +2 | -0 |
-| 367 | `base/inc/ica.h` | 3 | +3 | -1 |
+| 367 | `base/inc/ica.h` | 3 | +2 | -1 |
 | 369 | `base/inc/ios.h` | 1 | +1 | -1 |
 | 377 | `base/inc/quick_ev.h` | 2 | +35 | -0 |
 | 381 | `base/inc/sas.h` | 1 | +1 | -1 |
@@ -165,4 +165,4 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 466 | `host/src/nt_sbmxr.c` | 6 | +48 | -0 |
 | 467 | `host/src/nt_sound.c` | 12 | +7 | -80 |
 | 468 | `host/src/nt_vga.c` | 13 | +37 | -16 |
-| **Total** | **107 files** | **15716** | **+24670** | **-24033** |
+| **Total** | **107 files** | **15716** | **+24669** | **-24033** |
