@@ -140,7 +140,7 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 419 | `base/video/ega_prts.c` | 1 | +6 | -0 |
 | 421 | `base/video/ega_vide.c` | 1 | +13 | -0 |
 | 423 | `base/video/egwrtm12.c` | 11 | +11 | -11 |
-| 424 | `base/video/gfx_updt.c` | 131 | +231 | -211 |
+| 424 | `base/video/gfx_updt.c` | 130 | +230 | -210 |
 | 426 | `base/video/v7_ports.c` | 1 | +1 | -1 |
 | 427 | `base/video/v7_video.c` | 1 | +1 | -1 |
 | 428 | `base/video/vga_mode.c` | 3 | +3 | -3 |
@@ -164,4 +164,4 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 466 | `host/src/nt_sbmxr.c` | 6 | +48 | -0 |
 | 467 | `host/src/nt_sound.c` | 12 | +7 | -80 |
 | 468 | `host/src/nt_vga.c` | 13 | +37 | -16 |
-| **Total** | **106 files** | **15706** | **+24610** | **-24014** |
+| **Total** | **106 files** | **15705** | **+24609** | **-24013** |

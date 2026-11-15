@@ -6371,3 +6371,65 @@ candidate are presented for owner review. Next real file is base/video/v7_ports.
 (gvi.c has no real difference). Own hidden CMD gate and count scratch is
 build/t100-s4-p71, two-hour/fifteen-minute no-progress budget, removed after
 completion. Documentation/whitespace gates apply; S4/T100 remain open.
+
+## S4 P72: restore original stream prototype and review V7 pointer condition
+
+Owner approves restoring the original gfx_updt.c stream declaration and
+requests the next file. The exact XP extern at original5967 replaces its blank
+placeholder, retaining CRLF and line count. Production +1/-1, no test change.
+Local manifest hash updated. This reduces that file from131 blocks,+231/-211
+to130 blocks,+230/-210: one block and two changed lines removed. The inventory
+applies this delta only; it is not a new whole-tree recount of intervening EIP
+changes. No stream call or implementation is added or enabled.
+
+Hidden CMD tools/Build.cmd --no-pause completes cached x86/x64 build/publication
+with exit0. The actual gfx_updt.c objects are byte-identical to the pre-edit
+objects on both widths. Both complete EXEs compare equal after masking only PE
+COFF timestamp/checksum and compiler timestamp strings; the only changed string
+is the time at file offset2393152(x86),2262240(x64). Published times are
+Nov15 2026 14:43:38(x86),14:43:54(x64). SHA-256:
+- x86: 2c2fccfb3d7f96c99988f95b1e0b5ba56d37b97ae81361400b9f93e49b57a9e1
+- x64: 8bf95ab73bcbcf4e8ef811d927b638de2460de223c1d337e25001fbfdd29a34d
+
+Existing original-mirror warnings remain; no behavioral change or new runtime
+result is claimed. Under the owner's artifact-equivalence exception, full tests
+are not repeated. P69 full392/392 remains the runtime evidence. Documentation
+and mirror gates and actual diff review apply. No guest/INI/snapshot change.
+
+Next literal order426 base/video/v7_ports.c has exactly one selected replacement,
+R0536 current684 / XP679, +1/-1:
+
+```diff
+-        if (get_seq_chain4_mode() && get_chain4_mode())
++        if (get_seq_chain4_mode() && get_256_colour_mode())
+```
+
+Classification: display-coordinate correctness, not snapshot or standalone
+policy. SR4 CPU memory mode controls get_chain4_mode and CPU addressing; display
+256-colour interpretation is separately maintained. draw_v7ptr must use display
+interpretation to decide original X halving. The first sequential-chain4 test,
+condition order, position registers, halving, pattern lookup and paint callback
+are unchanged. Example: registers X16/Y6 in packed display must paint at X8
+when SR4 CPU chain4 is disabled, rather than moving the pointer to X16.
+
+Actual source chain: original pointer register handlers call draw_v7ptr, which
+calls paint_v7ptr. The existing verify_v7_cpu_scanout test enters modes66-69 via
+BIOS, toggles SR4 through ports, separately asserts changed CPU address mapping,
+then programs original pointer registers and asserts pixel[6*width+8]==ff.
+Historical P129 compiled/linked the exact original condition in the actual body
+on both widths. Current controls passed; both original variants failed this
+pixel assertion. This is historical negative evidence, not a fresh P72 run;
+negative runs stop at their first failure and do not prove every later matrix
+member fails. No fresh interactive Win3.1 or RDP claim.
+
+The earlier same-looking chain4 condition in v7_get_banks is intentionally
+unchanged: it selects CPU-access banks, not display coordinates. Do not apply
+this display correction indiscriminately to CPU addressing. No alternate
+renderer/state/helper or smaller safe restoration candidate is established.
+Recommend retain R0536 pending owner review; v7_ports.c production is untouched.
+Next real file is base/video/v7_video.c. S4/T100 remain open.
+
+Own scratch build/t100-s4-p72 has a two-hour/fifteen-minute no-progress budget;
+retire after all owned build/gate jobs exit. Fresh preflight showed a clean
+worktree and no SoftPC/build process, resolving automatic review's concern
+about stale concurrent Win95 edits. No other task's scratch is touched.

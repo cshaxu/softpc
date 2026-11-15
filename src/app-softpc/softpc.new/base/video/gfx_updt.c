@@ -4115,7 +4115,7 @@ GLOBAL void enable_gfx_update_routines IFN0()
 #line 5965
 #endif /* REAL_VGA */
 
-
+extern void host_stream_io_update(half_word *, word);
 
 #ifndef NEC_98
 #line 5970
