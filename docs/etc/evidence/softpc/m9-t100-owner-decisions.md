@@ -5542,3 +5542,63 @@ adds all three inputs as `OBJECT_DEPENDS` of `firmware.rc`. Generated Ninja
 rules confirm each firmware resource object, including all self-contained
 machine/integration tests, explicitly depends on all three ROMs. No ROM bytes,
 guest media, INI, CPU semantics or timer behavior are changed.
+
+## S4 P57: CMOS file review
+
+Owner advances from delivered P55 to the next file. Preserve the intervening
+P56 firmware-provenance work at current HEAD29c41ecb; this review does not
+alter or requalify it. Order405 base/system/cmos.c is compared against pinned
+XP SP1 a2f6d7c9. Excluded bodies and line controls are omitted, including the
+nested NTVDM rtc_init tick assignments: they are not extra live differences.
+The inventory reconciles to four blocks +122/-4, two semantic groups:
+
+| Point/current location | Blocks | Added/deleted | Classification |
+| --- | ---: | ---: | --- |
+| R0482a, cmos/port.h include at40 | 1 | +1/-0 | Host configuration declaration. |
+| R0482b, fixed-disk selection at963 | 1 | +1/-4 | Report configured HDD topology instead of always claiming C. |
+| R0483a, snapshot.h include at49 | 1 | +1/-0 | Snapshot declaration ownership. |
+| R0483b, appended callback/state functions at1177-1294 | 1 | +119/-0 | Snapshot capability, including separators. |
+
+Fresh caller proof: CMakeLists.txt:181 selects this original device owner;
+original POST calls cmos_post. platform.c:232 reports configured HDD paths,
+returning C type3 in the high nibble and D type4 in the low nibble. It owns no
+CMOS register state. The always-present floppy controller is unaffected.
+No HDD means type0, C only0x30, C+D0x34; D only0x04 is source-derived here.
+Original XP unconditionally initializes disk=0x30, then optionally0x34, so it
+cannot represent no configured HDD. Historical S1 P107 actual-controller
+original-restoration negative fails fdc_smoke CMOS_DISK==0 on both widths.
+Current fdc_smoke:235 retains that independent assertion and :237 expects
+CMOS_DISKETTE0x40; dual_media_smoke:63 checks0x30. Do not conflate no HDD with
+no floppy hardware or claim a fresh manual guest reproduction.
+
+R0483 four function bodies (including GLOBAL line): callback encoder17 lines,
+decoder12, capture30, restore56; together115 plus four separating blank lines
+make the119-line appended diff. The three callbacks are actual originals:
+rtc_periodic_event uses add_q_event_t; rtc_alarm and sync_rtc_to_host_time use
+add_tic_event. archive.c:63/87 encodes/decodes their identities; :151/219 calls
+capture/restore. The existing archive wire map carries state, not native function
+or struct-tm pointers. CMOS bytes, selected index, conversion modes, alarm/IRQ,
+tick count, calendar/time, periodic interval and event handle stay with their
+original owner. Restore rebuilds cmos_register and conversion-function pointers.
+Reading registerA clears UIP and reading registerC clears interrupt flags;
+port replay is not equivalent to restoring private state and pending callbacks.
+Moving equal serialization to Compat would expose private internals without
+removing the capability's complexity. Returning to XP removes required archive
+entry points; retaining the snapshot feature requires this access.
+
+Evidence limit: checkpoint_smoke:482/603/635 proves byte0x5a survives capture,
+mutation to0x42 and restore through the real archive; it does not exhaust every
+RTC phase/mode/host-time combination. P55 full392/392 is historical qualification,
+not a newly executed result at P56. Restore rejects invalid state and has no
+transactional per-device rollback guarantee; a failed Machine restore does not
+resume the guest. No claim of exhaustive malformed-snapshot coverage is made.
+
+Counter-review: remaining statements all have current consumers/state owners;
+no semantically redundant formatting, conditional relocation or added wrapper
+was found in the retained diff. R0484 cast, R0485 comment and R0486 parentheses
+were already restored in S1 P107 and are not pending retention items. In
+particular the old parentheses concern caused redundant internal correction,
+not a proven guest fault, and is not reintroduced. Recommend retaining R0482
+and R0483, awaiting owner decision. No source/test/EXE/snapshot changed or
+runtime tests rerun. Next real-difference file is ica.c; intervening zero-diff
+files remain excluded from this review list.
