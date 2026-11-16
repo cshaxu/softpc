@@ -69,6 +69,17 @@ production/test object configurations; identical outputs require no tests or
 publication. Different outputs require full qualification/publication before
 delivery. Preserve all other sources, original helpers, assets and exclusions.
 
+Owner admits P97 auditing all 34 deferred generated C-VID files (sevid000-030,
+sinit011-013) for unsupported retained differences. Read-only source work;
+classify individual current differences against fixed XP and existing evidence,
+without treating prior broad passing tests as per-point proof. Own disposable
+build/t100-s4-p97; two-hour/fifteen-minute no-progress budgets. No production
+restoration, publication or sibling writes in this investigation. Promote the
+finite evidence-gap ledger and remove scratch before delivery. P97 source audit
+finds eight unwired entries (145 blocks +228/-228); see the
+[bounded evidence report](../etc/evidence/softpc/m9-t100-s4-p97-cvidc-evidence.md).
+No production changes or restoration approval; S4 remains open.
+
 ## M9 T100 S4 Packet
 
 | Field | Required record |

@@ -7931,3 +7931,15 @@ through sinit013.c (34 files, orders283-316) are not thereby approved. The
 first deferred real-diff file is base/cvidc/sevid000.c, currently 408 blocks,
 +492/-497 per current inventory; these are inventory values, not a fresh
 per-block approval. Await owner direction to resume the deferred range.
+
+
+## S4 P97: all 34 generated files, missing retention evidence
+
+Owner requests unsupported points in the deferred C-VID range. The
+[current audit](m9-t100-s4-p97-cvidc-evidence.md) covers all 15,129 current hunks
+and finds eight unconnected generated entries: 145 blocks +228/-228 without
+production-consumer evidence. They are restoration candidates, not approved or
+implemented restorations. Shared ABI proof and historical negative controls
+remain distinct from fresh dynamic proof. No source/test/artifact changes; S4
+stays open. Full point coordinates and per-file source hashes accompany the
+report; no excluded body is separately recorded.
