@@ -85,6 +85,13 @@ then owner acceptance. Preserve user configuration/media and unrelated work.
 
 ## Current Technical Baseline
 
+Owner accepts P89. S4 P90 audits order464 nt_sbfm.c at 0570fad6: four real
+blocks,+20/-104; recommended retention is host-boundary omissions and two-byte
+FM snapshot state. No source/test/EXE change or fresh runtime claim. Corrected
+inventory total is 106 files,15747 blocks,+24594/-24023; two previously missed
+comment terminators explain the accounting-only change. All four points await
+owner approval; do not advance. See [P90 audit](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p90-nt_sbfmc-current-retained-content-audit).
+
 S4 P89 implements the five owner-approved nt_sbdsp.c restorations from P88:
 two original-position forwards and three original USHORT spellings. Source
 +13/-9, tests unchanged. Actual cached DSP objects are byte-identical on x86
@@ -97,7 +104,7 @@ four fewer changed lines, not fourteen; alignment produces 104 vs 103 blocks.
 The unchanged nt_sb.c inventory row separately corrects five missed deletions.
 Current global inventory: 106 files,15747 blocks,+24594/-24021. Other 97 P88
 blocks retain bounded source/alignment/historical evidence, not independent
-runtime reproductions. Await P89 acceptance; do not advance. S4/T100 remain
+runtime reproductions. P89 is owner-accepted. S4/T100 remain
 open. See [P89 evidence](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p89-restore-approved-dsp-declarations-and-cast-spelling).
 
 S4 P87 removes exactly two mirror-added duplicate includes in nt_graph.c and

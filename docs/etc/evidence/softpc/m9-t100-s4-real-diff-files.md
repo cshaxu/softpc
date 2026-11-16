@@ -159,9 +159,9 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 461 | `host/src/nt_munge.c` | 6 | +25 | -1 |
 | 462 | `host/src/nt_sb.c` | 24 | +147 | -381 |
 | 463 | `host/src/nt_sbdsp.c` | 104 | +541 | -1002 |
-| 464 | `host/src/nt_sbfm.c` | 4 | +20 | -102 |
+| 464 | `host/src/nt_sbfm.c` | 4 | +20 | -104 |
 | 465 | `host/src/nt_sbmid.c` | 33 | +284 | -400 |
 | 466 | `host/src/nt_sbmxr.c` | 6 | +48 | -0 |
 | 467 | `host/src/nt_sound.c` | 12 | +7 | -80 |
 | 468 | `host/src/nt_vga.c` | 13 | +37 | -16 |
-| **Total** | **106 files** | **15747** | **+24594** | **-24021** |
+| **Total** | **106 files** | **15747** | **+24594** | **-24023** |

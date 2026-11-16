@@ -7608,3 +7608,37 @@ no new API/state/helper, changed ownership, conditional or line-control change.
 No test source change or new guest/manual acceptance claim. Manifest and current
 inventory reconcile. Disposable P89 evidence is summarized here before cleanup;
 reusable Ninja/ccache trees remain. Await owner acceptance; S4/T100 stay open.
+
+
+## S4 P90: nt_sbfm.c current retained-content audit
+
+Owner accepts P89 and requests the next file. Baseline 0570fad6; order464,
+fixed XP SP1 only. No production/test/asset change. Excluded bodies and line
+controls are outside this review. Direct Git Myers numstat proves four blocks,
++20/-104, correcting the historical -102 count (two removed --*/ terminators).
+The current inventory correction does not represent any source deletion.
+
+| Point | Current anchor | XP anchor | Size | Purpose and evidence | Recommendation |
+| --- | --- | --- | --- | --- | --- |
+| R0657a | include list, line11 | lines11-13 | +0/-3 | NT private headers removed; retained Windows/host/SB headers supply current dependencies. Prior P155 coherent-original builds fail on unavailable NT declarations on both widths. | retain host boundary |
+| R0657b | snapshot.h, line17 | softpc.h, line20 | +1/-1 | Actual capture/restore signatures use the single Compat archive state declaration; unavailable NTVDM softpc.h does not provide this contract. | retain host/archive boundary |
+| R0662 | lines47-65 | insertion before ResetFM | +19/-0 | Capture/restore selected register and observable Status; nt_sb.c capture/restore calls them, archive.c writes/reads both fields. Existing exhaustive fixture checks 524288 transitions and roundtrips plus all 256 status bytes. | retain snapshot capability |
+| R0663 | after FindFMSynthDevice | OpenFMDevice/CloseFMDevice | +0/-100 | Removed native lifetime requires VDM_ADLIB_DATA/NtVdmControl and direct kernel port/emulation ownership. Full-repository search finds no current calls; original prototypes remain. Restoring cannot supply a standalone FM backend and reintroduces unsupported kernel dependencies. | retain host boundary |
+
+Current production CMake includes this file; SB input/output calls FMStatusRead,
+FMRegisterSelect, FMDataWrite, and reset calls ResetFM. It is not test-only.
+FMActive has only its FALSE initializer in the current production tree, so
+FMPortWrite drains the original software batch without issuing a native write.
+No FM sound capability is claimed. Position/PortData only service that inactive
+native-write path; timer booleans have no active read consumer. The guest-visible
+state is the selector and Status, exactly the two archived bytes. Original
+AD_MASK scope, immediate timer flags, register masking and read behavior remain
+unchanged; no guest mode or new hardware policy is introduced.
+
+Evidence distinction: this pass freshly reads XP/current full source, callers,
+archive mapping and test assertions. P155 withdrawal/compilation evidence and
+P89's successful dual full regression are historical evidence, not new runs.
+No new runtime/guest reproduction is claimed. No justified restoration candidate
+was found in these four current blocks; preserve independent original helpers
+and unused original declarations rather than create cleanup differences.
+Recommendations await owner approval. S4 remains on order464.
