@@ -92,6 +92,14 @@ delivery. Preserve all other sources, original helpers, assets and exclusions.
 
 ## Current Technical Baseline
 
+Owner approves nt_sbmid.c residuals and P92 restoration. S4 P93 reviews
+order466 nt_sbmxr.c at 0e765b4f: six additions,+48/-0, with every original XP
+line preserved in original order. All additions map to archive state, actual
+output application or composed gain. No restoration candidate or production
+change; fresh exhaustive integer check covers 131072 raw gain pairs, distinct
+from prior C/runtime evidence. Await owner approval; do not advance. See
+[P93 audit](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p93-nt_sbmxrc-complete-addition-only-audit).
+
 S4 P92 restores nine original nt_sbmid.c indentation prefixes: +9/-9, with no
 non-whitespace or line-count change. All six actual x86/x64 production/unit/
 native object compilations match pre-edit SHA256 byte-for-byte. Under owner

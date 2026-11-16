@@ -7788,3 +7788,50 @@ No new defect fix, compatibility layer or helper was introduced. Self-review
 confirms the actual diff is only approved whitespace plus manifest/evidence.
 Scratch evidence is promoted here and removed; S4 stays on order465 awaiting
 owner review, with no later-file approval inferred.
+
+
+## S4 P93: nt_sbmxr.c complete addition-only audit
+
+Owner approves nt_sbmid.c current residuals and P92 restoration, then requests
+order466. Baseline 0e765b4f. Fixed XP SP1 full comparison verifies every original
+line occurs in original order, with only six insertions,+48/-0. No exclusions
+or formatting replacements need restoration. No source/test/EXE change.
+
+| Point | Current lines | Size | Actual contract and evidence | Recommendation |
+| --- | --- | --- | --- | --- |
+| R0674 header | 19 | +1/-0 | snapshot.h declares the one archive record consumed by the two added functions. | retain |
+| R0674 archive | 47-69 | +23/-0 | Capture selected register plus four raw volume registers; restore validates selector before writes. nt_sb.c invokes both, archive.c maps all five bytes. Fixture preserves reserved bits, selected CD write continuation and invalid-selector nonmutation. | retain |
+| R0675 master apply | 269 | +1/-0 | Master write must update both active PCM/MIDI output; original HWaveOut branch is inactive under current ownership. | retain |
+| R0675 voice apply | 312 | +1/-0 | Voice write updates active PCM gain rather than only guest register readback. | retain |
+| R0675 MIDI apply | 354 | +1/-0 | FM/MIDI register write reaches current MidiApplyMixer/Lib output. | retain |
+| R0676 composition | 357-377 | +21/-0 | MixerGain and two getters derive effective gain from original registers. Actual PCM open/gain and MIDI open/gain consumers require this; Compat owns no competing guest mixer. | retain |
+
+Full current chain: guest mixer port -> original register selector/data setter
+-> added SbApplyMixer -> MidiApplyMixer and active PCM set_gain. Snapshot restore
+sets registers without native calls, then nt_sb owner applies gains after all
+SB state restoration. CD stays guest-readable even though no current CD host
+output is wired; omitting it would lose observable archive state. Unknown-index
+and reset behavior are unchanged original code.
+
+Concrete negative cases: omit archive selector and a post-load data write goes
+to the wrong register; omit application and register readback changes without
+updating active output; use only the last-written individual level and master/
+voice attenuation no longer composes. P157 independent withdrawals failed both
+widths for the three contracts; these are recorded historical tests, not fresh
+P93 executions. Current fixture contains independent level tables, reverse
+write ordering, zero gain, reserved-bit readback and archive assertions.
+
+Fresh mathematical check reproduces exact IU32 wrap/divide/IU16 narrowing for
+all 131072 raw master/channel pairs (voice and MIDI), comparing against positive
+64-bit level-table products with zero mapped to silence. All agree; this is an
+integer-identity check, not execution of the compiled C or acoustic calibration.
+The previously removed zero guard remains unnecessary for these exact ranges.
+Original host volume branches are not activated; their historical independent
+write/zero-wrap behavior is not silently treated as the current combined gain.
+
+Self-review finds no added duplicate declaration, alternate guest state owner,
+extra threading or needless format difference to restore. Each insertion has
+a concrete contract; this does not assert the original NTVDM product had the
+same host lifecycle. P89 remains latest full runtime qualification. P93 only
+changes the audit/approval record and CURRENT; no build/test/publication needed.
+All six additions await owner retention approval; do not advance past order466.
