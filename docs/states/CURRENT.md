@@ -92,6 +92,13 @@ delivery. Preserve all other sources, original helpers, assets and exclusions.
 
 ## Current Technical Baseline
 
+Owner approves nt_vga.c R0683-R0686. S4 P96 confirms the forward audit reaches
+order468, the last current real-diff file. Fresh checks find all four trailing
+ROM/resource files byte-identical to fixed XP. No further forward diff file.
+The 34 previously skipped generated cvidc files remain unapproved; first is
+order283 base/cvidc/sevid000.c. Do not infer S4/T100 closure or audit approval
+from reaching the end. No source/test/EXE change. See [P96 record](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p96-accept-vga-review-and-confirm-end-of-forward-order).
+
 Owner approves nt_sound.c R0677/R0678/R0680/R0681. S4 P95 audits order468
 nt_vga.c at 7529e4d5: all thirteen retained blocks,+37/-16 map to four standard
 painter boundary/geometry contracts (R0683-R0686). Current real dispatch and

@@ -7915,3 +7915,19 @@ necessary ordering, not formatting to restore independently. Existing comment
 text and conversion bodies remain untouched. All four IDs have bounded retention
 evidence; no safe exact-original restoration candidate found. Audit-only gates
 apply; all points await owner decision and S4 stays on order468.
+
+
+## S4 P96: accept VGA review and confirm end of forward order
+
+Owner approves P95 R0683-R0686 and requests the next file. Baseline 6feba783.
+Order468 nt_vga.c is the final current real-diff file in forward dir order.
+Fresh byte comparisons and SHA256 verify order469-472 bios1.rom, bios4.rom,
+cmos.ram and v7vga.rom are identical to fixed XP. They require no diff audit.
+No source/test/EXE change, build or test run.
+
+The forward frontier reaching the end does not close S4: owner previously
+skipped generated cvidc files. sevid000.c through sevid030.c and sinit011.c
+through sinit013.c (34 files, orders283-316) are not thereby approved. The
+first deferred real-diff file is base/cvidc/sevid000.c, currently 408 blocks,
++492/-497 per current inventory; these are inventory values, not a fresh
+per-block approval. Await owner direction to resume the deferred range.
