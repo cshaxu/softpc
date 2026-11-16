@@ -2,10 +2,10 @@
 
 ## Current Work
 
-No implementation subtask is active. Open task awaiting owner: T100.
-Owner approves the final uniform C-VID ABI retention and closes S4; S1-S4
-are closed. No next S is automatically admitted. See
-[S4 closure](../history/M9-T100-S4-ordered-mirror-audit.md).
+Owner admits M9 T100 S5: ordered Compat simplification audit. S1-S4 remain
+closed; T100 remains open. Baseline2464862d. Start with evidence and concrete
+removal/merge candidates; preserve behavior and existing ownership boundaries.
+[Progress](../etc/evidence/softpc/m9-t100-s5-compat-audit.md).
 
 The following admissions are retained historical records, not active work.
 
@@ -83,6 +83,27 @@ finds eight unwired entries (145 blocks +228/-228); see the
 [bounded evidence report](../etc/evidence/softpc/m9-t100-s4-p97-cvidc-evidence.md).
 Owner subsequently approves uniform ABI retention and S4 closure. The P97
 restoration candidate is withdrawn; no production change was made.
+
+## M9 T100 S5 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner admits a new S auditing Compat in fixed dir order to reduce code/file/line count. Initial source investigation, no blanket semantic rewrite approval. |
+| Objective | Audit every frozen Compat file for unnecessary code, duplicated owners/paths, thin wrappers and coherent file consolidation; favor fewer concepts and actual repository-wide reduction. |
+| Non-goals | No guest/configuration/media changes; no mirror diff growth, shared-package changes, new framework, alias, polling or second path merely to shrink Compat. No performance claims without measurement. |
+| Reference Baseline | SoftPC2464862d; existing in-tree XP mirror is comparison material, not a new import. |
+| Candidate Proposal | [S5 ordered Compat audit](../proposals/m9-xp-mirror-original-first-audit.md#s5-ordered-compat-simplification-audit). |
+| Files And ABI Surface | src/app-softpc/compat plus read-only caller/build/test inspection. Proposed interface or source changes must identify all consumers before implementation. |
+| Applicable Rules | docs/README.md reading set; execution, architecture, coding, documentation and source policies. |
+| Verification | Frozen dir order, hashes and tracked-file equality; per-file real callers and ownership proof. Documentation-only checks now; approved implementation uses cached dual builds and proportional/full regression, publication and review. |
+| Expected Markers | Every file has ordinal, lines/hash, finding, evidence and status; no missing file hidden by traversal changes. |
+| Asset Needs | Preserve assets/INI/media. If needed S5 owns only build/t100-s5, two-hour total and fifteen-minute no-progress budgets; hidden background jobs and delivery cleanup. No scratch currently created. |
+| Reporting Requirements | Per-file purpose, consumers, removable/merge candidates, exact or explicitly estimated source/test/file delta, mirror impact and proof limits. |
+| Stop Conditions | Unproved equivalence is an investigation item; do not remove required failure handling or add mirror differences to improve Compat metrics. |
+| Exit Criteria | Every frozen file reviewed and dispositioned; owner-approved changes qualified and delivered, unresolved candidates explicitly decided; self-review and clean workspace before owner closure. |
+| Original Owner Request | 现在准入一个新s 按照dir固定顺序审计compat 目标是精简compat代码规模 减少文件数和行数。 |
+| Similar-Issue Sweep | Trace matching redundancy across consumers without advancing unreviewed file status; distinguish original required adaptation from accidental duplication. |
 
 ## Current Technical Baseline
 

@@ -527,3 +527,32 @@ restoration candidate is withdrawn. See the [closure record](../history/M9-T100-
 The earlier S3/S4 admission paragraphs are history, not outstanding S work.
 T100 remains open for a separately authorized completion audit. No next S is
 admitted by this status update; existing TODO/Queue ownership remains unchanged.
+
+## S5 ordered Compat simplification audit
+
+Owner request: 现在准入一个新s 按照dir固定顺序审计compat 目标是精简compat代码规模 减少文件数和行数。
+S5 is admitted at2464862d; S4 remains closed. Scope is all50 tracked
+Compat files,8957 physical lines, in captured cmd /d /c dir /a /b /s order.
+The [frozen ledger](../etc/evidence/softpc/m9-t100-s5-compat-files.tsv) removes
+only directory rows; no lexical re-sort. A rename/deletion retains its original
+ordinal. New discoveries are appended explicitly, not silently reordered.
+
+For each file, prove production/test/build consumers, original mirror overlap,
+resource/state ownership and supported configurations. Report concrete removal,
+merge or existing-owner reuse candidates with source and repository-wide line/file
+impact, expected behavior, regression requirements and evidence limits. Moving
+code into another directory is not a code reduction. Smaller files do not justify
+unrelated aggregation; no macros, aliases, compressed statements, second paths,
+new state machines or public-package changes merely to improve size metrics.
+Prefer original functionality when equivalent, but do not increase mirror diff
+or silently undo S4-approved boundaries. Needed platform/ABI/failure handling
+remains even without a recorded customer failure.
+
+This admission starts investigation and review, not unreviewed wholesale deletion.
+Proceed in frozen order; dependent-file reads do not advance their audit status.
+Present each reviewed file's findings before semantic implementation. Approved
+changes receive cached dual builds, relevant/full regression and publication as
+required, actual-diff review and commit/push. Audit-only work gets documentation,
+whitespace and inventory checks; never invent new runtime results. Completion
+requires every ledger row to have evidence and final disposition, and all approved
+implementation candidates to be qualified or explicitly deferred by the owner.
