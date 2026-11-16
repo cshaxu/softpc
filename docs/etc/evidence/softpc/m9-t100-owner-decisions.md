@@ -7307,3 +7307,251 @@ or original repeated include changed. Documentation/whitespace gates pass.
 All owned jobs have completed; disposable probes/objects/logs are removed after
 promoting this evidence. Await owner acceptance; S4/T100 remain open and the
 unrelated file-diff review frontier is not advanced by this mechanical sweep.
+
+
+## S4 P88: exhaustive current nt_sbdsp retained-diff audit
+
+Owner asks to audit all 103 blocks, not infer necessity from functional groups.
+Source baseline: 075dc4b0. Fixed XP: a2f6d7c93aa4f11efc51147566d5961c59a8ef89.
+Owner approved nt_munge R0622-R0626 and nt_sb current residuals before this
+audit. No nt_sbdsp blanket approval is inferred. Production, tests, EXEs,
+configuration and guest/snapshot assets remain unchanged.
+
+### Universe, disposition and limits
+
+Read all retained original/current source and all 103 zero-context Myers blocks.
+Normalize newlines, match existing excluded bodies to XP, omit those bodies and
+line controls. This independently reproduces 103 blocks,+541/-1006. Research
+comparison text is not a build input. Existing exclusions get no new entries.
+
+Six blocks contain confirmed reducible edits: H006/H008/H009/H011/H095/H098.
+They represent two declaration restorations and three cast spellings. The
+remaining 97 blocks and necessary portions of those six have the bounded
+source-contract/alignment/negative-control reasons below. This is NOT 97
+independent runtime reproductions or proof of a globally optimal redesign.
+Retention remains an owner decision. The earlier 'no restoration candidate'
+conclusion is withdrawn. No unexplained block is silently skipped.
+
+### Evidence keys used by every block below
+
+- ABI: actual x86/x64 compile_commands and live physical SAS, EOI, q-event,
+  archive and PCM uses. sb_pcm.h precedes the original macro environment.
+  VDD_DMA_INFO is the private layout consumed by this file's QueryDMA and
+  SetDMACountAddr; P85 removed its public-header/test dependency. Original
+  Sim32/NTVDM headers do not supply a valid standalone guest-memory contract.
+- BUFFER: the 16-bit DSP block count plus one needs up to 65536 samples. The
+  owned copy survives guest mutation and partial output acceptance. The
+  removed original GenerateHdrs/ring initialization/free belongs to the old
+  WaveOut header/thread owner; restoring it alone is not coherent ownership.
+- EXEC: nt_sb.c service/stop/reset/close and platform.c executor/running handoff
+  are real consumers. Original CreateThread, semaphore and native waits mutate
+  DMA/PIC outside the sole executor and are not quiesced by current pause or
+  snapshot. The replacement services one copied transfer on that executor.
+  This is a source/architecture proof; no whole original XP backend was rebuilt
+  as a new dynamic experiment. No claim that original NTVDM was broken.
+- STATUS: DspGetStatus is consumed by SbGetStatus, readiness, service and
+  shutdown. Failures terminate submission instead of being reported as success;
+  setup cleanup retains its triggering status. Existing failure-injection
+  cases cover open/close/write/gain/progress, not every native API failure.
+- EOI: compat/eoi.c owns callback identity; auto-start registers once and
+  actual EOI advances Auto transfers. Negative count is cancellation, not a
+  fresh transfer. Original ExitAutoMode unconditionally removes its hook;
+  added DspEoiRegistered preserves archive/restore and duplicate-registration
+  state. No redundant outer removal guard remains.
+- PCM: compat/sb_pcm.c owns one Lib stream, converts unsigned bytes, and
+  transports samples; it does not interpret DSP commands or DMA. Existing
+  mixer writes reach SbApplyMixer. Original sampling-rate/sentinel behavior is
+  retained. Close/open/rate/gain tests exercise actual producer-to-adapter calls.
+- PAUSE_PREFIX: paused output must account consumed samples before discarding
+  queued host data and later submit only the remainder. Existing pause/archive
+  tests cover this; historical P154 running-handoff and consumed-prefix
+  withdrawals fail on both architectures. Host epoch is reset on new output,
+  not restored as a stale native identity.
+- EVENT: original Single/Auto delay adjustments, thresholds and ten bounded lag
+  checks are preserved, implemented through existing q-events. This is not a
+  claim that the code has no rescheduling: bounded lag checking is inherited
+  policy. Current verify_sb_completion covers 93000 us for 1025 samples,
+  cancellation, progress/epoch failure, DMA effects and one completion IRQ.
+  No claim of exact physical-hardware timing or all guest-driver compatibility.
+- MEM: physical DMA address is neither a host pointer nor guest linear address.
+  SAS physical access and channel/page plus 16-bit wrap/decrement are required.
+  Existing tests cover high pages, directions, edges, ADC and TableMunge;
+  historical P154 coherent direction and nonidentity-paging controls fail.
+- POSITION: keep original virtual-position heuristic, diagnostics and finite
+  yields. Remove waiting for nonexistent native worker and uninitialized lock;
+  calculate wrapped offset once, respecting decrement. DspVirtualIncx is still
+  used by retained finite-yield branches, so its original assignment is not dead.
+- SUBMIT: accepted, not requested, samples advance the prefix. Capacity limit
+  returns to executor instead of busy waiting. Historical P154 requested-prefix
+  withdrawal fails the seven-sample assertion; current frozen-copy/backpressure
+  fixtures remain on real DSP command/service entry points after P84/P85.
+- SNAP: archive.c prepares SB before PIC restore and restores SB afterward;
+  its q-event archive consumes the callback IDs. Capture/restore retains copied
+  PCM, partial command bytes and consumed prefix, validates sizes/state before
+  mutation and rebuilds paused output/EOI resources. Existing archive cases
+  cover partial/full/all-consumed data, ACK, parser continuation and invalid
+  states. Historical prefix withdrawal fails. Native handles are never archived.
+- MIDI: selected DSP MIDI output is unsupported; MPU-401 remains supported.
+  Unsupported payload must be consumed without becoming PCM commands.
+  verify_sb_midi_framing and historical dispatch withdrawal establish this
+  framing boundary, not a claim that XP's native MIDI capability was defective.
+- RESET: clear original partial reset state at a new device lifetime. Historical
+  removal fails actual-port reset assertion; original guest reset state machine
+  and high-speed-reset distinction remain.
+- ALIGN: Myers pairs repeated comments/signatures from different functions.
+  Current SetSpeaker/PauseDMA documentation and complete ContinueDMA are
+  original text, not invented implementation. Check complete paired functions,
+  not a mechanically restored hunk which would enter the wrong function.
+- ALIGN_PAUSE: new text is original ContinueDMA. Old span includes retired DMA
+  ownership, changed SetSpeaker and the removed PauseDMA native query. Actual
+  production never calls original LoadWinmm, so GetPositionProc is null.
+  Corrected P154 original-PauseDMA-body test faults 0xc0000005 on x86/x64;
+  current active-pause case passes. Earlier prototype-only experiment is not
+  evidence. Retain original unused local and comments, rather than create more
+  cleanup differences.
+
+### Confirmed restoration candidate, not installed
+
+1. Restore original ExitAutoMode forward before GetWaveOutPosition.
+2. Restore DmaDataToDsp forward before StartDspDmaThread in original multiline
+   form; retain static IBOOL because it is private and its result is consumed.
+3. Restore original USHORT in increment/count update casts and final count
+   assignment of SbGetDMAPosition. Keep all wrap/direction changes.
+
+Declaration-only candidate: 104 blocks,+543/-994, 10 fewer changed lines.
+Combined candidate: 104 blocks,+541/-992, 14 fewer changed lines. The extra
+text block is alignment, not an added semantic point. No helper, state, API,
+thread or guest behavior is added. Production source remains unchanged.
+
+Fresh six isolated compilations use the actual architecture compile commands,
+redirecting only source/object paths: baseline, declarations, declarations plus
+casts. All three objects per width are byte-identical and also equal the real
+cached production object:
+
+- x86 SHA-256: e9cc87f89ec9f06de1f7cd2e95b5d84d19845ceb761ee78bac417fefa23f22aa
+- x64 SHA-256: a0a5ebbd30a7d155ae5fa632ff45ef8e01e3a265d6f1f9e23cf03d1f7e6dd03b
+
+Fresh existing sb_dma/sb_commands/sb_archive tests pass 3/3 per architecture.
+They run current linked objects, matching candidate objects; candidates were
+not installed/relinked/published. No full/native/manual guest suite was rerun.
+An initial probe parser stripped Windows backslashes and failed to start the
+compiler; the corrected probe produced all six successful compiles. That is a
+harness error, not a production result. No original-removal negative controls
+were rerun this round; the P154 evidence cited above is explicitly historical.
+
+### Complete block ledger
+
+R = recommended retain on the named bounded evidence; C = partial/full
+restoration candidate. Anchors are physical source lines at 075dc4b0. Snippet
+is the first changed line (new when present, otherwise old); group explanations
+above cover both sides, including misleading Myers cross-function alignment.
+Existing original duplicate includes/declarations and unused independent native
+helpers are not cleanup candidates merely because they are old or inactive.
+
+| Block | XP line | Current line | Added | Removed | Disposition / evidence | Anchor or specific finding |
+| --- | ---: | ---: | ---: | ---: | --- | --- |
+| H001 | 11 | 11 | +1 | -3 | R / ABI | `#include "compat/sb_pcm.h"` |
+| H002 | 21 | 19 | +1 | -3 | R / ABI | `#include "sas.h"` |
+| H003 | 25 | 22 | +3 | -0 | R / ABI | `#include "compat/eoi.h"` |
+| H004 | 92 | 90 | +0 | -1 | R / BUFFER | `PUCHAR          DspBuffer;` |
+| H005 | 122 | 121 | +9 | -0 | R / ABI | `typedef struct _VDD_DMA_INFO {` |
+| H006 | 138 | 146 | +18 | -0 | C / CANDIDATE | Keep real sample/event/output/parser state; relocate only DmaDataToDsp forward. |
+| H007 | 170 | 195 | +2 | -1 | R / MIDI | `MidiOutPoll,` |
+| H008 | 264 | 289 | +0 | -5 | C / CANDIDATE | Restore original-position multiline forward; keep necessary static IBOOL. |
+| H009 | 284 | 304 | +0 | -5 | C / CANDIDATE | Restore exact original ExitAutoMode forward here. |
+| H010 | 294 | 310 | +4 | -19 | R / EXEC | `static lib_status DspProcessBlock(void);` |
+| H011 | 314 | 315 | +4 | -1 | C / CANDIDATE | Remove moved forward after restoring H009; other text is native-owner alignment. |
+| H012 | 315 | 320 | +1 | -0 | R / EXEC | `void StopDspTransfer(IBOOL reset)` |
+| H013 | 317 | 322 | +11 | -9 | R / EXEC | `lib_status status;` |
+| H014 | 327 | 334 | +4 | -3 | R / STATUS | `lib_status DspGetStatus(void)` |
+| H015 | 331 | 339 | +10 | -8 | R / EXEC | `lib_status DspServiceTransfer(void)` |
+| H016 | 339 | 350 | +2 | -0 | R / STATUS | `return DspTransferStatus;` |
+| H017 | 341 | 353 | +9 | -4 | R / EOI | `static void AutoInitEoiHook(int irq, int count)` |
+| H018 | 346 | 363 | +4 | -6 | R / EXEC | `static IBOOL StartDspTransfer(DSP_MODE mode)` |
+| H019 | 352 | 368 | +9 | -0 | R / EXEC | `if (!bDspActive) bExitAuto = FALSE;` |
+| H020 | 354 | 378 | +3 | -15 | R / STATUS | `if (status != LIB_STATUS_OK) {` |
+| H021 | 370 | 383 | +6 | -0 | R / EXEC | `bDspActive = TRUE;` |
+| H022 | 372 | 390 | +7 | -11 | R / PCM | `lib_status DspCloseOutput(void)` |
+| H023 | 383 | 398 | +2 | -0 | R / STATUS | `return status;` |
+| H024 | 385 | 401 | +34 | -12 | R / PAUSE_PREFIX | `void DspSetRunning(IBOOL running)` |
+| H025 | 398 | 435 | +0 | -6 | R / BUFFER | `DspBufferSize = BlockSize;` |
+| H026 | 406 | 438 | +1 | -22 | R / PCM | `static lib_status DspPrepareOutput(void)` |
+| H027 | 429 | 440 | +10 | -16 | R / PCM | `IU32 rate = TimeConstant == 0xffff ? DspOutputRate : GetSamplingRate();` |
+| H028 | 445 | 451 | +8 | -0 | R / PCM | `TimeConstant = 0xffff;` |
+| H029 | 447 | 460 | +7 | -3 | R / PCM | `void SbApplyMixer(void)` |
+| H030 | 451 | 467 | +0 | -2 | R / BUFFER | `BurstSize = AUTO_BLOCK_SIZE;` |
+| H031 | 454 | 469 | +12 | -3 | R / EVENT | `static lib_status DspScheduleCompletion(IU32 samples_minus_one)` |
+| H032 | 458 | 482 | +20 | -7 | R / EVENT | `static lib_status DspArmCompletion(IU32 rate)` |
+| H033 | 466 | 503 | +1 | -1 | R / EVENT | `bHighSpeedMode = FALSE;` |
+| H034 | 467 | 505 | +1 | -0 | R / EVENT | `return DspScheduleCompletion(size);` |
+| H035 | 470 | 508 | +8 | -10 | R / EXEC | `static void DspCancelTransfer(void)` |
+| H036 | 481 | 517 | +36 | -1 | R / EVENT | `static void DspCompleteBlock(long unused)` |
+| H037 | 483 | 554 | +24 | -1 | R / MEM | `static IBOOL DmaDataToDsp(DSP_MODE mode)` |
+| H038 | 485 | 579 | +13 | -1 | R / POSITION | `if (DspNumberDmaQueries == 0) {` |
+| H039 | 487 | 593 | +4 | -1 | R / POSITION | `dprintf3(("NoQ = %x, Inc = %x\n", DspNumberDmaQueries, DspVirtualInc));` |
+| H040 | 489 | 598 | +19 | -1 | R / SUBMIT | `static lib_status DspProcessBlock(void)` |
+| H041 | 490 | 618 | +1 | -0 | R / SNAP | `int softpc_device_snapshot_capture_sb_dsp(softpc_device_sb_dsp_state *state)` |
+| H042 | 492 | 620 | +51 | -3 | R / SNAP | `lib_audio_pcm_progress progress;` |
+| H043 | 496 | 672 | +78 | -3 | R / SNAP | `int softpc_device_snapshot_restore_sb_dsp(const softpc_device_sb_dsp_state *state)` |
+| H044 | 500 | 751 | +7 | -3 | R / SNAP | `int softpc_device_snapshot_encode_sb_callback(Q_CALLBACK_FN callback,` |
+| H045 | 504 | 759 | +4 | -6 | R / SNAP | `Q_CALLBACK_FN softpc_device_snapshot_decode_sb_callback(unsigned long callback_id)` |
+| H046 | 511 | 763 | +0 | -3 | R / BUFFER | `//` |
+| H047 | 515 | 765 | +7 | -6 | R / MEM | `IBOOL SbInitializeDMA(void)` |
+| H048 | 679 | 929 | +0 | -2 | R / SNAP | `static DWORD blockSize;` |
+| H049 | 689 | 937 | +0 | -1 | R / MIDI | `BufferMidi(data);` |
+| H050 | 692 | 941 | +3 | -0 | R / MIDI | `case UnsupportedMidiUart:` |
+| H051 | 757 | 1008 | +4 | -1 | R / MEM | `if (dmaInfo.mode & 0x20)` |
+| H052 | 768 | 1022 | +1 | -2 | R / EXEC | `StartDspTransfer(Single);` |
+| H053 | 789 | 1042 | +2 | -1 | R / MEM | `BYTE silence = 0x80;` |
+| H054 | 851 | 1106 | +11 | -0 | R / MIDI | `case MIDI_WRITE_POLL:` |
+| H055 | 926 | 1191 | +1 | -2 | R / EXEC | `StartDspTransfer(Single);` |
+| H056 | 943 | 1207 | +4 | -1 | R / MEM | `if (dmaInfo.mode & 0x20)` |
+| H057 | 954 | 1221 | +1 | -2 | R / EXEC | `StartDspTransfer(Auto);` |
+| H058 | 961 | 1227 | +1 | -2 | R / EXEC | `StartDspTransfer(Auto);` |
+| H059 | 998 | 1263 | +1 | -11 | R / EXEC | `StopDspTransfer(bExitDMAThread);` |
+| H060 | 1020 | 1274 | +0 | -1 | R / EXEC | `StopDspDmaThread(TRUE);` |
+| H061 | 1026 | 1279 | +0 | -5 | R / EXEC | `CloseHandle(DspWaveSem);` |
+| H062 | 1047 | 1295 | +0 | -2 | R / EXEC | `ResetEvent(DspResetDone);` |
+| H063 | 1056 | 1304 | +1 | -0 | R / RESET | `ResetState = ResetNotStarted;` |
+| H064 | 1089 | 1336 | +0 | -2 | R / SNAP | `static BYTE TableMungeData;` |
+| H065 | 1115 | 1361 | +1 | -1 | R / MEM | `sas_PWS(dMAPhysicalAddress, &data, 1);` |
+| H066 | 1120 | 1366 | +1 | -1 | R / MEM | `dMAInfo.addr += (dMAInfo.mode & 0x20) ? -1 : 1;` |
+| H067 | 1135 | 1381 | +1 | -1 | R / MEM | `sas_PWS(dMAPhysicalAddress, &data, 1);` |
+| H068 | 1140 | 1386 | +1 | -1 | R / MEM | `dMAInfo.addr += (dMAInfo.mode & 0x20) ? -1 : 1;` |
+| H069 | 1277 | 1523 | +2 | -3 | R / ALIGN | `SetSpeaker(` |
+| H070 | 1286 | 1531 | +1 | -3 | R / ALIGN | `This function sets the speaker on or off.` |
+| H071 | 1292 | 1535 | +1 | -3 | R / ALIGN | `On - supplies a boolean value to specify speaker state.` |
+| H072 | 1303 | 1544 | +3 | -18 | R / PCM | `if (DspOutputRate == 0) return;` |
+| H073 | 1324 | 1550 | +2 | -2 | R / ALIGN | `PauseDMA(` |
+| H074 | 1332 | 1558 | +4 | -2 | R / ALIGN | `This function pauses single-cycle or Auto-Init DMA.` |
+| H075 | 1337 | 1565 | +1 | -1 | R / ALIGN | `None.` |
+| H076 | 1341 | 1569 | +1 | -1 | R / ALIGN | `None` |
+| H077 | 1346 | 1574 | +1 | -5 | R / ALIGN | `ULONG position;` |
+| H078 | 1352 | 1576 | +1 | -4 | R / ALIGN | `bDspPaused = TRUE;` |
+| H079 | 1357 | 1578 | +1 | -5 | R / ALIGN | `}` |
+| H080 | 1363 | 1580 | +4 | -8 | R / ALIGN | `VOID` |
+| H081 | 1372 | 1585 | +1 | -3 | R / ALIGN | `/*++` |
+| H082 | 1376 | 1587 | +1 | -2 | R / ALIGN | `Routine Description:` |
+| H083 | 1379 | 1589 | +1 | -5 | R / ALIGN | `This function continues paused single-cycle or Auto-Init DMA.` |
+| H084 | 1385 | 1591 | +2 | -1 | R / ALIGN | `Note, we don't support PauseDMA and ContinueDMA just for PAUSE.` |
+| H085 | 1387 | 1594 | +1 | -3 | R / ALIGN | `Arguments:` |
+| H086 | 1391 | 1596 | +1 | -5 | R / ALIGN | `None.` |
+| H087 | 1397 | 1598 | +1 | -2 | R / ALIGN | `Return Value:` |
+| H088 | 1400 | 1600 | +1 | -1 | R / ALIGN | `None.` |
+| H089 | 1402 | 1602 | +1 | -3 | R / ALIGN | `--*/` |
+| H090 | 1406 | 1604 | +4 | -167 | R / ALIGN_PAUSE | New side is original ContinueDMA; old side spans DMA/SetSpeaker and unsafe PauseDMA native query. |
+| H091 | 2029 | 2064 | +2 | -2 | R / MEM | `address = dma_system_address(SbDmaChannel,` |
+| H092 | 2149 | 2184 | +1 | -5 | R / POSITION | `if (bDspActive && SbAnswerDMAPosition && bWriteBurstStarted) {` |
+| H093 | 2156 | 2187 | +3 | -8 | R / POSITION | `offset = (IU16)((DmaInfo.mode & 0x20) ?` |
+| H094 | 2171 | 2196 | +0 | -1 | R / POSITION | `offset = DmaInfo.addr + DspVirtualInc - StartingDmaAddr;` |
+| H095 | 2173 | 2198 | +5 | -2 | C / CANDIDATE | Keep decrement logic; restore original USHORT in increment and count casts. |
+| H096 | 2180 | 2207 | +0 | -1 | R / POSITION | `UnlockDsp();` |
+| H097 | 2188 | 2215 | +0 | -1 | R / POSITION | `offset = DmaInfo.addr - StartingDmaAddr + DspVirtualInc;` |
+| H098 | 2274 | 2264 | +3 | -2 | C / CANDIDATE | Keep direction-aware address; restore original USHORT in final count cast. |
+| H099 | 2280 | 2270 | +0 | -1 | R / POSITION | `UnlockDsp();` |
+| H100 | 2344 | 2333 | +0 | -143 | R / EXEC | `VOID` |
+| H101 | 2555 | 2401 | +0 | -238 | R / EXEC | `BOOL` |
+| H102 | 2810 | 2404 | +0 | -111 | R / EXEC | `}` |
+| H103 | 2957 | 2443 | +1 | -0 | R / EOI | `DspEoiRegistered = FALSE;` |
+
+Total: 103 blocks,+541/-1006; 97 retained recommendations and six full/partial restoration candidates. S4 stays on this file pending owner decision.

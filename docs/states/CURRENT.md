@@ -77,6 +77,16 @@ commit/push, await owner acceptance; do not approve unrelated later-file diffs.
 
 ## Current Technical Baseline
 
+S4 P88 audits all 103 current nt_sbdsp.c retained-content diff blocks at
+075dc4b0; no production/test/EXE/asset changes. Six blocks contain confirmed
+restoration candidates (two forwards and three original cast spellings).
+Isolated dual-width production-command compiles are byte-identical to current
+cached objects; existing SB DMA/commands/archive tests pass 3/3 per width.
+The combined candidate reduces XP changed lines by 14, but is not installed.
+Other 97 blocks have explicitly bounded source/alignment/historical-test
+evidence, not 97 independent runtime reproductions. Await owner decision on
+this file; do not advance. See [complete block ledger](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p88-exhaustive-current-nt_sbdsp-retained-diff-audit).
+
 S4 P87 removes exactly two mirror-added duplicate includes in nt_graph.c and
 nt_sbmid.c after scanning 467 mirror C/H files (74 added include occurrences).
 Original duplicate includes and non-mirror code remain untouched. Four actual
