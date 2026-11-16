@@ -45,6 +45,15 @@ Baseline 76b10b1e; own scratch build/t100-s4-p86, two-hour job and fifteen-minut
 no-progress budget. Preserve guest/media/configuration; do not advance beyond
 this file or change unrelated implementations. Await acceptance after delivery.
 
+Owner approves P86's nt_cga.c code change; manual acceptance is deferred.
+Owner approves nt_ega.c R0595-R0600 retention. P87 admits a mirror-only sweep
+of added duplicate includes against fixed XP; original duplicates and all
+non-mirror source remain untouched. Baseline 1581635d. Prove redundancy and
+actual compiler equivalence before restoring; no transitive-include cleanup
+outside that boundary. Own build/t100-s4-p87, two-hour/fifteen-minute no-progress
+budgets. Cached dual build/publication, full regression, actual diff review,
+commit/push, await owner acceptance; do not approve unrelated later-file diffs.
+
 ## M9 T100 S4 Packet
 
 | Field | Required record |
@@ -67,6 +76,17 @@ this file or change unrelated implementations. Await acceptance after delivery.
 | Similar-Issue Sweep | Audit the actual current universe rather than only historical patch IDs; read coupled consumers without advancing later files' audit status. |
 
 ## Current Technical Baseline
+
+S4 P87 removes exactly two mirror-added duplicate includes in nt_graph.c and
+nt_sbmid.c after scanning 467 mirror C/H files (74 added include occurrences).
+Original duplicate includes and non-mirror code remain untouched. Four actual
+x86/x64 object comparisons are byte-identical. Source +0/-2; tests unchanged;
+XP changed-line count reduces two. Dual cached publication and all 392 cases
+pass without retry (188 background, six native and two separate package tests
+per width). Existing same-runner package P2 remains open. Final object hashes
+still match the unchanged baseline. Await owner acceptance.
+P86 code and nt_ega.c retention are owner-approved; P86 manual acceptance remains
+deferred. S4/T100 stay open. See [P87 sweep](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p87-mirror-added-duplicate-include-sweep).
 
 S4 P86 reviews order457 nt_cga.c completely outside existing exclusions.
 R0587 redundant include is restored through original conapi.h; exact dual-width

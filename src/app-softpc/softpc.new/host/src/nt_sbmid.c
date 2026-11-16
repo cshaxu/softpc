@@ -9,7 +9,6 @@
 #error "Unsupported SoftPC mirror configuration: NTVDM sound mode diagnostics"
 #endif
 #line 8
-#include "compat/sb_midi.h"
 #include "compat/devices/snapshot.h"
 
 #define MIDI_BUFFER_SIZE 0x1000

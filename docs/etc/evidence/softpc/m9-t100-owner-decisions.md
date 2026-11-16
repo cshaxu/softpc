@@ -7217,3 +7217,93 @@ Final qualification and actual-change review:
   is preserved. Documentation and whitespace checks pass after final records.
   All owned jobs have completed; task-local negative candidates, EXEs and logs
   are removed after evidence promotion. Await owner acceptance, S4/T100 open.
+
+
+## S4 P87: mirror-added duplicate include sweep
+
+Owner approves P86 nt_cga.c's code change, with manual acceptance deferred,
+and approves nt_ega.c R0595-R0600 retention. Subsequent nt_graph.c review finds
+R0602 redundant, like restored R0587. Owner requests a full-directory sweep,
+then explicitly narrows it to mirror-added differences: preserve original
+repeated includes and do not clean autonomous sources. Baseline 1581635d.
+
+Finite universe: all 472 tracked mirror paths; 467 C/H files are compared with
+same-position fixed XP SP1 sources. The other five are c-files, three ROMs
+and cmos.ram, not C include graphs. Literal include targets, occurrence counts
+and original macro includes are checked; existing #error bodies are not audited
+or re-accounted. Before cleanup, 74 added literal include occurrences exist.
+Resolve project headers with actual compile-command search directories and
+including-file locations, not basename matches. Expand original CpuH/StringH/
+TimeH/TypesH mappings as well. Inspect every transitive duplicate candidate;
+only two qualify. Do not treat incidental SDK declarations as a stable substitute
+for a direct standard-header contract.
+
+| Mirror file | Removed added include | Existing provider | Disposition |
+| --- | --- | --- | --- |
+| host/src/nt_graph.c | dib_surface.h | Original conapi.h resolves to Compat conapi.h, whose explicit DIB endpoint includes dib_surface.h. | Restore R0602; no new declaration or provider. |
+| host/src/nt_sbmid.c | compat/sb_midi.h | Original nt_sb.h include already exposes the MIDI contract through its retained header inclusion. | Remove only redundant leaf include; retain the actual shared MIDI type owner. |
+
+The remaining 72 additions have no duplicate project-header inclusion path in
+the resolved scan. They comprise snapshot contracts (4 snapshot.h and 17 device
+snapshot includes), 34 GDP rule access includes, and 17 other CPU, controller,
+video and audio contracts. This is duplicate-include classification, not new
+approval of their independent functional differences. The apparent nt_sb.c
+lifecycle candidate in a basename-only scan is false: devices/snapshot.h is not
+machine/snapshot.h and does not import lifecycle.h. The actual path resolves it.
+Original repeated headers in c_main.c, ccpusas4.c, gfi.c, gfi_mpty.c and nt_sound.c
+remain exactly untouched. Repeated includes in non-mirror tests or Compat are
+outside this authorized scope and are unchanged. No new repeated occurrence of
+an originally present header was found. The final macro-expanded scan finds no
+remaining candidate of this bounded class.
+
+Fresh equivalence proof compiles each unchanged and one-line-restored source
+with both actual production compiler commands into owned scratch objects.
+All four pairs are byte-identical, not just equal size. SHA256:
+
+| Architecture/file | Before and after object SHA256 |
+| --- | --- |
+| x64 nt_graph.c | 73cd503b642d9ad101095102d19408847f64bda2d2fc6dd9fb272dd6970c4ea8 |
+| x64 nt_sbmid.c | 1c97f1f80ad185457106fc3fd72205a140ea1dada00611d4d27ac2c41c53a677 |
+| x86 nt_graph.c | a66f3d33bffa8cbd00a42855b5af107bfbcb79b250be49ee61550fb845ae008b |
+| x86 nt_sbmid.c | f9a2f8ae35866a35afccacc51650945865af3823eb7790900577b080f8d72e14 |
+
+Production +0/-2, tests +0/-0. XP retained-content diff reduces two added
+lines: nt_graph.c 11 blocks,+31/-20 -> 10,+30/-20; nt_sbmid.c remains 33 blocks,
++285/-400 -> +284/-400. The earlier nt_sbmid.c inventory's -399 was stale:
+fresh same-method before/after comparison gives -400 in both versions. This
+one-line accounting correction is not a new source deletion. Overall current
+inventory: 106 files, 15746 blocks,+24594/-24020.
+No other mirror semantics, conditional structure, line controls, shared-package,
+Compat, test source, guest, user INI, media or snapshot changes. No added framework,
+production path or permanent scanner. Final verification follows below.
+
+| Architecture | Group | Passed | Duration |
+| --- | --- | --- | --- |
+| x64 | background | 188/188 | 298.60s |
+| x64 | native | 6/6 | 11.91s |
+| x64 | package | 1/1 | 9.04s |
+| x64 | compact | 1/1 | 7.81s |
+| x86 | background | 188/188 | 195.76s |
+| x86 | native | 6/6 | 9.57s |
+| x86 | package | 1/1 | 7.94s |
+| x86 | compact | 1/1 | 7.78s |
+
+All 392 architecture/case pairs pass on this run without failure or retry.
+Native coverage uses six desktop/audio cases followed by separate normal and
+compact package CTest invocations. It is not a claim that the existing P2
+same-runner sequential startup interruption is fixed; that TODO remains open.
+Both cached full build presets publish fresh compiler timestamps: x64
+Nov 15 2026 17:40:21; x86 Nov 15 2026 17:46:04. Publication verifies embedded
+compiler literals. EXE SHA256:
+x64 dd9b91911240e355e48601442f172b07dff27b845eb491dca05e645f3abb83f2;
+x86 fb34aecd4389cfe40f2d2b82845886615ff19243d7009b3fecef4f083b96d765.
+Only existing mirror warnings remain; there is no new non-mirror warning.
+Final production objects match all four pre-cleanup hashes above exactly.
+
+Actual-change review confirms exactly the two authorized include deletions,
+normalized mirror hashes/counts, task evidence/approval/status, and dual EXEs.
+CRLF is preserved in both mirror files; no non-mirror production/test source
+or original repeated include changed. Documentation/whitespace gates pass.
+All owned jobs have completed; disposable probes/objects/logs are removed after
+promoting this evidence. Await owner acceptance; S4/T100 remain open and the
+unrelated file-diff review frontier is not advanced by this mechanical sweep.

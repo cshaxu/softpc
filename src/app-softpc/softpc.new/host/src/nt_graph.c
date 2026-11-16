@@ -54,7 +54,6 @@
 #include "ckmalloc.h"
 #include "conapi.h"
 
-#include "dib_surface.h"
 #include "nt_graph.h"
 #include "nt_cga.h"
 #include "nt_ega.h"

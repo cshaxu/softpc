@@ -1,6 +1,6 @@
 # T100 S4 current real-difference file list
 
-Current source: S4 P86 nt_cga.c redundant-include restoration from `76b10b1e`.
+Current source: S4 P87 mirror-added duplicate-include restoration from `1581635d`.
 Fixed XP SP1: `a2f6d7c93aa4f11efc51147566d5961c59a8ef89`.
 All paths are relative to `src/app-softpc/softpc.new/`.
 
@@ -154,14 +154,14 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 455 | `host/inc/nt_sb.h` | 4 | +22 | -2 |
 | 457 | `host/src/nt_cga.c` | 9 | +21 | -52 |
 | 458 | `host/src/nt_ega.c` | 9 | +33 | -12 |
-| 459 | `host/src/nt_graph.c` | 11 | +31 | -20 |
+| 459 | `host/src/nt_graph.c` | 10 | +30 | -20 |
 | 460 | `host/src/nt_keycd.c` | 4 | +2 | -173 |
 | 461 | `host/src/nt_munge.c` | 6 | +25 | -1 |
 | 462 | `host/src/nt_sb.c` | 24 | +147 | -376 |
 | 463 | `host/src/nt_sbdsp.c` | 103 | +541 | -1006 |
 | 464 | `host/src/nt_sbfm.c` | 4 | +20 | -102 |
-| 465 | `host/src/nt_sbmid.c` | 33 | +285 | -399 |
+| 465 | `host/src/nt_sbmid.c` | 33 | +284 | -400 |
 | 466 | `host/src/nt_sbmxr.c` | 6 | +48 | -0 |
 | 467 | `host/src/nt_sound.c` | 12 | +7 | -80 |
 | 468 | `host/src/nt_vga.c` | 13 | +37 | -16 |
-| **Total** | **106 files** | **15747** | **+24596** | **-24019** |
+| **Total** | **106 files** | **15746** | **+24594** | **-24020** |
