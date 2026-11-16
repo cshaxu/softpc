@@ -118,6 +118,15 @@ ULONG           EndingDmaValue;
 // DMA globals to speed up dma update
 //
 
+typedef struct _VDD_DMA_INFO {
+    WORD    addr;
+    WORD    count;
+    WORD    page;
+    BYTE    status;
+    BYTE    mode;
+    BYTE    mask;
+} VDD_DMA_INFO, *PVDD_DMA_INFO;
+
 VDD_DMA_INFO DmaInfo;
 
 DMA_ADAPT    *pDmaAdp;
@@ -151,309 +160,6 @@ static BYTE TableMungeData;
 static BOOL TableMungeFirstByte = TRUE; // munging first or second byte
 static void DspCompleteBlock(long unused);
 static IBOOL DmaDataToDsp(DSP_MODE mode);
-
-VOID
-ExitAutoMode(
-    VOID
-    );
-
-void StopDspTransfer(IBOOL reset)
-{
-    lib_status status;
-    ExitAutoMode();
-    DspCancelTransfer();
-    host_DelayHwInterrupt(SbInterrupt, 0, 0xfffffffful);
-    ica_clear_int(ICA_MASTER, SbInterrupt);
-    status = reset ? DspCloseOutput() :
-        (DspOutputRate != 0 ? softpc_sb_pcm_clear() : LIB_STATUS_OK);
-    DspTransferStatus = status;
-    DspResetOutput = FALSE;
-    if (reset) bDspActive = FALSE;
-}
-
-lib_status DspGetStatus(void)
-{
-    return DspTransferStatus;
-}
-
-lib_status DspServiceTransfer(void)
-{
-    if (DspTransferStatus != LIB_STATUS_OK) return DspTransferStatus;
-    if (DspOutputSuspended || bDspPaused || !bDspActive || DspTransferSize == 0 || DspCompletionEvent != 0)
-        return LIB_STATUS_OK;
-    DspTransferStatus = DspProcessBlock();
-    if (DspTransferStatus == LIB_STATUS_OK && bWriteBurstStarted) {
-        DspTransferStatus = DspArmCompletion(DspOutputRate);
-        if (DspTransferStatus == LIB_STATUS_OK && DspMode == Auto && bExitAuto)
-            ExitAutoMode();
-    }
-    return DspTransferStatus;
-}
-
-static void AutoInitEoiHook(int irq, int count)
-{
-    if (irq != SbInterrupt || count < 0 || DspMode != Auto ||
-        bDspPaused || bDspReset || DspTransferStatus != LIB_STATUS_OK ||
-        DspTransferSize != 0) return;
-    DspTransferStatus = DspPrepareOutput();
-    if (DspTransferStatus == LIB_STATUS_OK && DmaDataToDsp(Auto))
-        DspServiceTransfer();
-}
-
-static IBOOL StartDspTransfer(DSP_MODE mode)
-{
-    lib_status status;
-    if ((mode != Single && mode != Auto) || DspTransferStatus != LIB_STATUS_OK)
-        return FALSE;
-    if (!bDspActive) bExitAuto = FALSE;
-    if (mode == Single) ExitAutoMode();
-    DspCancelTransfer();
-    status = DspPrepareOutput();
-    if (status == LIB_STATUS_OK && (mode == Single || DspMode != Auto))
-        status = softpc_sb_pcm_clear();
-    if (status == LIB_STATUS_OK && mode == Auto && !DspEoiRegistered) {
-        if (RegisterEOIHook(SbInterrupt, AutoInitEoiHook)) DspEoiRegistered = TRUE;
-        else status = LIB_STATUS_INVALID_STATE;
-    }
-    if (status != LIB_STATUS_OK) {
-        StopDspTransfer(TRUE);
-        DspTransferStatus = status;
-        return FALSE;
-    }
-    bDspActive = TRUE;
-    bDspPaused = FALSE;
-    DspMode = mode;
-    if (DmaDataToDsp(mode)) return DspServiceTransfer() == LIB_STATUS_OK;
-    return TRUE;
-}
-
-lib_status DspCloseOutput(void)
-{
-    lib_status status = softpc_sb_pcm_close();
-    if (status == LIB_STATUS_OK) {
-        DspOutputRate = 0;
-        DspSpeakerEnabled = TRUE;
-        DspOutputSuspended = FALSE;
-    }
-    return status;
-}
-
-void DspSetRunning(IBOOL running)
-{
-    lib_audio_pcm_progress progress;
-    lib_u64 origin, played;
-    IU32 queued;
-    if (DspOutputRate == 0 || DspTransferStatus != LIB_STATUS_OK ||
-        DspOutputSuspended == !running) return;
-    if (!running) {
-        queued = DspTransferQueued - DspTransferConsumed;
-        if (queued != 0) {
-            DspTransferStatus = softpc_sb_pcm_progress(&progress);
-            if (DspTransferStatus != LIB_STATUS_OK) return;
-            if (progress.accepted_frames < queued ||
-                (DspCompletionEvent != 0 && progress.epoch != DspHostEpoch)) {
-                DspTransferStatus = LIB_STATUS_INVALID_STATE;
-                return;
-            }
-            origin = progress.accepted_frames - queued;
-            played = progress.consumed_frames > origin ?
-                progress.consumed_frames - origin : 0;
-            DspTransferConsumed += played < queued ? (IU32)played : queued;
-        }
-        DspTransferStatus = softpc_sb_pcm_set_active(LIB_FALSE);
-        if (DspTransferStatus != LIB_STATUS_OK) return;
-        if (DspCompletionEvent != 0) delete_q_event(DspCompletionEvent);
-        DspCompletionEvent = 0;
-        DspTransferQueued = DspTransferConsumed;
-        bWriteBurstStarted = FALSE;
-        DspOutputSuspended = TRUE;
-    } else {
-        DspTransferStatus = softpc_sb_pcm_set_active(LIB_TRUE);
-        if (DspTransferStatus != LIB_STATUS_OK) return;
-        DspOutputSuspended = FALSE;
-        DspServiceTransfer();
-    }
-}
-
-lib_status DspPrepareOutput(void)
-{
-    IU32 rate = TimeConstant == 0xffff ? DspOutputRate : GetSamplingRate();
-    lib_status status;
-    if (rate == 0) return LIB_STATUS_INVALID_STATE;
-    if (DspTransferStatus != LIB_STATUS_OK) return DspTransferStatus;
-    if (rate != DspOutputRate) {
-        status = DspCloseOutput();
-        if (status != LIB_STATUS_OK) return status;
-        status = softpc_sb_pcm_open(rate, MixerGetVoiceGain());
-        if (status != LIB_STATUS_OK) return status;
-        DspOutputRate = rate;
-    }
-    TimeConstant = 0xffff;
-    if (DspResetOutput) {
-        status = softpc_sb_pcm_clear();
-        if (status != LIB_STATUS_OK) return status;
-        DspResetOutput = FALSE;
-    }
-    return LIB_STATUS_OK;
-}
-
-void SbApplyMixer(void)
-{
-    MidiApplyMixer();
-    if (DspOutputRate != 0 && DspTransferStatus == LIB_STATUS_OK)
-        DspTransferStatus = softpc_sb_pcm_set_gain(
-            DspSpeakerEnabled ? MixerGetVoiceGain() : 0);
-}
-
-
-static lib_status DspScheduleCompletion(IU32 samples_minus_one)
-{
-    lib_u64 delay = ((1000ull * (samples_minus_one + 1ull)) /
-        DspCompletionRate + 1ull) * 1000ull;
-    if (delay > 0xffffffffull) return LIB_STATUS_LIMIT_EXCEEDED;
-    DspCompletionEvent = add_q_event_t(DspCompleteBlock, (unsigned long)delay, 0);
-    if (DspCompletionEvent == 0 || DspCompletionEvent == 0xffff) {
-        DspCompletionEvent = 0;
-        return LIB_STATUS_IO_ERROR;
-    }
-    return LIB_STATUS_OK;
-}
-
-lib_status DspArmCompletion(IU32 rate)
-{
-    lib_audio_pcm_progress progress;
-    lib_status status;
-    IU32 size;
-    if (!bWriteBurstStarted || DspTransferSize == 0 || DspCompletionEvent != 0)
-        return LIB_STATUS_INVALID_STATE;
-    if (rate == 0) return LIB_STATUS_INVALID_ARGUMENT;
-    status = softpc_sb_pcm_progress(&progress);
-    if (status != LIB_STATUS_OK) return status;
-    size = DspTransferSize - DspTransferConsumed;
-    if (progress.accepted_frames < size) return LIB_STATUS_INVALID_STATE;
-    DspHostOrigin = progress.accepted_frames - size;
-    DspHostEpoch = progress.epoch;
-    DspCompletionRate = rate;
-    DspCompletionChecks = PreviousWaveOutPos = 0;
-    size = size != 0 ? size - 1 : 0;
-    if (DspTransferMode == Auto) {
-        if (size < 0x400) size += size / 8;
-        else if (size > 0x1800) size -= AUTO_BLOCK_SIZE;
-    } else {
-        bHighSpeedMode = FALSE;
-    }
-    return DspScheduleCompletion(size);
-}
-
-void DspCancelTransfer(void)
-{
-    if (DspCompletionEvent != 0) delete_q_event(DspCompletionEvent);
-    DspCompletionEvent = 0;
-    DspTransferSize = DspTransferQueued = DspTransferConsumed = 0;
-    DspTransferStatus = LIB_STATUS_OK;
-    SbAnswerDMAPosition = bWriteBurstStarted = FALSE;
-}
-
-static void DspCompleteBlock(long unused)
-{
-    lib_audio_pcm_progress progress;
-    lib_u64 played;
-    IU32 remaining;
-    UNUSED(unused);
-    DspCompletionEvent = 0;
-    if (DspTransferStatus != LIB_STATUS_OK) return;
-    DspTransferStatus = softpc_sb_pcm_progress(&progress);
-    if (DspTransferStatus != LIB_STATUS_OK) return;
-    if (progress.epoch != DspHostEpoch) {
-        DspTransferStatus = LIB_STATUS_INVALID_STATE;
-        return;
-    }
-    if (PreviousWaveOutPos != 0) {
-        played = progress.consumed_frames > DspHostOrigin ?
-            progress.consumed_frames - DspHostOrigin : 0;
-        played += DspTransferConsumed;
-        remaining = played >= DspTransferSize ? 0 : DspTransferSize - (IU32)played;
-        if (remaining > (DspTransferMode == Single ? 4u : 0x20u)) {
-            if (++DspCompletionChecks < 10) {
-                DspTransferStatus = DspScheduleCompletion(remaining);
-                return;
-            }
-            DspResetOutput = TRUE;
-        }
-    }
-    DmaInfo.count = (IU16)(StartingDmaCount - DspTransferSize);
-    DmaInfo.addr = (IU16)((DmaInfo.mode & 0x20) ?
-        StartingDmaAddr - DspTransferSize : StartingDmaAddr + DspTransferSize);
-    SetDMACountAddr(&DmaInfo);
-    if (DmaInfo.count == 0xffff) SetDMAStatus(&DmaInfo, TRUE, TRUE);
-    GenerateInterrupt(0);
-    SbAnswerDMAPosition = bWriteBurstStarted = FALSE;
-    DspTransferSize = DspTransferQueued = DspTransferConsumed = 0;
-}
-
-static IBOOL DmaDataToDsp(DSP_MODE mode)
-{
-    IU32 i;
-    IU16 address;
-    if (DspCompletionEvent != 0) return FALSE;
-    if (mode == Auto && bDspReset) return FALSE;
-    QueryDMA(&DmaInfo);
-    if (DmaInfo.count == 0xffff || DmaInfo.count == 0 ||
-        (DmaInfo.mask & (1u << SbDmaChannel))) return FALSE;
-    if (SBBlockSize >= sizeof(DspBuffer)) return FALSE;
-    StartingDmaAddr = DmaInfo.addr;
-    StartingDmaCount = DmaInfo.count;
-    DspTransferSize = SBBlockSize + 1;
-    DspTransferQueued = 0;
-    DspTransferConsumed = 0;
-    DspTransferMode = mode;
-    DspTransferStatus = LIB_STATUS_OK;
-    SbAnswerDMAPosition = SBBlockSize > 0xff;
-    bWriteBurstStarted = FALSE;
-    address = StartingDmaAddr;
-    for (i = 0; i < DspTransferSize; ++i) {
-        sas_PRS(dma_system_address(SbDmaChannel, DmaInfo.page, address), &DspBuffer[i], 1);
-        address = (IU16)(address + ((DmaInfo.mode & 0x20) ? -1 : 1));
-    }
-
-    if (DspNumberDmaQueries == 0) {
-        DspVirtualInc = DspTransferSize >> 4;
-    } else {
-        DspVirtualInc = DspTransferSize / DspNumberDmaQueries;
-        if (DspTransferSize > 0x400) {
-            if (DspVirtualInc < 5) DspVirtualInc = 5;
-            else if (DspVirtualInc > 0x200) DspVirtualInc = 0x200;
-        } else if (DspVirtualInc > DspTransferSize / 4) {
-            DspVirtualInc = DspTransferSize / 4;
-        }
-    }
-    DspVirtualIncx = DspVirtualInc;     // remember the original virtual incr in case we
-                                        // need to fall back to original value.
-
-    dprintf3(("NoQ = %x, Inc = %x\n", DspNumberDmaQueries, DspVirtualInc));
-    DspNumberDmaQueries = 0;
-    return TRUE;
-}
-
-lib_status DspProcessBlock(void)
-{
-    if (DspTransferStatus != LIB_STATUS_OK) return DspTransferStatus;
-    while (DspTransferQueued < DspTransferSize) {
-        IU32 count = DspTransferSize - DspTransferQueued;
-        lib_u32 accepted = 0;
-        lib_status status;
-        if (count > LIB_AUDIO_PCM_STREAM_MAX_FRAMES_PER_SUBMISSION)
-            count = LIB_AUDIO_PCM_STREAM_MAX_FRAMES_PER_SUBMISSION;
-        status = softpc_sb_pcm_write(DspBuffer + DspTransferQueued, count, &accepted);
-        if (accepted > count) return LIB_STATUS_IO_ERROR;
-        DspTransferQueued += accepted;
-        if (status == LIB_STATUS_LIMIT_EXCEEDED) return LIB_STATUS_OK;
-        if (status != LIB_STATUS_OK) return status;
-        if (accepted == 0) return LIB_STATUS_IO_ERROR;
-    }
-    if (DspTransferSize != 0) bWriteBurstStarted = TRUE;
-    return LIB_STATUS_OK;
-}
 
 //
 //
@@ -600,6 +306,314 @@ BOOL
 GetWaveOutPosition(
     PULONG pPos
     );
+
+static lib_status DspProcessBlock(void);
+static lib_status DspPrepareOutput(void);
+static lib_status DspArmCompletion(IU32 rate);
+static void DspCancelTransfer(void);
+
+VOID
+ExitAutoMode(
+    VOID
+    );
+
+void StopDspTransfer(IBOOL reset)
+{
+    lib_status status;
+    ExitAutoMode();
+    DspCancelTransfer();
+    host_DelayHwInterrupt(SbInterrupt, 0, 0xfffffffful);
+    ica_clear_int(ICA_MASTER, SbInterrupt);
+    status = reset ? DspCloseOutput() :
+        (DspOutputRate != 0 ? softpc_sb_pcm_clear() : LIB_STATUS_OK);
+    DspTransferStatus = status;
+    DspResetOutput = FALSE;
+    if (reset) bDspActive = FALSE;
+}
+
+lib_status DspGetStatus(void)
+{
+    return DspTransferStatus;
+}
+
+lib_status DspServiceTransfer(void)
+{
+    if (DspTransferStatus != LIB_STATUS_OK) return DspTransferStatus;
+    if (DspOutputSuspended || bDspPaused || !bDspActive || DspTransferSize == 0 || DspCompletionEvent != 0)
+        return LIB_STATUS_OK;
+    DspTransferStatus = DspProcessBlock();
+    if (DspTransferStatus == LIB_STATUS_OK && bWriteBurstStarted) {
+        DspTransferStatus = DspArmCompletion(DspOutputRate);
+        if (DspTransferStatus == LIB_STATUS_OK && DspMode == Auto && bExitAuto)
+            ExitAutoMode();
+    }
+    return DspTransferStatus;
+}
+
+static void AutoInitEoiHook(int irq, int count)
+{
+    if (irq != SbInterrupt || count < 0 || DspMode != Auto ||
+        bDspPaused || bDspReset || DspTransferStatus != LIB_STATUS_OK ||
+        DspTransferSize != 0) return;
+    DspTransferStatus = DspPrepareOutput();
+    if (DspTransferStatus == LIB_STATUS_OK && DmaDataToDsp(Auto))
+        DspServiceTransfer();
+}
+
+static IBOOL StartDspTransfer(DSP_MODE mode)
+{
+    lib_status status;
+    if ((mode != Single && mode != Auto) || DspTransferStatus != LIB_STATUS_OK)
+        return FALSE;
+    if (!bDspActive) bExitAuto = FALSE;
+    if (mode == Single) ExitAutoMode();
+    DspCancelTransfer();
+    status = DspPrepareOutput();
+    if (status == LIB_STATUS_OK && (mode == Single || DspMode != Auto))
+        status = softpc_sb_pcm_clear();
+    if (status == LIB_STATUS_OK && mode == Auto && !DspEoiRegistered) {
+        if (RegisterEOIHook(SbInterrupt, AutoInitEoiHook)) DspEoiRegistered = TRUE;
+        else status = LIB_STATUS_INVALID_STATE;
+    }
+    if (status != LIB_STATUS_OK) {
+        StopDspTransfer(TRUE);
+        DspTransferStatus = status;
+        return FALSE;
+    }
+    bDspActive = TRUE;
+    bDspPaused = FALSE;
+    DspMode = mode;
+    if (DmaDataToDsp(mode)) return DspServiceTransfer() == LIB_STATUS_OK;
+    return TRUE;
+}
+
+lib_status DspCloseOutput(void)
+{
+    lib_status status = softpc_sb_pcm_close();
+    if (status == LIB_STATUS_OK) {
+        DspOutputRate = 0;
+        DspSpeakerEnabled = TRUE;
+        DspOutputSuspended = FALSE;
+    }
+    return status;
+}
+
+void DspSetRunning(IBOOL running)
+{
+    lib_audio_pcm_progress progress;
+    lib_u64 origin, played;
+    IU32 queued;
+    if (DspOutputRate == 0 || DspTransferStatus != LIB_STATUS_OK ||
+        DspOutputSuspended == !running) return;
+    if (!running) {
+        queued = DspTransferQueued - DspTransferConsumed;
+        if (queued != 0) {
+            DspTransferStatus = softpc_sb_pcm_progress(&progress);
+            if (DspTransferStatus != LIB_STATUS_OK) return;
+            if (progress.accepted_frames < queued ||
+                (DspCompletionEvent != 0 && progress.epoch != DspHostEpoch)) {
+                DspTransferStatus = LIB_STATUS_INVALID_STATE;
+                return;
+            }
+            origin = progress.accepted_frames - queued;
+            played = progress.consumed_frames > origin ?
+                progress.consumed_frames - origin : 0;
+            DspTransferConsumed += played < queued ? (IU32)played : queued;
+        }
+        DspTransferStatus = softpc_sb_pcm_set_active(LIB_FALSE);
+        if (DspTransferStatus != LIB_STATUS_OK) return;
+        if (DspCompletionEvent != 0) delete_q_event(DspCompletionEvent);
+        DspCompletionEvent = 0;
+        DspTransferQueued = DspTransferConsumed;
+        bWriteBurstStarted = FALSE;
+        DspOutputSuspended = TRUE;
+    } else {
+        DspTransferStatus = softpc_sb_pcm_set_active(LIB_TRUE);
+        if (DspTransferStatus != LIB_STATUS_OK) return;
+        DspOutputSuspended = FALSE;
+        DspServiceTransfer();
+    }
+}
+
+static lib_status DspPrepareOutput(void)
+{
+    IU32 rate = TimeConstant == 0xffff ? DspOutputRate : GetSamplingRate();
+    lib_status status;
+    if (rate == 0) return LIB_STATUS_INVALID_STATE;
+    if (DspTransferStatus != LIB_STATUS_OK) return DspTransferStatus;
+    if (rate != DspOutputRate) {
+        status = DspCloseOutput();
+        if (status != LIB_STATUS_OK) return status;
+        status = softpc_sb_pcm_open(rate, MixerGetVoiceGain());
+        if (status != LIB_STATUS_OK) return status;
+        DspOutputRate = rate;
+    }
+    TimeConstant = 0xffff;
+    if (DspResetOutput) {
+        status = softpc_sb_pcm_clear();
+        if (status != LIB_STATUS_OK) return status;
+        DspResetOutput = FALSE;
+    }
+    return LIB_STATUS_OK;
+}
+
+void SbApplyMixer(void)
+{
+    MidiApplyMixer();
+    if (DspOutputRate != 0 && DspTransferStatus == LIB_STATUS_OK)
+        DspTransferStatus = softpc_sb_pcm_set_gain(
+            DspSpeakerEnabled ? MixerGetVoiceGain() : 0);
+}
+
+
+static lib_status DspScheduleCompletion(IU32 samples_minus_one)
+{
+    lib_u64 delay = ((1000ull * (samples_minus_one + 1ull)) /
+        DspCompletionRate + 1ull) * 1000ull;
+    if (delay > 0xffffffffull) return LIB_STATUS_LIMIT_EXCEEDED;
+    DspCompletionEvent = add_q_event_t(DspCompleteBlock, (unsigned long)delay, 0);
+    if (DspCompletionEvent == 0 || DspCompletionEvent == 0xffff) {
+        DspCompletionEvent = 0;
+        return LIB_STATUS_IO_ERROR;
+    }
+    return LIB_STATUS_OK;
+}
+
+static lib_status DspArmCompletion(IU32 rate)
+{
+    lib_audio_pcm_progress progress;
+    lib_status status;
+    IU32 size;
+    if (!bWriteBurstStarted || DspTransferSize == 0 || DspCompletionEvent != 0)
+        return LIB_STATUS_INVALID_STATE;
+    if (rate == 0) return LIB_STATUS_INVALID_ARGUMENT;
+    status = softpc_sb_pcm_progress(&progress);
+    if (status != LIB_STATUS_OK) return status;
+    size = DspTransferSize - DspTransferConsumed;
+    if (progress.accepted_frames < size) return LIB_STATUS_INVALID_STATE;
+    DspHostOrigin = progress.accepted_frames - size;
+    DspHostEpoch = progress.epoch;
+    DspCompletionRate = rate;
+    DspCompletionChecks = PreviousWaveOutPos = 0;
+    size = size != 0 ? size - 1 : 0;
+    if (DspTransferMode == Auto) {
+        if (size < 0x400) size += size / 8;
+        else if (size > 0x1800) size -= AUTO_BLOCK_SIZE;
+    } else {
+        bHighSpeedMode = FALSE;
+    }
+    return DspScheduleCompletion(size);
+}
+
+static void DspCancelTransfer(void)
+{
+    if (DspCompletionEvent != 0) delete_q_event(DspCompletionEvent);
+    DspCompletionEvent = 0;
+    DspTransferSize = DspTransferQueued = DspTransferConsumed = 0;
+    DspTransferStatus = LIB_STATUS_OK;
+    SbAnswerDMAPosition = bWriteBurstStarted = FALSE;
+}
+
+static void DspCompleteBlock(long unused)
+{
+    lib_audio_pcm_progress progress;
+    lib_u64 played;
+    IU32 remaining;
+    UNUSED(unused);
+    DspCompletionEvent = 0;
+    if (DspTransferStatus != LIB_STATUS_OK) return;
+    DspTransferStatus = softpc_sb_pcm_progress(&progress);
+    if (DspTransferStatus != LIB_STATUS_OK) return;
+    if (progress.epoch != DspHostEpoch) {
+        DspTransferStatus = LIB_STATUS_INVALID_STATE;
+        return;
+    }
+    if (PreviousWaveOutPos != 0) {
+        played = progress.consumed_frames > DspHostOrigin ?
+            progress.consumed_frames - DspHostOrigin : 0;
+        played += DspTransferConsumed;
+        remaining = played >= DspTransferSize ? 0 : DspTransferSize - (IU32)played;
+        if (remaining > (DspTransferMode == Single ? 4u : 0x20u)) {
+            if (++DspCompletionChecks < 10) {
+                DspTransferStatus = DspScheduleCompletion(remaining);
+                return;
+            }
+            DspResetOutput = TRUE;
+        }
+    }
+    DmaInfo.count = (IU16)(StartingDmaCount - DspTransferSize);
+    DmaInfo.addr = (IU16)((DmaInfo.mode & 0x20) ?
+        StartingDmaAddr - DspTransferSize : StartingDmaAddr + DspTransferSize);
+    SetDMACountAddr(&DmaInfo);
+    if (DmaInfo.count == 0xffff) SetDMAStatus(&DmaInfo, TRUE, TRUE);
+    GenerateInterrupt(0);
+    SbAnswerDMAPosition = bWriteBurstStarted = FALSE;
+    DspTransferSize = DspTransferQueued = DspTransferConsumed = 0;
+}
+
+static IBOOL DmaDataToDsp(DSP_MODE mode)
+{
+    IU32 i;
+    IU16 address;
+    if (DspCompletionEvent != 0) return FALSE;
+    if (mode == Auto && bDspReset) return FALSE;
+    QueryDMA(&DmaInfo);
+    if (DmaInfo.count == 0xffff || DmaInfo.count == 0 ||
+        (DmaInfo.mask & (1u << SbDmaChannel))) return FALSE;
+    if (SBBlockSize >= sizeof(DspBuffer)) return FALSE;
+    StartingDmaAddr = DmaInfo.addr;
+    StartingDmaCount = DmaInfo.count;
+    DspTransferSize = SBBlockSize + 1;
+    DspTransferQueued = 0;
+    DspTransferConsumed = 0;
+    DspTransferMode = mode;
+    DspTransferStatus = LIB_STATUS_OK;
+    SbAnswerDMAPosition = SBBlockSize > 0xff;
+    bWriteBurstStarted = FALSE;
+    address = StartingDmaAddr;
+    for (i = 0; i < DspTransferSize; ++i) {
+        sas_PRS(dma_system_address(SbDmaChannel, DmaInfo.page, address), &DspBuffer[i], 1);
+        address = (IU16)(address + ((DmaInfo.mode & 0x20) ? -1 : 1));
+    }
+
+    if (DspNumberDmaQueries == 0) {
+        DspVirtualInc = DspTransferSize >> 4;
+    } else {
+        DspVirtualInc = DspTransferSize / DspNumberDmaQueries;
+        if (DspTransferSize > 0x400) {
+            if (DspVirtualInc < 5) DspVirtualInc = 5;
+            else if (DspVirtualInc > 0x200) DspVirtualInc = 0x200;
+        } else if (DspVirtualInc > DspTransferSize / 4) {
+            DspVirtualInc = DspTransferSize / 4;
+        }
+    }
+    DspVirtualIncx = DspVirtualInc;     // remember the original virtual incr in case we
+                                        // need to fall back to original value.
+
+    dprintf3(("NoQ = %x, Inc = %x\n", DspNumberDmaQueries, DspVirtualInc));
+    DspNumberDmaQueries = 0;
+    return TRUE;
+}
+
+static lib_status DspProcessBlock(void)
+{
+    if (DspTransferStatus != LIB_STATUS_OK) return DspTransferStatus;
+    while (DspTransferQueued < DspTransferSize) {
+        IU32 count = DspTransferSize - DspTransferQueued;
+        lib_u32 accepted = 0;
+        lib_status status;
+        if (count > LIB_AUDIO_PCM_STREAM_MAX_FRAMES_PER_SUBMISSION)
+            count = LIB_AUDIO_PCM_STREAM_MAX_FRAMES_PER_SUBMISSION;
+        status = softpc_sb_pcm_write(DspBuffer + DspTransferQueued, count, &accepted);
+        if (accepted > count) return LIB_STATUS_IO_ERROR;
+        DspTransferQueued += accepted;
+        if (status == LIB_STATUS_LIMIT_EXCEEDED) return LIB_STATUS_OK;
+        if (status != LIB_STATUS_OK) return status;
+        if (accepted == 0) return LIB_STATUS_IO_ERROR;
+    }
+    if (DspTransferSize != 0) bWriteBurstStarted = TRUE;
+    return LIB_STATUS_OK;
+}
 
 int softpc_device_snapshot_capture_sb_dsp(softpc_device_sb_dsp_state *state)
 {

@@ -312,7 +312,6 @@ extern IBOOL bExitAuto, bDspPaused;
 extern IBOOL bDspActive, SbAnswerDMAPosition, bWriteBurstStarted;
 extern IU32 PreviousWaveOutPos, DspNumberDmaQueries, DspVirtualInc;
 extern IU16 StartingDmaAddr, StartingDmaCount;
-extern VDD_DMA_INFO DmaInfo;
 static lib_u8 sb_pcm_bytes[65536];
 static lib_u32 sb_pcm_count, sb_pcm_budget;
 static lib_status sb_pcm_status = LIB_STATUS_OK;
@@ -423,7 +422,8 @@ static void verify_sb_block(void)
 {
     static const unsigned lengths[] = { 32, 700, 65536 };
     unsigned direction, length, i;
-    VDD_DMA_INFO actual;
+    sys_addr actual_address;
+    word actual_count;
     SbDmaChannel = 1;
     assert(SbInitializeDMA());
     for (direction = 0; direction != 2; ++direction)
@@ -450,19 +450,18 @@ static void verify_sb_block(void)
             c_sas_PWS(0x20000u + address, &zero, 1);
         }
         sb_pcm_count = 0; sb_pcm_budget = 7;
-        assert(DspProcessBlock() == LIB_STATUS_OK && sb_pcm_count == 7 && !bWriteBurstStarted);
-        assert(QueryDMA(&actual) && actual.addr == start && actual.count == 0x1234);
-        assert(DspProcessBlock() == LIB_STATUS_OK && sb_pcm_count == 7);
-        sb_pcm_status = LIB_STATUS_IO_ERROR;
-        assert(DspProcessBlock() == LIB_STATUS_IO_ERROR && sb_pcm_count == 7);
-        sb_pcm_status = LIB_STATUS_OK;
+        assert(DspServiceTransfer() == LIB_STATUS_OK && sb_pcm_count == 7 && !bWriteBurstStarted);
+        dma_enquire((half_word)SbDmaChannel, &actual_address, &actual_count);
+        assert((actual_address & 0xffff) == start && actual_count == 0x1234);
+        assert(DspServiceTransfer() == LIB_STATUS_OK && sb_pcm_count == 7);
         sb_pcm_budget = lengths[length];
-        assert(DspProcessBlock() == LIB_STATUS_OK && bWriteBurstStarted);
+        assert(DspServiceTransfer() == LIB_STATUS_OK && bWriteBurstStarted);
         assert(sb_pcm_count == lengths[length]);
         for (i = 0; i < lengths[length]; ++i)
             assert(sb_pcm_bytes[i] == (lib_u8)(i * 7 + 3));
-        assert(DspProcessBlock() == LIB_STATUS_OK && sb_pcm_count == lengths[length]);
-        assert(QueryDMA(&actual) && actual.addr == start && actual.count == 0x1234);
+        assert(DspServiceTransfer() == LIB_STATUS_OK && sb_pcm_count == lengths[length]);
+        dma_enquire((half_word)SbDmaChannel, &actual_address, &actual_count);
+        assert((actual_address & 0xffff) == start && actual_count == 0x1234);
         outb(0x0a, 5);
         sb_start(lengths[length] - 1, 0);
         assert(DspGetStatus() == LIB_STATUS_OK && sb_pcm_count == 0);
@@ -478,14 +477,16 @@ static void verify_sb_block(void)
 static void verify_sb_output(void)
 {
     lib_u32 opens, calls;
-    DspCancelTransfer();
-    ResetMixer();
+    StopDspTransfer(TRUE); ResetMixer();
+    outb(0x0a, 5); /* Output lifecycle without submitting PCM. */
     TimeConstant = 0xa6;
-    assert(DspPrepareOutput() == LIB_STATUS_OK);
+    sb_start(31, 0);
+    assert(DspGetStatus() == LIB_STATUS_OK);
     assert(sb_output_rate == 11025 && sb_output_gain == 16383);
     assert(TimeConstant == 0xffff);
     opens = sb_open_calls;
-    assert(DspPrepareOutput() == LIB_STATUS_OK && sb_open_calls == opens);
+    sb_start(31, 0);
+    assert(DspGetStatus() == LIB_STATUS_OK && sb_open_calls == opens);
     DspWrite(DSP_SPEAKER_OFF); assert(sb_output_gain == 0);
     MixerAddrWrite(MIXER_MASTER_VOLUME); MixerDataWrite(14);
     MixerAddrWrite(MIXER_VOICE_VOLUME); MixerDataWrite(6);
@@ -495,33 +496,39 @@ static void verify_sb_output(void)
     MixerDataWrite(0); assert(sb_output_gain == 0);
     DspWrite(DSP_SPEAKER_ON); assert(sb_output_gain == 0);
     ResetMixer(); assert(sb_output_gain == 16383);
-    TimeConstant = 0xa5; /* Same rounded rate does not recreate output. */
-    assert(DspPrepareOutput() == LIB_STATUS_OK && sb_open_calls == opens);
+    DspWrite(DSP_SET_SAMPLE_RATE); DspWrite(0xa5);
+    sb_start(31, 0); /* Same rounded rate does not recreate output. */
+    assert(DspGetStatus() == LIB_STATUS_OK && sb_open_calls == opens);
     sb_close_status = LIB_STATUS_IO_ERROR;
-    TimeConstant = 0xd3;
-    assert(DspPrepareOutput() == LIB_STATUS_IO_ERROR);
+    DspWrite(DSP_SET_SAMPLE_RATE); DspWrite(0xd3);
+    sb_start(31, 0);
+    assert(DspGetStatus() == LIB_STATUS_IO_ERROR);
     assert(sb_output_rate == 11025 && sb_open_calls == opens);
     sb_close_status = LIB_STATUS_OK;
-    assert(DspPrepareOutput() == LIB_STATUS_OK);
-    assert(sb_output_rate == 22050 && sb_open_calls == opens + 1);
+    StopDspTransfer(TRUE); TimeConstant = 0xd3;
+    sb_start(31, 0);
+    assert(DspGetStatus() == LIB_STATUS_OK && sb_output_rate == 22050 && sb_open_calls == opens + 1);
     sb_gain_status = LIB_STATUS_IO_ERROR;
     DspWrite(DSP_SPEAKER_OFF);
-    assert(DspProcessBlock() == LIB_STATUS_IO_ERROR);
+    assert(DspServiceTransfer() == LIB_STATUS_IO_ERROR);
     calls = sb_gain_calls;
     MixerSetVoiceVolume(6);
     assert(sb_gain_calls == calls); /* First failure remains terminal. */
-    assert(DspPrepareOutput() == LIB_STATUS_IO_ERROR);
-    assert(DspCloseOutput() == LIB_STATUS_OK && sb_output_rate == 0);
+    sb_start(31, 0);
+    assert(DspGetStatus() == LIB_STATUS_IO_ERROR);
     sb_gain_status = LIB_STATUS_OK;
-    DspCancelTransfer();
-    TimeConstant = 0xa6;
+    StopDspTransfer(TRUE); TimeConstant = 0xa6;
     sb_open_status = LIB_STATUS_UNSUPPORTED;
-    assert(DspPrepareOutput() == LIB_STATUS_UNSUPPORTED);
-    assert(sb_output_rate == 0 && TimeConstant == 0xa6);
+    sb_start(31, 0);
+    assert(DspGetStatus() == LIB_STATUS_UNSUPPORTED && sb_output_rate == 0);
     sb_open_status = LIB_STATUS_OK;
-    assert(DspPrepareOutput() == LIB_STATUS_OK && sb_output_rate == 11025);
+    StopDspTransfer(TRUE); TimeConstant = 0xa6;
+    sb_start(31, 0);
+    assert(DspGetStatus() == LIB_STATUS_OK && sb_output_rate == 11025);
     assert(DspCloseOutput() == LIB_STATUS_OK);
-    assert(DspPrepareOutput() == LIB_STATUS_INVALID_STATE);
+    sb_start(31, 0);
+    assert(DspGetStatus() == LIB_STATUS_INVALID_STATE);
+    StopDspTransfer(TRUE);
 }
 
 static IU8 sb_read(void) { IU8 value; DspReadData(&value); return value; }
@@ -549,9 +556,10 @@ static void verify_sb_transfer(void)
 {
     unsigned direction, i;
     unsigned char value;
-    VDD_DMA_INFO actual;
+    sys_addr actual_address;
+    word actual_count;
     for (direction = 0; direction != 2; ++direction) {
-        StopDspTransfer(TRUE); DspCancelTransfer();
+        StopDspTransfer(TRUE);
         TimeConstant = 0xa6; ResetMixer();
         ica0_post(); ica_outb(0x21, 0xdf);
         outb(0x0c, 0); dma_word(2, 0x1000); dma_word(3, 63);
@@ -575,16 +583,16 @@ static void verify_sb_transfer(void)
             assert(bDspPaused && sb_pcm_count == 7 && !bWriteBurstStarted);
             dispatch_q_event();
             assert(!(ica_scan_irr(ICA_MASTER) & 0x80));
-            assert(QueryDMA(&actual));
-            assert(actual.addr == 0x1000 && actual.count == 63);
+            dma_enquire((half_word)SbDmaChannel, &actual_address, &actual_count);
+            assert((actual_address & 0xffff) == 0x1000 && actual_count == 63);
         }
         DspWrite(DSP_CONTINUE_DMA);
         assert(!bDspPaused && sb_pcm_count == 7);
         assert(DspServiceTransfer() == LIB_STATUS_OK && sb_pcm_count == 32);
         for (i = 0; i != 32; ++i) assert(sb_pcm_bytes[i] == i);
         dispatch_q_event();
-        assert(QueryDMA(&actual));
-        assert(actual.addr == (direction ? 0x0fe0 : 0x1020) && actual.count == 31);
+        dma_enquire((half_word)SbDmaChannel, &actual_address, &actual_count);
+        assert((actual_address & 0xffff) == (direction ? 0x0fe0 : 0x1020) && actual_count == 31);
         assert(sb_pcm_count == 32); /* IRQ alone does not capture another block. */
         host_EOI_hook(SbInterrupt, -1);
         assert(sb_pcm_count == 32 && !bWriteBurstStarted);
@@ -594,7 +602,8 @@ static void verify_sb_transfer(void)
         DspWrite(DSP_PAUSE_DMA);
         dispatch_q_event(); verify_sb_interrupt(0);
         assert(sb_pcm_count == 64 && !bWriteBurstStarted);
-        assert(QueryDMA(&actual) && actual.addr == 0x1000 && actual.count == 63);
+        dma_enquire((half_word)SbDmaChannel, &actual_address, &actual_count);
+        assert((actual_address & 0xffff) == 0x1000 && actual_count == 63);
         DspWrite(DSP_CONTINUE_DMA);
         assert(sb_pcm_count == 64); /* Continue alone does not invent an EOI. */
         DspWrite(DSP_WRITE_AUTO);
@@ -628,7 +637,7 @@ static void verify_sb_transfer(void)
 static void verify_sb_transfer_failures(void)
 {
     half_word pending;
-    StopDspTransfer(TRUE); DspCancelTransfer();
+    StopDspTransfer(TRUE);
     SbDmaChannel = 1; assert(SbInitializeDMA());
     TimeConstant = 0xa6; SBBlockSize = 31;
     ica0_post(); ica_outb(0x21, 0xdf);
@@ -649,6 +658,16 @@ static void verify_sb_transfer_failures(void)
     StopDspTransfer(TRUE); TimeConstant = 0xa6;
     sb_start(31, 0);
     assert(DspGetStatus() == LIB_STATUS_OK);
+    StopDspTransfer(TRUE); TimeConstant = 0xa6;
+    sb_pcm_budget = 7;
+    sb_start(31, 0);
+    assert(sb_pcm_count == 7);
+    sb_pcm_status = LIB_STATUS_IO_ERROR;
+    assert(DspServiceTransfer() == LIB_STATUS_IO_ERROR && sb_pcm_count == 7);
+    sb_pcm_status = LIB_STATUS_OK; sb_pcm_budget = 4096;
+    assert(DspServiceTransfer() == LIB_STATUS_IO_ERROR && sb_pcm_count == 7);
+    StopDspTransfer(TRUE); TimeConstant = 0xa6;
+    sb_start(31, 0);
     sb_gain_status = LIB_STATUS_IO_ERROR;
     SetSpeaker(FALSE);
     dispatch_q_event();
@@ -907,7 +926,8 @@ static void verify_sb_executor(softpc_machine *machine)
 static void verify_sb_machine_pause(softpc_machine *machine)
 {
     unsigned partial, consumed, i;
-    VDD_DMA_INFO before, after;
+    sys_addr before_address, after_address;
+    word before_count, after_count;
     for (partial = 0; partial != 2; ++partial)
     for (consumed = 0; consumed != 3; ++consumed) {
         lib_u32 played = consumed == 0 ? 0 : consumed == 1 ? 3 : partial ? 7 : 64;
@@ -923,7 +943,7 @@ static void verify_sb_machine_pause(softpc_machine *machine)
         sb_pcm_budget = partial ? 7 : 64;
         outb(0x22c, DSP_WRITE); outb(0x22c, 63); outb(0x22c, 0);
         sb_pcm_consumed = played;
-        assert(QueryDMA(&before));
+        dma_enquire((half_word)SbDmaChannel, &before_address, &before_count);
         softpc_machine_set_heartbeat(machine, 0);
         assert(DspGetStatus() == LIB_STATUS_OK && !sb_output_active);
         assert(sb_pcm_count == 0 && !bWriteBurstStarted);
@@ -932,7 +952,8 @@ static void verify_sb_machine_pause(softpc_machine *machine)
         assert(sb_pcm_epoch == epoch); /* Repeated park cannot discard twice. */
         sb_pcm_budget = 4096;
         assert(DspServiceTransfer() == LIB_STATUS_OK && sb_pcm_count == 0);
-        assert(QueryDMA(&after) && after.addr == before.addr && after.count == before.count);
+        dma_enquire((half_word)SbDmaChannel, &after_address, &after_count);
+        assert((after_address & 0xffff) == (before_address & 0xffff) && after_count == before_count);
         softpc_machine_set_heartbeat(machine, 1);
         assert(DspGetStatus() == LIB_STATUS_OK && sb_output_active && bWriteBurstStarted);
         assert(sb_pcm_count == 64 - played);
@@ -948,10 +969,12 @@ static void verify_sb_machine_pause(softpc_machine *machine)
             assert(DspGetStatus() == LIB_STATUS_OK && sb_pcm_count == 64 - played);
             for (i = 0; i < sb_pcm_count; ++i) assert(sb_pcm_bytes[i] == i + played);
         }
-        assert(QueryDMA(&after) && after.addr == before.addr && after.count == before.count);
+        dma_enquire((half_word)SbDmaChannel, &after_address, &after_count);
+        assert((after_address & 0xffff) == (before_address & 0xffff) && after_count == before_count);
         /* Resumption did not complete DMA; only the existing deadline may. */
         dispatch_q_event();
-        assert(QueryDMA(&after) && after.addr == 0x1040 && after.count == 0xffff);
+        dma_enquire((half_word)SbDmaChannel, &after_address, &after_count);
+        assert((after_address & 0xffff) == 0x1040 && after_count == 0xffff);
     }
     sb_active_status = LIB_STATUS_IO_ERROR;
     softpc_machine_set_heartbeat(machine, 0);
@@ -971,7 +994,8 @@ static void verify_sb_midi_framing(void)
 {
     static const IU8 commands[] = {0x38, 0x34, 0x35, 0x36, 0x37};
     softpc_device_sb_dsp_state pending, actual, invalid;
-    VDD_DMA_INFO before, after;
+    sys_addr before_address, after_address;
+    word before_count, after_count;
     unsigned command, data;
     IU8 value;
     outb(0x0a, 5); /* No test payload may start an actual PCM transfer. */
@@ -979,7 +1003,7 @@ static void verify_sb_midi_framing(void)
         sb_reset_ports();
         assert(host_DelayHwInterrupt(5, 0, 0xfffffffful));
         ica0_post(); ica_outb(0x21, 0xdf);
-        assert(QueryDMA(&before));
+        dma_enquire((half_word)SbDmaChannel, &before_address, &before_count);
         lib_u32 midi = sb_midi_writes, pcm = sb_open_calls;
         outb(0x22c, commands[command]);
         assert(softpc_device_snapshot_capture_sb_dsp(&pending));
@@ -1017,7 +1041,8 @@ static void verify_sb_midi_framing(void)
                 assert(sb_read() == 2 && sb_read() == 1 && sb_status() == 0x7f);
             }
         }
-        assert(QueryDMA(&after) && after.addr == before.addr && after.count == before.count);
+        dma_enquire((half_word)SbDmaChannel, &after_address, &after_count);
+        assert((after_address & 0xffff) == (before_address & 0xffff) && after_count == before_count);
         sb_reset_ports();
         outb(0x22c, DSP_GET_VERSION);
         assert(sb_read() == 2 && sb_read() == 1 && sb_status() == 0x7f);
@@ -1032,7 +1057,8 @@ static void verify_sb_commands(void)
         { 0x0001, 0x0004, 0xfffe }
     };
     unsigned i, automatic, decrement, edge;
-    VDD_DMA_INFO info;
+    sys_addr info_address;
+    word info_count;
     unsigned char observed;
     SbDmaChannel = 1;
     assert(SbInitializeDMA());
@@ -1112,10 +1138,10 @@ static void verify_sb_commands(void)
         DspWrite(automatic ? DSP_SET_BLOCK_SIZE : DSP_WRITE);
         DspWrite(2); DspWrite(0);
         if (automatic) DspWrite(DSP_WRITE_AUTO);
-        assert(QueryDMA(&info));
-        assert(info.addr == (decrement ? edges[edge].decremented : edges[edge].incremented));
-        assert(info.count == 0xffff && info.page == 2);
-        assert(info.status & 2);
+        dma_enquire((half_word)SbDmaChannel, &info_address, &info_count);
+        assert((info_address & 0xffff) == (decrement ? edges[edge].decremented : edges[edge].incremented));
+        assert(info_count == 0xffff && (info_address >> 16) == 2);
+        assert(dmaGetAdaptor()->controller[0].status.all & 2);
         assert(!bDspActive);
         verify_sb_interrupt(1);
     }
@@ -1123,7 +1149,8 @@ static void verify_sb_commands(void)
     outb(0x83, 0);
     outb(0x0c, 0); dma_word(2, 0x1000); dma_word(3, 2);
     DspWrite(DSP_WRITE); DspWrite(0); DspWrite(0);
-    assert(QueryDMA(&info) && info.addr == 0x1000 && info.count == 2);
+    dma_enquire((half_word)SbDmaChannel, &info_address, &info_count);
+    assert((info_address & 0xffff) == 0x1000 && info_count == 2);
     verify_sb_interrupt(1);
     DspWrite(DSP_READ); DspWrite(1); DspWrite(0);
     c_sas_PRS(0x1000, &observed, 1);
@@ -1138,7 +1165,8 @@ static void verify_sb_commands(void)
         assert(observed == 0x20);
         c_sas_PRS(decrement ? 0xfff : 0x1001, &observed, 1);
         assert(observed == 0xc5);
-        assert(QueryDMA(&info) && info.addr == (decrement ? 0xffe : 0x1002) && info.count == 0);
+        dma_enquire((half_word)SbDmaChannel, &info_address, &info_count);
+        assert((info_address & 0xffff) == (decrement ? 0xffe : 0x1002) && info_count == 0);
     }
 }
 
@@ -1149,7 +1177,7 @@ static int sb_test_encode_event(Q_CALLBACK_FN callback, unsigned long *id)
     return 1;
 }
 
-static void verify_sb_deadline(void)
+static void verify_sb_deadline(unsigned expected)
 {
     Q_EVENT_SNAPSHOT_STATE state;
     Q_EVENT_SNAPSHOT_ENTRY quick[32], tick[32];
@@ -1157,14 +1185,15 @@ static void verify_sb_deadline(void)
     assert(q_event_snapshot_capture(&state, quick, 32, tick, 32, sb_test_encode_event));
     for (i = 0; i < state.quick_entries; ++i)
         if (quick[i].original_time == 93000 && quick[i].event_type == 0) ++matches;
-    assert(matches == 1); /* 1025 samples at 11025 Hz: 92 + 1 milliseconds, EVENT_TIME. */
+    assert(matches == expected); /* 1025 samples at 11025 Hz: 92 + 1 milliseconds, EVENT_TIME. */
 }
 
 static void verify_sb_completion(void)
 {
     unsigned direction, automatic, scenario, i;
-    VDD_DMA_INFO actual;
-    DspCancelTransfer();
+    sys_addr actual_address;
+    word actual_count;
+    StopDspTransfer(TRUE);
     for (direction = 0; direction != 2; ++direction)
     for (automatic = 0; automatic != 2; ++automatic)
     for (scenario = 0; scenario != 6; ++scenario) {
@@ -1176,22 +1205,20 @@ static void verify_sb_completion(void)
         sb_pcm_consumed = 0; sb_pcm_budget = 0;
         sb_start(0x400, 0);
         assert(DspGetStatus() == LIB_STATUS_OK && sb_pcm_count == 0);
-        assert(DspArmCompletion(11025) == LIB_STATUS_INVALID_STATE);
+        verify_sb_deadline(0);
         sb_pcm_budget = 13;
-        assert(DspProcessBlock() == LIB_STATUS_OK && !bWriteBurstStarted);
-        assert(DspArmCompletion(11025) == LIB_STATUS_INVALID_STATE);
+        assert(DspServiceTransfer() == LIB_STATUS_OK && !bWriteBurstStarted);
+        verify_sb_deadline(0);
         sb_pcm_budget = 1025;
-        assert(DspProcessBlock() == LIB_STATUS_OK && bWriteBurstStarted);
-        assert(DspArmCompletion(0) == LIB_STATUS_INVALID_ARGUMENT);
         bHighSpeedMode = TRUE;
-        assert(DspArmCompletion(11025) == LIB_STATUS_OK && !bHighSpeedMode);
+        assert(DspServiceTransfer() == LIB_STATUS_OK && bWriteBurstStarted && !bHighSpeedMode);
         DspWrite(DSP_PAUSE_DMA); assert(bDspPaused);
         DspWrite(DSP_CONTINUE_DMA); assert(!bDspPaused);
-        verify_sb_deadline();
-        assert(DspArmCompletion(11025) == LIB_STATUS_INVALID_STATE);
+        verify_sb_deadline(1);
         assert(DspServiceTransfer() == LIB_STATUS_OK && sb_pcm_count == 1025);
-        verify_sb_deadline(); /* Servicing a live deadline must not recapture. */
-        assert(QueryDMA(&actual) && actual.addr == 0x1000 && actual.count == 0x400);
+        verify_sb_deadline(1); /* Servicing a live deadline must not recapture. */
+        dma_enquire((half_word)SbDmaChannel, &actual_address, &actual_count);
+        assert((actual_address & 0xffff) == 0x1000 && actual_count == 0x400);
         assert(!(ica_scan_irr(ICA_MASTER) & 0x80));
         if (scenario == 1 || scenario == 2) {
             SbGetDMAPosition();
@@ -1203,25 +1230,27 @@ static void verify_sb_completion(void)
         }
         if (scenario == 3) ++sb_pcm_epoch;
         if (scenario == 4) sb_progress_status = LIB_STATUS_IO_ERROR;
-        if (scenario == 5) DspCancelTransfer();
+        if (scenario == 5) StopDspTransfer(TRUE);
         dispatch_q_event();
         if (scenario >= 3) {
             assert(!(ica_scan_irr(ICA_MASTER) & 0x80));
-            assert(QueryDMA(&actual) && actual.addr == 0x1000 && actual.count == 0x400);
-            assert(DspProcessBlock() == (scenario == 3 ? LIB_STATUS_INVALID_STATE :
+            dma_enquire((half_word)SbDmaChannel, &actual_address, &actual_count);
+            assert((actual_address & 0xffff) == 0x1000 && actual_count == 0x400);
+            assert(DspServiceTransfer() == (scenario == 3 ? LIB_STATUS_INVALID_STATE :
                 scenario == 4 ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK));
         } else {
-            assert(QueryDMA(&actual) && actual.page == 2);
-            assert(actual.addr == (automatic ? 0x1000 : direction ? 0x0bff : 0x1401));
-            assert(actual.count == (automatic ? 0x400 : 0xffff));
-            assert(actual.status & 2);
+            dma_enquire((half_word)SbDmaChannel, &actual_address, &actual_count);
+            assert((actual_address >> 16) == 2);
+            assert((actual_address & 0xffff) == (automatic ? 0x1000 : direction ? 0x0bff : 0x1401));
+            assert(actual_count == (automatic ? 0x400 : 0xffff));
+            assert(dmaGetAdaptor()->controller[0].status.all & 2);
             assert(!SbAnswerDMAPosition && !bWriteBurstStarted);
             verify_sb_interrupt(0);
-            assert(DspProcessBlock() == LIB_STATUS_OK);
+            assert(DspServiceTransfer() == LIB_STATUS_OK);
             assert(sb_pcm_count == 1025); /* Completion cannot queue the block again. */
         }
         sb_progress_status = LIB_STATUS_OK;
-        DspCancelTransfer();
+        StopDspTransfer(TRUE);
     }
     bDspActive = FALSE;
 }
@@ -1240,7 +1269,7 @@ static void verify_sb_dma_read_ports(void)
         outb(0x0c, 0); dma_word((io_addr)(channel * 2), StartingDmaAddr);
         dma_word((io_addr)(channel * 2 + 1), StartingDmaCount);
         outb(0x0b, (half_word)(0x48 | channel | decrement * 0x20));
-        assert(QueryDMA(&DmaInfo));
+        outb(0x0a, (half_word)SbDmaChannel);
         sb_pcm_budget = 0;
         sb_start(0x400, 0);
         DspVirtualInc = 64;
@@ -1267,7 +1296,8 @@ static void verify_sb_dma_read_ports(void)
 static void verify_sb_position(void)
 {
     unsigned decrement, small, automatic, i;
-    VDD_DMA_INFO actual;
+    sys_addr actual_address;
+    word actual_count;
     SbDmaChannel = 1;
     assert(SbInitializeDMA());
     for (decrement = 0; decrement != 2; ++decrement)
@@ -1277,7 +1307,7 @@ static void verify_sb_position(void)
         StartingDmaCount = 0x1000;
         outb(0x0c, 0); dma_word(2, StartingDmaAddr); dma_word(3, StartingDmaCount);
         outb(0x83, 2); outb(0x0b, (half_word)(0x49 | decrement * 0x20));
-        assert(QueryDMA(&DmaInfo));
+        outb(0x0a, (half_word)SbDmaChannel);
         StopDspTransfer(TRUE); TimeConstant = 0xa6;
         sb_pcm_budget = 0;
         sb_start(small ? 0xff : 0x400, automatic);
@@ -1290,18 +1320,20 @@ static void verify_sb_position(void)
         SbAnswerDMAPosition = TRUE; bWriteBurstStarted = FALSE;
         SbGetDMAPosition();
         assert(DspNumberDmaQueries == 0);
-        assert(QueryDMA(&actual) && actual.addr == StartingDmaAddr && actual.count == 0x1000);
+        dma_enquire((half_word)SbDmaChannel, &actual_address, &actual_count);
+        assert((actual_address & 0xffff) == StartingDmaAddr && actual_count == 0x1000);
         bWriteBurstStarted = TRUE;
         for (i = 0; i != 100; ++i) SbGetDMAPosition();
         assert(DspNumberDmaQueries == 100);
-        assert(QueryDMA(&actual) && actual.page == 2);
+        dma_enquire((half_word)SbDmaChannel, &actual_address, &actual_count);
+        assert((actual_address >> 16) == 2);
         if (small) {
-            assert(actual.addr == (decrement ? 0xff60 : 0x00a0));
-            assert(actual.count == 0x0f50 && DspVirtualInc == 16);
+            assert((actual_address & 0xffff) == (decrement ? 0xff60 : 0x00a0));
+            assert(actual_count == 0x0f50 && DspVirtualInc == 16);
             assert(PreviousWaveOutPos == 0);
         } else {
-            assert(actual.addr == (decrement ? 0xfc18 : 0x03e8));
-            assert(actual.count == 0x0c08 && DspVirtualInc == 2);
+            assert((actual_address & 0xffff) == (decrement ? 0xfc18 : 0x03e8));
+            assert(actual_count == 0x0c08 && DspVirtualInc == 2);
             assert(PreviousWaveOutPos == (automatic ? 0u : 100u));
         }
     }
@@ -1318,8 +1350,9 @@ static void verify_sb_dma(void)
         { 0xe9, 44100, 0xe9 }, { 0xea, 44100, 0xea }, { 0xff, 44100, 0xea }
     };
     unsigned i, channel, automatic, decrement;
-    VDD_DMA_INFO info;
-    half_word low, high, status;
+    sys_addr info_address;
+    word info_count;
+    half_word status;
     for (i = 0; i != sizeof(rates) / sizeof(rates[0]); ++i) {
         TimeConstant = rates[i].constant;
         assert(GetSamplingRate() == rates[i].rate && TimeConstant == rates[i].stored);
@@ -1327,39 +1360,36 @@ static void verify_sb_dma(void)
     for (channel = 1; channel <= 3; channel += 2)
     for (automatic = 0; automatic != 2; ++automatic)
     for (decrement = 0; decrement != 2; ++decrement) {
+        StopDspTransfer(TRUE); TimeConstant = 0xa6;
         SbDmaChannel = (IU16)channel;
         assert(SbInitializeDMA());
         outb(0x0c, 0);
         dma_word((io_addr)(channel * 2), 0x9234);
-        dma_word((io_addr)(channel * 2 + 1), 0x1234);
+        dma_word((io_addr)(channel * 2 + 1), 31);
         outb(channel == 1 ? 0x83 : 0x82, 0xab);
         outb(0x0b, (half_word)(0x48 | channel | automatic * 0x10 | decrement * 0x20));
         outb(0x0a, (half_word)(4 | channel));
-        assert(QueryDMA(&info));
-        assert(info.addr == 0x9234 && info.count == 0x1234 && info.page == 0xab);
-        assert(info.mask & (1u << channel));
-        assert(!!(info.mode & 0x10) == automatic && !!(info.mode & 0x20) == decrement);
-        assert(GetDMATransferAddress() == 0xab9234);
+        for (i = 0; i != 32; ++i) {
+            IU8 sample = (IU8)(i + 17);
+            c_sas_PWS(0xab0000u + (decrement ? 0x9234 - i : 0x9234 + i), &sample, 1);
+        }
+        sb_pcm_budget = 32;
+        sb_start(31, 0);
+        assert(DspGetStatus() == LIB_STATUS_OK && sb_pcm_count == 0);
         outb(0x0a, (half_word)channel);
-        assert(QueryDMA(&info) && !(info.mask & (1u << channel)));
-        info.addr = 0x4321; info.count = 0x0201;
-        assert(SetDMACountAddr(&info));
-        outb(0x0c, 0);
-        inb((io_addr)(channel * 2), &low); inb((io_addr)(channel * 2), &high);
-        assert(low == 0x21 && high == 0x43);
-        inb((io_addr)(channel * 2 + 1), &low); inb((io_addr)(channel * 2 + 1), &high);
-        assert(low == 1 && high == 2);
-        info.count = 0xffff;
-        assert(SetDMACountAddr(&info) && QueryDMA(&info));
-        assert(info.addr == (automatic ? 0x9234 : 0x4321));
-        assert(info.count == (automatic ? 0x1234 : 0xffff));
-        SetDMAStatus(&info, TRUE, TRUE);
+        sb_start(31, 0);
+        assert(DspGetStatus() == LIB_STATUS_OK && sb_pcm_count == 32);
+        for (i = 0; i != 32; ++i) assert(sb_pcm_bytes[i] == i + 17);
+        dispatch_q_event();
+        dma_enquire((half_word)channel, &info_address, &info_count);
+        assert(info_address == (automatic ? 0xab9234u : decrement ? 0xab9214u : 0xab9254u));
+        assert(info_count == (automatic ? 31 : 0xffff));
         inb(0x08, &status);
         assert((status & (0x11u << channel)) == (0x11u << channel));
-        assert(QueryDMA(&info) && !(info.status & (1u << channel)));
-        SetDMAStatus(&info, FALSE, FALSE);
-        assert(QueryDMA(&info) && !(info.status & (0x11u << channel)));
+        inb(0x08, &status);
+        assert(!(status & (1u << channel))); /* Native status read consumes TC. */
     }
+    StopDspTransfer(TRUE);
     SbDmaChannel = 4;
     assert(!SbInitializeDMA()); /* SB2's byte-wide DMA must not bind the cascade. */
     SbDmaChannel = 1;
@@ -1624,7 +1654,8 @@ static void verify_sb_parser_archive(void)
     for (prefix = 1; prefix < commands[command].length; ++prefix) {
         softpc_device_archive *saved = softpc_device_archive_create(), *decoded = NULL;
         softpc_device_sb_dsp_state initial, expected, actual;
-        VDD_DMA_INFO expected_dma, actual_dma;
+        sys_addr expected_dma_address, actual_dma_address;
+    word expected_dma_count, actual_dma_count;
         FILE *file = tmpfile();
         assert(saved && file);
         ResetAll();
@@ -1643,18 +1674,20 @@ static void verify_sb_parser_archive(void)
         assert(fseek(file, 0, SEEK_SET) == 0);
         assert(softpc_device_archive_read(&decoded, sb_archive_read, file) == LIB_STATUS_OK);
         for (i = prefix; i < commands[command].length; ++i) DspWrite(commands[command].bytes[i]);
-        assert(softpc_device_snapshot_capture_sb_dsp(&expected) && QueryDMA(&expected_dma));
+        assert(softpc_device_snapshot_capture_sb_dsp(&expected));
+        dma_enquire((half_word)SbDmaChannel, &expected_dma_address, &expected_dma_count);
         ResetAll();
         DspWrite(DSP_SET_BLOCK_SIZE); DspWrite(0xff); DspWrite(0xff);
         assert(softpc_device_archive_restore(decoded));
         for (i = prefix; i < commands[command].length; ++i) DspWrite(commands[command].bytes[i]);
-        assert(softpc_device_snapshot_capture_sb_dsp(&actual) && QueryDMA(&actual_dma));
+        assert(softpc_device_snapshot_capture_sb_dsp(&actual));
+        dma_enquire((half_word)SbDmaChannel, &actual_dma_address, &actual_dma_count);
         assert(actual.DSPWriteState == expected.DSPWriteState && actual.DSPReadState == expected.DSPReadState);
         assert(actual.SBBlockSize == expected.SBBlockSize && actual.blockSize == expected.blockSize);
         assert(actual.IdentByte == expected.IdentByte && actual.ReservedRegister == expected.ReservedRegister);
         assert(actual.TimeConstant == expected.TimeConstant);
         assert(actual.TableMungeFirstByte == expected.TableMungeFirstByte && actual.TableMungeData == expected.TableMungeData);
-        assert(actual_dma.addr == expected_dma.addr && actual_dma.count == expected_dma.count);
+        assert((actual_dma_address & 0xffff) == (expected_dma_address & 0xffff) && actual_dma_count == expected_dma_count);
         softpc_device_archive_dispose(decoded);
         softpc_device_archive_dispose(saved);
         assert(fclose(file) == 0);
@@ -1671,7 +1704,8 @@ static void verify_sb_archive(softpc_machine *machine, const char *write_path,
         if ((write_path || read_path) && (automatic != 0 || prefix != 1)) continue;
         softpc_device_archive *saved = softpc_device_archive_create(), *decoded = NULL;
         softpc_device_sb_state sound;
-        VDD_DMA_INFO dma;
+        sys_addr dma_address;
+    word dma_count;
         IU8 value, sample;
         FILE *file = write_path ? fopen(write_path, "w+b") :
             read_path ? fopen(read_path, "rb") : tmpfile();
@@ -1751,9 +1785,10 @@ static void verify_sb_archive(softpc_machine *machine, const char *write_path,
         assert(sb_midi_length == 3 && sb_midi_message[0] == 0x90 &&
             sb_midi_message[1] == 60 && sb_midi_message[2] == 100);
         for (i = 0; i < 100 && bWriteBurstStarted; ++i) dispatch_q_event();
-        assert(!bWriteBurstStarted && QueryDMA(&dma));
-        assert(dma.addr == (automatic ? 0x1000 : 0x1040));
-        assert(dma.count == (automatic ? 63 : 0xffff));
+        assert(!bWriteBurstStarted);
+        dma_enquire((half_word)SbDmaChannel, &dma_address, &dma_count);
+        assert((dma_address & 0xffff) == (automatic ? 0x1000 : 0x1040));
+        assert(dma_count == (automatic ? 63 : 0xffff));
         if (automatic) {
             lib_u32 previous = sb_pcm_count;
             IU32 hook = 0;

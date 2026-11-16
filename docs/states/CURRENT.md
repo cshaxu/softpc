@@ -30,6 +30,14 @@ no-progress budgets. Cached dual build, publication, full background/native
 regression, actual-diff review, commit/push then owner acceptance. Similar-issue
 sweep covers all callers of the five withdrawn header definitions.
 
+Owner approves S4 P85 completing the analogous DSP/DMA boundary cleanup:
+remove eleven header declarations and relocate the private DMA record; reuse
+original local forwards and existing DSP commands/service plus DMA observation
+in the existing fixture. No private-type copy, new production test API, schema,
+behavior or guest change. Baseline cb89ef52. Own scratch build/t100-s4-p85,
+two-hour job/fifteen-minute no-progress budget. Full cached dual build,
+publication, regression, review and commit/push, then await acceptance.
+
 ## M9 T100 S4 Packet
 
 | Field | Required record |
@@ -53,15 +61,17 @@ sweep covers all callers of the five withdrawn header definitions.
 
 ## Current Technical Baseline
 
-S4 P84 implements the owner-approved R0580 boundary cleanup: DSP_MODE returns
-to its XP source-file owner, four header prototypes disappear, and the fixture
-uses DSP commands instead of private mode definitions/transfer calls. Production
-+9/-12, tests +47/-27; XP retained-content diff decreases by eleven changed
-lines. Snapshot schema and production function bodies are unchanged. Both EXEs are published. Both background suites pass 188/188; x64 native passes
-8/8; x86 native passes seven plus isolated compact rerun 1/1. Sequential package
-startup interruptions remain explicitly unproved and transferred to TODO; do not
-claim clean repeated-native execution. Await acceptance; no S4 closure claimed.
-See [P84 delivery](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p84-restore-dsp-internal-ownership).
+S4 P85 completes the owner-approved analogous cleanup: eleven nt_sb.h
+prototypes removed, private DMA record relocated, original local forwards reused;
+four added DSP helpers now static. Tests drive original commands/service and
+DMA observations. Source +165/-171; tests +152/-117. Matched-XP changed-line
+count decreases four; old provider deleted-line accounting is corrected
+separately, not attributed to this change. No function-body/schema/shared-package
+change. Dual publication/build succeeded; background 188/188 each, x64 native
+8/8; x86 native 7/8 initially plus the interrupted compact case passed in an
+isolated rerun. Existing P2 startup debt remains, not a clean aggregate claim.
+Final affected SB tests 3/3 each. Await owner acceptance, no S4 closure.
+See [P85 delivery](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p85-complete-dsp-and-dma-declaration-ownership).
 
 S4 P82 records owner approval of R0563/R0564. Eight intervening host headers
 have no retained differences. nt_graph.h has R0571/R0573, one block,+2/-1:

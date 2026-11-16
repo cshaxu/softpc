@@ -347,32 +347,12 @@ void SbApplyMixer(void);
 IU16 MixerGetVoiceGain(void);
 IU16 MixerGetMidiGain(void);
 
-typedef struct _VDD_DMA_INFO {
-    WORD    addr;
-    WORD    count;
-    WORD    page;
-    BYTE    status;
-    BYTE    mode;
-    BYTE    mask;
-} VDD_DMA_INFO, *PVDD_DMA_INFO;
-
 IBOOL SbInitializeDMA(void);
-BOOL QueryDMA(PVDD_DMA_INFO DmaInfo);
-BOOL SetDMACountAddr(PVDD_DMA_INFO DmaInfo);
-IU32 GetDMATransferAddress(void);
-VOID SetDMAStatus(PVDD_DMA_INFO DmaInfo, BOOL requesting, BOOL tc);
 
-void ResetAll(void);
-void VsbByteIn(IU16 port, IU8 *data);
-void VsbByteOut(IU16 port, IU8 data);
-lib_status DspProcessBlock(void);
 lib_status DspServiceTransfer(void);
 lib_status DspGetStatus(void);
 void DspSetRunning(IBOOL running);
 void SbSetRunning(IBOOL running);
 lib_status MidiSetRunning(IBOOL running);
-lib_status DspPrepareOutput(void);
 lib_status DspCloseOutput(void);
-lib_status DspArmCompletion(IU32 rate);
-void DspCancelTransfer(void);
 void StopDspTransfer(IBOOL reset);

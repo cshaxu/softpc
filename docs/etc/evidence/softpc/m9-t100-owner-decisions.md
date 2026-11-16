@@ -7041,3 +7041,85 @@ Only existing mirror warnings appeared; changed tests/shared sources have no
 new warnings. No user INI or asset snapshot changed. Final whitespace,
 documentation and mirror gates apply after this record update. Retire owned
 scratch after promoting these results. Await owner acceptance; S4/T100 stay open.
+
+
+## S4 P85: complete DSP and DMA declaration ownership
+
+Owner approves the three analogous cleanup groups after P84. Remove eleven
+nt_sb.h declarations: ResetAll/VsbByteIn/VsbByteOut; QueryDMA/SetDMACountAddr/
+GetDMATransferAddress/SetDMAStatus; DspProcessBlock/DspPrepareOutput/
+DspArmCompletion/DspCancelTransfer. Restore use of the original sndblst.h ResetAll
+contract and original nt_sb.c byte-I/O forwards. Move the unchanged VDD_DMA_INFO
+record into its sole production consumer nt_sbdsp.c. No test copy or alias.
+
+Put the existing added DSP implementation after the original forward-reference
+section so early DMA consumers can use those declarations without duplicate
+forwards. Four added DSP helpers have static linkage and one local forward each.
+The original DMA helpers retain original declarations/linkage, with no exported
+header contract. A normalized comparison proves the relocated function block
+is byte-identical except those four static qualifiers. No production function
+body, device algorithm, snapshot schema or shared component changed.
+
+The existing fixture uses DSP commands/start/service/stop, dma_enquire for
+non-consuming address/count observations, and actual transfer completion for
+DMA auto reload/TC. DMA controller status observations remain with the original
+controller; no VDD_DMA_INFO or DmaInfo dependency remains in test. Original
+port-read progression is still explicitly exercised. New tests do not copy
+QueryDMA, create another device algorithm or expose a test-only production API.
+Masked DMA, channel 1/3, high page 0xAB with actual sample-byte checks, both
+directions, auto reload, partial/frozen PCM, output
+reuse/rate changes, close/open/gain/write failures, pause, cancellation, epoch
+and progress failures, IRQ completion and snapshot replay remain exercised.
+
+Coverage changes are intentional: the internal helper's rate=0 and duplicate-arm
+call assertions are retired with that non-public entry; actual service is checked
+for zero completion events before a full submission and exactly one afterward.
+Write failure is now checked as terminal at the production service boundary,
+including no submission after capacity returns; reset/stop owns recovery. Tests
+no longer directly call a lower helper to bypass terminal state. Direct DMA
+setter/getter round trips are replaced by actual SB transfers and original DMA
+readback/TC consumption. Existing paging, 64K-wrap and snapshot command-prefix
+fixtures remain, without changing their guest data or adding production paths.
+
+Accounting method: fixed XP, normalized newlines, match conditional branch paths
+and remove only corresponding original/existing #error bodies, omit #line,
+then git diff --no-index --numstat/-U0 (Myers). Recount HEAD before applying delta:
+nt_sb.h +42/-2 (4 blocks) -> +22/-2 (4 blocks);
+nt_sbdsp.c +526/-1005 (60 blocks) -> +541/-1006 (103 blocks).
+The provider's earlier -996 ledger was stale by nine deleted lines; this is an
+accounting correction, not nine new source deletions. Previous total row also
+had not incorporated P84 row changes. Reconcile totals from all current rows.
+This P reduces actual XP changed-line count by four: added -5, removed +1.
+The +43 textual blocks are Myers alignment after relocating the same function
+block, not 43 new semantic changes. Original state-machine and forward sections
+remain in their original relative order. Source delta +165/-171 (net -6);
+test delta +152/-117 (net +35), including migrated observations and real-path
+failure checks. Do not confuse relocation churn with added implementation.
+
+Similar-issue scope: new/changed declarations and types across mirror headers,
+plus local added declaration candidates. All eleven withdrawn names are now
+absent from nt_sb.h and tests. Genuine cross-file service/status/lifecycle,
+quick-event archive, DMA adaptor, video panning and debug contracts remain.
+No claim of re-auditing every C-VID algorithm. The ordered mirror-file frontier
+is unchanged; await owner acceptance.
+
+Verification: cached dual product/test builds and publication succeeded. x64
+background 188/188 and native 8/8 passed; x86 background 188/188 and native 7/8
+passed initially. The compact Console case was interrupted during startup,
+matching the separately retained P2 package-startup debt; its isolated rerun
+passed (7.61 seconds). Every registered case has a passing observation, but the
+first x86 native aggregate was not clean and this does not resolve that P2.
+Final high-page sample and completion-deadline assertions were then rebuilt
+and passed in all three SB device cases on each architecture (6/6).
+No guest manual playback claim is made for this declaration-only change.
+
+Published compiler timestamps: x64 Nov 15 2026 17:01:04; x86 Nov 15 2026 17:05:15.
+SHA256 x86: 4a2ec48048c7712daed015fad041702ae0a30e88bb1877746b4034060d158884.
+SHA256 x64: 942c5599b4d8c0c13d7311ed5ed6dd68331423a072bf5e8767759001b14056c6.
+Publication checked embedded compiler literals. Only existing mirror warnings
+remain; changed tests and shared code introduce no warning. No user INI,
+media or snapshot changed. Actual-change self-review confirms one production
+DSP path, original DMA declarations reused, private helpers internal, and no
+copied private type or test-only export. Documentation, XP-manifest and
+whitespace gates are rerun after recording results; owned scratch is removed
+before delivery. S4 and T100 remain open.
