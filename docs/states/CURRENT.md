@@ -44,6 +44,11 @@ is unchanged.
 
 ## Current Technical Baseline
 
+S4 P82 records owner approval of R0563/R0564. Eight intervening host headers
+have no retained differences. nt_graph.h has R0571/R0573, one block,+2/-1:
+scanline panning parameter and shared group-helper declaration. Recommend
+retain pending review; no source/artifact change. See [P82 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p82-approved-pointer-carriers-and-ega-panning-declarations).
+
 S4 P81 records owner approval of R0558/R0559. Six intervening host headers
 have no retained differences. insignia.h has R0563/R0564, three blocks,+10/-1:
 native IHPE and source-scoped C-VID IUH. Recommend retain pending owner review;

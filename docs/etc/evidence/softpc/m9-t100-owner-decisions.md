@@ -6863,3 +6863,47 @@ and whitespace gates qualify the records. Own hidden scratch build/t100-s4-p81
 has two-hour/fifteen-minute no-progress budgets and is retired after gates.
 Next literal file is host/inc/ntcheese.h; zero-diff successors will be checked
 before presenting the next true-diff file. S4/T100 remain open.
+
+## S4 P82: approved pointer carriers and EGA panning declarations
+
+Owner approves R0563/R0564. At3d656aee fresh whole-file comparisons of
+order445-452 ntcheese.h,nt_cga.h,nt_cgalt.h,nt_det.h,nt_ega.h,nt_egalt.h,
+nt_event.h,nt_fulsc.h find zero retained differences after ignoring existing
+#error bodies and necessary #line. R0566-R0568 restorations have no residual.
+
+Next true-diff file is order453 host/inc/nt_graph.h. Exactly one contiguous
+zero-context block,+2/-1 contains two points:
+
+| Point | Current location | Added/removed | Purpose |
+| --- | --- | --- | --- |
+| R0571 | 423 | +1/-1 | Seventh int parameter to ega_colour_hi_munge carries the scanline pel pan. |
+| R0573 | 424 | +1/-0 | Declare shared ega_colour_panned_group(source,pan). |
+
+R0569/R0570/R0572/R0574's whitespace/comment/declaration restorations are done.
+All other retained text matches fixed XP SP1. Actual nt_ega medium/high standard
+painters call the existing munge with ega_get_pel_panning for each scanline;
+low standard painter calls the group helper. nt_munge owns the helper, shared
+by its masked and unmasked loops. Zero pan returns the original group; nonzero
+pan combines corresponding plane bytes from this and next group, with the
+existing display-extent wrap. It neither mixes neighbouring planes nor adds
+another rendering subsystem. No new public KVM API or state owner is involved.
+
+The argument is needed because split-screen state can cancel panning below the
+split; a single global pan value for the whole frame is insufficient. Returning
+the header alone to six arguments would conflict with real callers/definition,
+but this dependency alone is not treated as necessity proof. Historical
+P80/R0428 real-module no-pan query counterexample fails pixels after an actual
+3C0h pan=1 write on both widths; current controls pass. Existing
+verify_panning_pixels checks low/medium/high painters, pan0..7, bank/wrap,
+split/no-split and rows against shifted unpanned pixels. This fixture also
+supports shared helper need without introducing copied drawing logic.
+
+Recommend retain both declarations. Their implementation bodies remain subject
+to their later ordered reviews; the historical no-pan query negative is not a
+claim of coherently restoring all coupled XP implementations. This P verifies
+current source/calls/tests and historical records, not new runtime or guest
+acceptance or exhaustive mode coverage. No safe restoration candidate found.
+No production/test/artifact modification. Documentation/whitespace gate applies.
+Own hidden scratch build/t100-s4-p82 has two-hour/fifteen-minute no-progress
+budgets and is retired after gate completion. Next literal file follows
+nt_graph.h in frozen order. S4/T100 remain open.
