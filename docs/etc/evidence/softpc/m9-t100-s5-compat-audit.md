@@ -199,3 +199,39 @@ No other redundant direct inclusion established.
 Read-only source/caller evidence, no new build/test. Existing P3 test evidence is
 not represented as a new run. Source/test delta0; two of50 files reviewed,48
 remain. Next fixed file: conapi.h.
+
+## P5: audio.h ownership wording and unused include
+
+Owner approves P4's two candidates and requests the usual full delivery. Baseline
+7a743d5e. Correct audio.h's shutdown comment: failure retains unreleased
+resources, not necessarily a live worker. Remove platform.c's unused audio.h
+include; platform.c directly includes Types and calls neither audio lifecycle
+entry. Do not advance platform.c's full-review status.
+
+Production: two files +2/-3,net-1. No test changes or new tests: no executable
+behavior changed. No mirror/public-package/API/schema/media/config changes.
+The existing shutdown order remains task cancellation, PCM cancellation, join,
+stream destruction and final resource release. Existing error returns remain.
+
+Self-review compares the actual two hunks and all direct header consumers:
+audio.c, driver.c, machine sound and native lifecycle tests retain required
+includes. platform.c does not acquire a transitive dependency after removal.
+Header comment covers both failed join and post-join stream-release failure.
+No new abstractions, paths or error handling.
+
+Verification: cached Ninja/ccache full builds and publication completed for
+x86/x64. Each architecture passed188/188 background and8/8 native tests:
+392/392 total, including desktop/audio/package and existing audio ownership
+regressions. Runner exit0. Fresh package timestamps validated by post-build
+check: x86 Nov15 2026 20:48:15; x64 Nov15 2026 20:51:13.
+
+Each build emitted178 diagnostics, all from unchanged softpc.new mirror headers
+(host_cpu.h endif labels and cpu4gen.h macro redefinitions); zero non-mirror
+warnings and no build error. Mirror warnings are not cleaned in this task.
+Documentation gate and actual-diff review passed. No new guest manual-test claim.
+Scratch removed after runner termination; caches retained. File2 delivered for
+owner acceptance,48 files still pending; platform.c remains pending full review.
+
+P5 softpc32.exe SHA-256: `a13e4b002193c8e8898fe56b8cecdab9d001f20ebdf82fbe7eba2ebe925396f0`.
+
+P5 softpc64.exe SHA-256: `034d4eafbdb53b044802d68d806cd4944e4dffbfd785985fbc5f1766a1799b1a`.

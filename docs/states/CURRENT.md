@@ -9,8 +9,10 @@ removal/merge candidates; preserve behavior and existing ownership boundaries.
 S5 P3 implements file1/50 audio.c: production +5/-29,net-24; tests
 +15/-17,net-2. Cached dual builds/publication and392/392 full tests passed,
 including native desktop/audio/package. Owner accepted P3 and requested the next
-file. P4 reviews audio.h: retain both required declarations; propose correcting
-one ownership comment.2/50 files reviewed,48 remain. No source change in P4.
+file. P5 corrects audio.h ownership wording and removes platform.c's unused
+include: production +2/-3,net-1; no test/mirror/API changes. Cached dual full
+builds/publication and392/392 tests passed; self-review passed. Mirror-header
+warnings only. Delivery awaits acceptance.2/50 files reviewed,48 remain.
 
 The following admissions are retained historical records, not active work.
 
@@ -94,7 +96,7 @@ restoration candidate is withdrawn; no production change was made.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits a new S auditing Compat in fixed dir order to reduce code/file/line count. P3 owner approves the audio.c candidate and its existing regression adaptations; no blanket semantic rewrite approval. |
+| Admission And Approval | Owner admits a new S auditing Compat in fixed dir order to reduce code/file/line count. P3 owner approves the audio.c candidate and its existing regression adaptations; P5 approves audio.h ownership comment and unused platform.c include removal; no blanket semantic rewrite approval. |
 | Objective | Audit every frozen Compat file for unnecessary code, duplicated owners/paths, thin wrappers and coherent file consolidation; favor fewer concepts and actual repository-wide reduction. |
 | Non-goals | No guest/configuration/media changes; no mirror diff growth, shared-package changes, new framework, alias, polling or second path merely to shrink Compat. No performance claims without measurement. |
 | Reference Baseline | SoftPC2464862d; existing in-tree XP mirror is comparison material, not a new import. |
