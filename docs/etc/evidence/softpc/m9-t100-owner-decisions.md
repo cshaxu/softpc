@@ -7943,3 +7943,12 @@ implemented restorations. Shared ABI proof and historical negative controls
 remain distinct from fresh dynamic proof. No source/test/artifact changes; S4
 stays open. Full point coordinates and per-file source hashes accompany the
 report; no excluded body is separately recorded.
+
+## S4 P98: owner retention decision and S4 closure
+
+Owner approves retaining the eight generated entries for uniform native ABI
+semantics and directs S4 closure. This supersedes P97's restoration proposal;
+the145 point rows now record approved retention, not an outstanding candidate.
+All34 deferred generated files complete the S4 review. No new dynamic proof or
+production consumer is asserted. See [closure](../../../history/M9-T100-S4-ordered-mirror-audit.md).
+T100 remains open. No source/test/artifact changes in P98.

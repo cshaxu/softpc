@@ -518,3 +518,12 @@ S4 owner subsequently approves all already-reviewed points in files 1-11,
 through c_main.c after P6-P9. Record retention approval in the current
 file-by-file decision ledger without reviving removed differences or upgrading
 evidence strength. Continue with c_page.c; unreviewed points remain pending.
+
+## Status after S4 owner closure
+
+Owner accepts the34-file generated C-VID audit and retains the eight unwired
+entries for consistent native ABI semantics. S4 is closed; its earlier
+restoration candidate is withdrawn. See the [closure record](../history/M9-T100-S4-ordered-mirror-audit.md).
+The earlier S3/S4 admission paragraphs are history, not outstanding S work.
+T100 remains open for a separately authorized completion audit. No next S is
+admitted by this status update; existing TODO/Queue ownership remains unchanged.

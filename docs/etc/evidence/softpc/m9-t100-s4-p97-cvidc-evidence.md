@@ -1,5 +1,14 @@
 # S4 P97: generated C-VID retention-evidence audit
 
+## Owner disposition: S4 P98
+
+Owner approves retaining the eight entries and closes S4. The restoration
+recommendation below is historical and withdrawn: absent product consumers
+are not absence of an ABI rationale. These original generated functions keep
+the same native GDP and local-slot assumptions as their active siblings.
+Disposition: APPROVED_RETAIN_UNIFORM_NATIVE_ABI for all145 listed blocks.
+No code changed; no production-use or runtime-failure claim is added.
+
 ## Frozen universe and method
 
 Owner request: 接下来 34的cvidc文件 找出所有没有证据的diff点位。
