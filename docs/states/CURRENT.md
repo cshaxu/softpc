@@ -6,6 +6,8 @@ Owner admits M9 T100 S5: ordered Compat simplification audit. S1-S4 remain
 closed; T100 remains open. Baseline2464862d. Start with evidence and concrete
 removal/merge candidates; preserve behavior and existing ownership boundaries.
 [Progress](../etc/evidence/softpc/m9-t100-s5-compat-audit.md).
+S5 P2 completes source review of file1/50 audio.c: candidate +5/-28,net-23;
+no source modification or fresh build/test.49 files remain in fixed order.
 
 The following admissions are retained historical records, not active work.
 
