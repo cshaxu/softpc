@@ -85,12 +85,18 @@ then owner acceptance. Preserve user configuration/media and unrelated work.
 
 ## Current Technical Baseline
 
+Owner approves P90's nt_sbfm.c residuals. S4 P91 reviews order465 nt_sbmid.c
+at fb8d9df4: all 33 blocks,+284/-400 map to storage, lifetime/archive, parser
+and send contracts. Nine XP-identical switch statements differ only in
+indentation; isolated formatting restoration reduces XP diff to +275/-391.
+No source/test/EXE modification or new runtime claim. Await owner decision on
+retention and formatting restoration; do not advance. See [P91 ledger](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p91-nt_sbmidc-current-retained-content-audit).
+
 Owner accepts P89. S4 P90 audits order464 nt_sbfm.c at 0570fad6: four real
 blocks,+20/-104; recommended retention is host-boundary omissions and two-byte
 FM snapshot state. No source/test/EXE change or fresh runtime claim. Corrected
 inventory total is 106 files,15747 blocks,+24594/-24023; two previously missed
-comment terminators explain the accounting-only change. All four points await
-owner approval; do not advance. See [P90 audit](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p90-nt_sbfmc-current-retained-content-audit).
+comment terminators explain the accounting-only change. All four points are now owner-approved. See [P90 audit](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p90-nt_sbfmc-current-retained-content-audit).
 
 S4 P89 implements the five owner-approved nt_sbdsp.c restorations from P88:
 two original-position forwards and three original USHORT spellings. Source

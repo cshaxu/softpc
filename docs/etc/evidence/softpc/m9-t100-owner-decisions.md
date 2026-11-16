@@ -7642,3 +7642,98 @@ No new runtime/guest reproduction is claimed. No justified restoration candidate
 was found in these four current blocks; preserve independent original helpers
 and unused original declarations rather than create cleanup differences.
 Recommendations await owner approval. S4 remains on order464.
+
+
+## S4 P91: nt_sbmid.c current retained-content audit
+
+Owner approves P90 R0657/R0662/R0663 retention and requests order465.
+Baseline fb8d9df4; fixed XP only. No production/test/EXE change. Direct Git
+Myers comparison excluding the two existing REPORT_SB_MODE bodies and line
+controls is 33 blocks,+284/-400. Every block is mapped below; textual alignment
+of the removed initializer against new functions is not a semantic equivalence.
+
+Current callers: nt_sb.c sends UART bytes through BufferMidi, drains via
+SendMidiRequest, pauses/resumes via MidiSetRunning, resets via ResetMidiParser,
+and invokes MIDI archive capture/restore. Compat sb_midi.c owns Lib output;
+original InitializeMidi has no current caller. The six retained original native
+helpers have no production activation path and are not proposed for removal.
+
+Evidence groups:
+- STORAGE (R0665): one bounded complete-message buffer, pending realtime and
+  oversize state replace ring ownership. P156's original-body x64 high-address
+  probe faults through ULONG pointer truncation. The withdrawn void forward
+  conflicts with the existing status-returning header contract; old ring comment
+  no longer describes the active storage. New snapshot header owns archive types.
+- LIFETIME (R0667-R0670): remove native initializer; add copied parser/voice state,
+  validated restore, note/pedal accounting, pause silence/resume and parser reset.
+  Current archive fields map these values; fixture tests unfinished channel/SysEx
+  roundtrip, note/sustain/sostenuto behavior, invalid state and failed resume prefix.
+  P156 separate field/host-reset withdrawals fail both widths. Raw original
+  initialization opens another native owner and is not parser-only reset.
+- PARSER (R0672): complete messages, running-status materialization, realtime
+  separation, bounded SysEx, and new-status cancellation. P156 original low-address
+  ring keeps the final message unsent; corrected experimental pointer/tail ring
+  still fails current Lib validation on running status, interleaved F8 and F4.
+  Existing fixture checks exact messages, overflow, blocked output and reset.
+- SEND (R0671): status-returning Lib write, pending data kept until accepted,
+  note accounting only after acceptance, paused service idle, realtime reset.
+  nt_sb.c observes the status. Historical withdrawal fails host-error assertions;
+  current fixture asserts explicit tail drain and no duplicate accepted output.
+
+Restore candidate: nine whitespace-only lines in BufferMidi's F0/F1/F2/F3
+switch cases differ from XP indentation. An isolated candidate restores only
+those nine prefixes; non-whitespace text is identical and direct Git numstat
+becomes +275/-391: eighteen fewer mirror changed lines. Production is unchanged;
+no compiler-equivalence run is claimed. This is formatting restoration, not
+permission to restore the incompatible ring/parser or delete original helpers.
+
+The following normalized anchors refer to both comparison streams with excluded
+bodies/line directives removed; they are not current physical source line numbers.
+
+| Block | XP/current normalized anchor | Added | Deleted | Evidence |
+| --- | --- | --- | --- | --- |
+| H01 | `-8,0 +9` | +1 | -0 | STORAGE |
+| H02 | `-19 +20` | +1 | -1 | STORAGE |
+| H03 | `-42,12 +43,2` | +2 | -12 | STORAGE |
+| H04 | `-258,20 +249,6` | +6 | -20 | LIFETIME |
+| H05 | `-278,0 +256,2` | +2 | -0 | LIFETIME |
+| H06 | `-279,0 +259,18` | +18 | -0 | LIFETIME |
+| H07 | `-281,15 +278,35` | +35 | -15 | LIFETIME |
+| H08 | `-297,9 +314,7` | +7 | -9 | LIFETIME |
+| H09 | `-306,0 +322,18` | +18 | -0 | LIFETIME |
+| H10 | `-308,16 +341,9` | +9 | -16 | LIFETIME |
+| H11 | `-325 +351,31` | +31 | -1 | LIFETIME |
+| H12 | `-326,0 +383` | +1 | -0 | LIFETIME |
+| H13 | `-328,4 +385,31` | +31 | -4 | LIFETIME |
+| H14 | `-333,3 +417,6` | +6 | -3 | LIFETIME |
+| H15 | `-337 +423,0` | +0 | -1 | LIFETIME |
+| H16 | `-339 +425` | +1 | -1 | LIFETIME |
+| H17 | `-342 +428,32` | +32 | -1 | LIFETIME |
+| H18 | `-367,141 +484,12` | +12 | -141 | PARSER |
+| H19 | `-509,3 +497,7` | +7 | -3 | PARSER |
+| H20 | `-513,18 +505,10` | +10 | -18 | PARSER |
+| H21 | `-531,0 +516,4` | +4 | -0 | PARSER |
+| H22 | `-534,23 +522,6` | +6 | -23 | PARSER |
+| H23 | `-565,28 +536,16` | +16 | -28 | PARSER; nine indentation restorations |
+| H24 | `-594,3 +553` | +1 | -3 | PARSER |
+| H25 | `-611,2 +568,2` | +2 | -2 | PARSER |
+| H26 | `-626 +583` | +1 | -1 | PARSER |
+| H27 | `-629,17 +586,2` | +2 | -17 | PARSER |
+| H28 | `-654 +595,0` | +0 | -1 | PARSER |
+| H29 | `-656,18 +597,2` | +2 | -18 | PARSER |
+| H30 | `-738 +663` | +1 | -1 | SEND |
+| H31 | `-760,60 +685,11` | +11 | -60 | SEND |
+| H32 | `-820,0 +697,7` | +7 | -0 | SEND |
+| H33 | `-821,0 +705` | +1 | -0 | SEND |
+
+Group totals: STORAGE +4/-13; LIFETIME +197/-71; PARSER +63/-255;
+SEND +20/-61; total +284/-400. Semantic recommendations retain the seven
+residual IDs; the nine formatting lines await restoration approval.
+
+Evidence boundary: current pass reads the entire original/current file, all
+real callers, host adapter and fixture. Negative controls are retained P156
+records; latest full tests are P89, not a fresh P91 run. Neither source review
+nor prior passing tests proves minimality of every new line or exact acoustic
+continuation. One voice per channel/key and approximate envelopes remain explicit
+limitations. The inactive original volume-return bug remains recorded, not fixed
+or used to justify active-path changes. No new TODO or production patch.
