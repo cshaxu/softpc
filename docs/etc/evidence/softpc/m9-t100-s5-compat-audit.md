@@ -165,3 +165,37 @@ here and removed after the owned runner finishes; reusable caches remain.
 Published softpc32.exe SHA-256: `1d5350eff04e64cf6b4cff2e2fd91552f6e18d99076e379b71129ec8ac76b628`.
 
 Published softpc64.exe SHA-256: `75060d81f370be37a0c3e5535a54f2f9040e456a975d5fb7eb70fac370178380`.
+
+## P4: file2 audio.h audit
+
+Owner requests the next ordered file after accepting the P3 delivery. Baseline
+de96a91e. audio.h is13 lines and has two declarations; both are necessary.
+
+| Item | Actual consumer and disposition |
+| --- | --- |
+| Header guard | Retain: ordinary standalone declaration boundary. |
+| types_interface.h | Retain: directly owns lib_status, with no mirror/Windows dependency. |
+| softpc_platform_audio_start | driver.c vm_create starts the speaker after machine creation and before driver publication. Real integration and machine sound fixtures also call it. |
+| softpc_platform_audio_shutdown | vm_create rollback and vm_destroy both check its result before releasing the machine/admission. Tests include failed join and repeated lifecycle. |
+
+Do not delete/merge this header or relocate its declarations to mirror headers:
+it separates host-worker lifecycle from original-device tone requests. Removing
+it merely relocates declarations or forces callers to unrelated headers.
+The tone callback declared by original nt_sound.c is a distinct device-host ABI;
+there is no reason to add its mirror ULONG types to this neutral lifecycle header.
+
+One comment is too broad: shutdown can join the worker successfully and then
+fail stream destruction; in that case the worker is already NULL. Thus "A failed
+destroy retains the live worker" is not true for every failure. Minimum proposal
+is a two-line comment replacement: failure retains unreleased resources, and
+the VM owner must retain admission until shutdown succeeds (+2/-2, no behavior
+change). No production edit is made in this audit.
+
+Consumer sweep found platform.c includes audio.h but uses neither declaration;
+its Types dependency is already explicit on line1. Candidate: remove that one
+include when reviewing platform.c (-1 line); do not mark that file reviewed now.
+No other redundant direct inclusion established.
+
+Read-only source/caller evidence, no new build/test. Existing P3 test evidence is
+not represented as a new run. Source/test delta0; two of50 files reviewed,48
+remain. Next fixed file: conapi.h.

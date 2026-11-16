@@ -8,8 +8,9 @@ removal/merge candidates; preserve behavior and existing ownership boundaries.
 [Progress](../etc/evidence/softpc/m9-t100-s5-compat-audit.md).
 S5 P3 implements file1/50 audio.c: production +5/-29,net-24; tests
 +15/-17,net-2. Cached dual builds/publication and392/392 full tests passed,
-including native desktop/audio/package. Self-review passed; delivery awaits
-owner acceptance.49 files remain in fixed order. No mirror/shared/schema change.
+including native desktop/audio/package. Owner accepted P3 and requested the next
+file. P4 reviews audio.h: retain both required declarations; propose correcting
+one ownership comment.2/50 files reviewed,48 remain. No source change in P4.
 
 The following admissions are retained historical records, not active work.
 
