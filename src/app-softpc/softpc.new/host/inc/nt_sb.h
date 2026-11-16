@@ -362,19 +362,9 @@ BOOL SetDMACountAddr(PVDD_DMA_INFO DmaInfo);
 IU32 GetDMATransferAddress(void);
 VOID SetDMAStatus(PVDD_DMA_INFO DmaInfo, BOOL requesting, BOOL tc);
 
-typedef enum {
-    Auto,
-    Single,
-    None
-} DSP_MODE;
-
 void ResetAll(void);
 void VsbByteIn(IU16 port, IU8 *data);
 void VsbByteOut(IU16 port, IU8 data);
-void PauseDMA(void);
-void ContinueDMA(void);
-IBOOL StartDspTransfer(DSP_MODE mode);
-IBOOL DmaDataToDsp(DSP_MODE mode);
 lib_status DspProcessBlock(void);
 lib_status DspServiceTransfer(void);
 lib_status DspGetStatus(void);

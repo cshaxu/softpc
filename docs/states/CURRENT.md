@@ -21,6 +21,15 @@ input was checked unsuccessfully before owner replacement; no old-snapshot
 recovery claim is made. S4's ordered mirror audit remains open and its frontier
 is unchanged.
 
+Owner approves S4 P84 DSP boundary correctness cleanup (baseline 44c8cdac):
+restore DSP_MODE to nt_sbdsp.c; remove internal helper declarations from nt_sb.h;
+migrate device tests to DSP commands, preserving staged PCM/DMA/error/completion
+and snapshot coverage. No schema, shared-package or guest changes. Scratch:
+build/t100-s4-p84, this packet owns cleanup; two-hour job / fifteen-minute
+no-progress budgets. Cached dual build, publication, full background/native
+regression, actual-diff review, commit/push then owner acceptance. Similar-issue
+sweep covers all callers of the five withdrawn header definitions.
+
 ## M9 T100 S4 Packet
 
 | Field | Required record |
@@ -44,11 +53,15 @@ is unchanged.
 
 ## Current Technical Baseline
 
-S4 P83 records owner approval of R0571/R0573. nt_mouse.h matches XP;
-nt_sb.h has four real blocks,+52/-2 covering R0577-R0580 and diagnostic-profile
-define omission. Recommend retain, distinguishing necessary interfaces from
-R0580's measured placement tradeoff. No code/artifact change or fresh runtime
-claim. See [P83 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p83-approved-panning-declarations-and-sound-header-review).
+S4 P84 implements the owner-approved R0580 boundary cleanup: DSP_MODE returns
+to its XP source-file owner, four header prototypes disappear, and the fixture
+uses DSP commands instead of private mode definitions/transfer calls. Production
++9/-12, tests +47/-27; XP retained-content diff decreases by eleven changed
+lines. Snapshot schema and production function bodies are unchanged. Both EXEs are published. Both background suites pass 188/188; x64 native passes
+8/8; x86 native passes seven plus isolated compact rerun 1/1. Sequential package
+startup interruptions remain explicitly unproved and transferred to TODO; do not
+claim clean repeated-native execution. Await acceptance; no S4 closure claimed.
+See [P84 delivery](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p84-restore-dsp-internal-ownership).
 
 S4 P82 records owner approval of R0563/R0564. Eight intervening host headers
 have no retained differences. nt_graph.h has R0571/R0573, one block,+2/-1:

@@ -1,6 +1,6 @@
 # T100 S4 current real-difference file list
 
-Current source: S4 P62 owner-approved ROM scope restoration from `76717b54`.
+Current source: S4 P84 DSP internal-boundary restoration from `44c8cdac`.
 Fixed XP SP1: `a2f6d7c93aa4f11efc51147566d5961c59a8ef89`.
 All paths are relative to `src/app-softpc/softpc.new/`.
 
@@ -151,14 +151,14 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 437 | `host/inc/host_def.h` | 2 | +0 | -2 |
 | 444 | `host/inc/insignia.h` | 3 | +10 | -1 |
 | 453 | `host/inc/nt_graph.h` | 1 | +2 | -1 |
-| 455 | `host/inc/nt_sb.h` | 4 | +52 | -2 |
+| 455 | `host/inc/nt_sb.h` | 4 | +42 | -2 |
 | 457 | `host/src/nt_cga.c` | 10 | +22 | -52 |
 | 458 | `host/src/nt_ega.c` | 9 | +33 | -12 |
 | 459 | `host/src/nt_graph.c` | 11 | +31 | -20 |
 | 460 | `host/src/nt_keycd.c` | 4 | +2 | -173 |
 | 461 | `host/src/nt_munge.c` | 6 | +25 | -1 |
 | 462 | `host/src/nt_sb.c` | 24 | +147 | -376 |
-| 463 | `host/src/nt_sbdsp.c` | 60 | +523 | -1000 |
+| 463 | `host/src/nt_sbdsp.c` | 60 | +526 | -996 |
 | 464 | `host/src/nt_sbfm.c` | 4 | +20 | -102 |
 | 465 | `host/src/nt_sbmid.c` | 33 | +285 | -399 |
 | 466 | `host/src/nt_sbmxr.c` | 6 | +48 | -0 |

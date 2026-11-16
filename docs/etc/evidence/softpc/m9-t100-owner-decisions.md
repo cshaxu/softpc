@@ -6966,3 +6966,78 @@ source diff, consumers and existing test assertions. No source/test/artifact
 change. Documentation/whitespace gate applies. Own hidden scratch
 build/t100-s4-p83 has two-hour/fifteen-minute no-progress budgets and is retired
 after gates. Next literal file is host/inc/nt_uis.h. S4/T100 remain open.
+
+
+## S4 P84: restore DSP internal ownership
+
+Owner approves boundary correctness over the earlier line-count tradeoff.
+This explicitly supersedes P83's recommendation to retain R0580 in nt_sb.h.
+The five-line DSP_MODE enum is restored verbatim at its XP location in
+nt_sbdsp.c. Remove its header copy and all four internal helper prototypes.
+PauseDMA/ContinueDMA reuse the existing original local forwards. The two
+standalone transfer helpers have file-local linkage; only DmaDataToDsp needs
+one early local forward for its existing earlier callers. No behavior, state,
+snapshot layout, guest binary or shared component changes.
+
+Whole src/test consumer search finds those definitions used only by nt_sbdsp.c
+and the device contract fixture. The fixture now selects modes through existing
+DSP commands; it has no enum alias or external DspMode reference. A single local
+command encoder replaces direct StartDspTransfer/DmaDataToDsp calls. Zero PCM
+capacity preserves capture-before-submit, source-mutation/frozen-data proof,
+partial submission, explicit completion arming and failure injection. Masks,
+oversize corrupt state, auto EOI, pause/continue/reset, DMA address/count progress
+and snapshot transport remain covered through their existing tests. A live
+completion is checked through service with unchanged sample count and exactly
+one deadline rather than direct recapture of an internally owned block.
+
+Production delta from 44c8cdac: +9/-12 (net -3), two files. This is different
+from XP mirror difference: existing exclusion bodies/line controls are unchanged;
+header retained-content difference goes +52/-2 to +42/-2; provider goes
++523/-1000 to +526/-996. Combined XP difference shrinks by 11 changed lines
+(7 fewer added and 4 fewer removed), with the same 64 textual blocks. Myers
+alignment accounts for the provider's +3/-4 change; the actual enum itself is
+restored exactly. R0580's header difference is removed, not renamed or duplicated.
+R0577-R0579 remain as previously reviewed, without blanket approval of later
+provider-body differences. The sequential frontier remains after nt_sb.h.
+
+Review proof: normalize the two mirror files to LF, remove only the restored
+enum/local forward and reverse the two static linkage edits; the DSP source
+then equals HEAD exactly. Both mirror files retain CRLF. The fixture changes
+are +47/-27 (net +20), with one eight-line command encoder; no replacement
+production test API or enum copy. Existing original PauseDMA/ContinueDMA linkage
+and original DspMode storage remain intact. Similar-issue search across src/test
+finds all five withdrawn header definitions confined to nt_sbdsp.c; snapshot
+field comparisons do not redeclare or interpret the internal enum.
+
+Coordinator actual-diff review: scope is exactly the two mirror files, their
+manifest, the existing device fixture, current accounting/status and published
+EXEs. Function bodies and snapshot representation remain unchanged. Do not
+claim full guest audio scenarios from mock tests: native integration verifies
+host PCM/MIDI/package paths, not exhaustive guest driver behavior.
+
+
+Fresh verification on both widths: cached full builds succeeded and published
+EXEs; 188/188 background cases each passed, including the changed device tests,
+archive, snapshot cross-process and all corpus/dependency/mirror gates. x64
+native group passed 8/8. x86 native group passed 7/8, with compact package
+interrupted; isolated compact rerun passed 1/1. Thus every one of 392 registered
+architecture/case pairs has a passing observation, but this is not a claim that
+the aggregate native run or repeated startup was clean.
+
+Preserved failure disposition: package repeat-until-fail:3 saw each scenario
+pass once then interrupt on its second startup. Another complete x86 native run
+again passed seven cases; compact failed before Console attachment completed
+(stage=1, error=6, child=0xc000013a). Desktop session remained Active, no orphan
+package/product processes remained. Root cause and introduction revision are
+unproved; do not call this an RDP disconnect or a repaired DSP failure. No fixture
+assertion, production timeout or retry was changed. The isolated compact rerun
+passed in 7.12 seconds. Transfer this separate startup investigation to TODO.
+
+Publication timestamps: x64 Nov 15 2026 16:31:58; x86 Nov 15 2026 16:36:01.
+The standard publication gate checked compiler object literals in each EXE.
+SHA256 x86: 14c7ac283305d718fc4870ce972d2c5dec5d0e074b59650e9a6dc18fcc02fad1.
+SHA256 x64: 6a5a1793bfd7a7818c6623fb72e254215a33e792b03ead627f0a5fba04b9e59f.
+Only existing mirror warnings appeared; changed tests/shared sources have no
+new warnings. No user INI or asset snapshot changed. Final whitespace,
+documentation and mirror gates apply after this record update. Retire owned
+scratch after promoting these results. Await owner acceptance; S4/T100 stay open.

@@ -313,7 +313,6 @@ extern IBOOL bDspActive, SbAnswerDMAPosition, bWriteBurstStarted;
 extern IU32 PreviousWaveOutPos, DspNumberDmaQueries, DspVirtualInc;
 extern IU16 StartingDmaAddr, StartingDmaCount;
 extern VDD_DMA_INFO DmaInfo;
-extern DSP_MODE DspMode;
 static lib_u8 sb_pcm_bytes[65536];
 static lib_u32 sb_pcm_count, sb_pcm_budget;
 static lib_status sb_pcm_status = LIB_STATUS_OK;
@@ -412,6 +411,14 @@ lib_status softpc_sb_pcm_write(const lib_u8 *samples, lib_u32 count, lib_u32 *ac
     return LIB_STATUS_OK;
 }
 
+static void sb_start(unsigned count, int automatic)
+{
+    DspWrite(automatic ? DSP_SET_BLOCK_SIZE : DSP_WRITE);
+    DspWrite((IU8)count);
+    DspWrite((IU8)(count >> 8));
+    if (automatic) DspWrite(DSP_WRITE_AUTO);
+}
+
 static void verify_sb_block(void)
 {
     static const unsigned lengths[] = { 32, 700, 65536 };
@@ -430,9 +437,11 @@ static void verify_sb_block(void)
             unsigned char sample = (unsigned char)(i * 7 + 3);
             c_sas_PWS(0x20000u + address, &sample, 1);
         }
-        SBBlockSize = lengths[length] - 1;
+        StopDspTransfer(TRUE); TimeConstant = 0xa6;
         DspNumberDmaQueries = 0;
-        assert(DmaDataToDsp(Single));
+        sb_pcm_budget = 0;
+        sb_start(lengths[length] - 1, 0);
+        assert(DspGetStatus() == LIB_STATUS_OK && sb_pcm_count == 0);
         assert(DspVirtualInc == lengths[length] / 16);
         /* Modify the source after capture: pending PCM must remain frozen. */
         for (i = 0; i < lengths[length]; ++i) {
@@ -455,10 +464,13 @@ static void verify_sb_block(void)
         assert(DspProcessBlock() == LIB_STATUS_OK && sb_pcm_count == lengths[length]);
         assert(QueryDMA(&actual) && actual.addr == start && actual.count == 0x1234);
         outb(0x0a, 5);
-        assert(!DmaDataToDsp(Single));
+        sb_start(lengths[length] - 1, 0);
+        assert(DspGetStatus() == LIB_STATUS_OK && sb_pcm_count == 0);
         outb(0x0a, 1);
-        SBBlockSize = 65536;
-        assert(!DmaDataToDsp(Single));
+        SBBlockSize = 65536; /* Corrupt state must not overrun the capture buffer. */
+        DspWrite(DSP_WRITE_AUTO);
+        assert(DspGetStatus() == LIB_STATUS_OK && sb_pcm_count == 0);
+        StopDspTransfer(TRUE);
     }
 }
 
@@ -552,7 +564,7 @@ static void verify_sb_transfer(void)
         sb_pcm_budget = 7; sb_pcm_consumed = 0;
         DspWrite(DSP_SET_BLOCK_SIZE); DspWrite(31); DspWrite(0);
         DspWrite(DSP_WRITE_AUTO);
-        assert(bDspActive && DspMode == Auto && sb_pcm_count == 7);
+        assert(bDspActive && sb_pcm_count == 7);
         assert(!bWriteBurstStarted && DspServiceTransfer() == LIB_STATUS_OK);
         assert(!(ica_scan_irr(ICA_MASTER) & 0x80));
         /* Host capacity returning must not resume a guest-paused partial block. */
@@ -589,7 +601,7 @@ static void verify_sb_transfer(void)
         assert(sb_pcm_count == 96);
         DspWrite(DSP_STOP_AUTO);
         dispatch_q_event(); verify_sb_interrupt(0);
-        assert(DspMode == None && sb_pcm_count == 128);
+        assert(sb_pcm_count == 128);
         dispatch_q_event(); verify_sb_interrupt(0);
         assert(sb_pcm_count == 128); /* Last submitted block retains its IRQ. */
         DspWrite(DSP_WRITE_AUTO);
@@ -603,7 +615,8 @@ static void verify_sb_transfer(void)
         DspWrite(DSP_WRITE_AUTO); /* Explicit guest restart recovers normally. */
         assert(sb_pcm_count == i + 32);
         StopDspTransfer(TRUE); TimeConstant = 0xa6;
-        assert(StartDspTransfer(Single));
+        sb_start(31, 0);
+        assert(DspGetStatus() == LIB_STATUS_OK);
         assert(sb_pcm_count == 32);
         StopDspTransfer(TRUE);
         dispatch_q_event();
@@ -623,18 +636,19 @@ static void verify_sb_transfer_failures(void)
     outb(0x0b, 0x59); outb(0x0a, 1);
     sb_pcm_budget = 4096;
     assert(RegisterEOIHook(5, record_eoi));
-    assert(!StartDspTransfer(Auto));
+    sb_start(31, 1);
     assert(DspServiceTransfer() == LIB_STATUS_INVALID_STATE);
     assert(!bDspActive && sb_output_rate == 0);
     assert(RemoveEOIHook(5, record_eoi)); /* Failed start retains other owner. */
     StopDspTransfer(TRUE); TimeConstant = 0xa6;
     sb_open_status = LIB_STATUS_UNSUPPORTED;
-    assert(!StartDspTransfer(Auto));
+    sb_start(31, 1);
     assert(DspServiceTransfer() == LIB_STATUS_UNSUPPORTED);
     assert(!bDspActive && sb_output_rate == 0);
     sb_open_status = LIB_STATUS_OK;
     StopDspTransfer(TRUE); TimeConstant = 0xa6;
-    assert(StartDspTransfer(Single));
+    sb_start(31, 0);
+    assert(DspGetStatus() == LIB_STATUS_OK);
     sb_gain_status = LIB_STATUS_IO_ERROR;
     SetSpeaker(FALSE);
     dispatch_q_event();
@@ -1057,29 +1071,29 @@ static void verify_sb_commands(void)
     assert(SBBlockSize == 0x1234);
     outb(0x0a, 5); /* Dispatch test: masked DMA does not submit a block. */
     DspWrite(DSP_WRITE_AUTO);
-    assert(bDspActive && DspMode == Auto);
+    assert(bDspActive);
     DspWrite(DSP_WRITE); DspWrite(0x21); DspWrite(0);
-    assert(DspMode == Single && SBBlockSize == 0x21);
+    assert(bDspActive && SBBlockSize == 0x21);
     DspWrite(DSP_WRITE_HS_AUTO);
-    assert(DspMode == Auto && bHighSpeedMode);
+    assert(bDspActive && bHighSpeedMode);
     DspResetWrite(1); DspResetWrite(0);
     assert(bDspActive && !bHighSpeedMode);
     assert(TimeConstant == 0xffff && sb_output_rate == 11025);
     assert(SBBlockSize == 0x7ff && sb_read() == 0xaa);
     DspWrite(DSP_WRITE_HS);
-    assert(DspMode == Single && bHighSpeedMode);
+    assert(bDspActive && bHighSpeedMode);
     DspResetWrite(1); DspResetWrite(0); (void)sb_read();
     DspResetWrite(1); DspResetWrite(0); (void)sb_read();
     assert(!bDspActive && sb_output_rate == 0 && TimeConstant == 0xa6);
     for (i = 0; i != 2; ++i) {
-        DspMode = i ? Auto : Single;
+        sb_start(31, i);
         DspWrite(DSP_PAUSE_DMA); assert(bDspPaused);
         DspWrite(DSP_PAUSE_DMA); assert(bDspPaused);
         DspWrite(DSP_CONTINUE_DMA); assert(!bDspPaused);
         DspWrite(DSP_CONTINUE_DMA); assert(!bDspPaused);
         DspWrite(DSP_PAUSE_DMA);
         DspResetWrite(1); DspResetWrite(0); (void)sb_read();
-        assert(!bDspPaused && DspMode == None);
+        assert(!bDspPaused && !bDspActive);
     }
     {
         lib_u32 calls = sb_gain_calls;
@@ -1158,10 +1172,12 @@ static void verify_sb_completion(void)
         outb(0x0c, 0); dma_word(2, 0x1000); dma_word(3, 0x400);
         outb(0x83, 2); outb(0x0b, (half_word)(0x49 | direction * 0x20 | automatic * 0x10));
         outb(0x0a, 1);
-        SBBlockSize = 0x400; DspMode = Single; bDspActive = TRUE;
-        sb_pcm_count = 0; sb_pcm_consumed = 0; sb_pcm_budget = 13;
-        assert(DmaDataToDsp(Single));
+        StopDspTransfer(TRUE); TimeConstant = 0xa6;
+        sb_pcm_consumed = 0; sb_pcm_budget = 0;
+        sb_start(0x400, 0);
+        assert(DspGetStatus() == LIB_STATUS_OK && sb_pcm_count == 0);
         assert(DspArmCompletion(11025) == LIB_STATUS_INVALID_STATE);
+        sb_pcm_budget = 13;
         assert(DspProcessBlock() == LIB_STATUS_OK && !bWriteBurstStarted);
         assert(DspArmCompletion(11025) == LIB_STATUS_INVALID_STATE);
         sb_pcm_budget = 1025;
@@ -1173,7 +1189,8 @@ static void verify_sb_completion(void)
         DspWrite(DSP_CONTINUE_DMA); assert(!bDspPaused);
         verify_sb_deadline();
         assert(DspArmCompletion(11025) == LIB_STATUS_INVALID_STATE);
-        assert(!DmaDataToDsp(Single)); /* A live deadline owns this block. */
+        assert(DspServiceTransfer() == LIB_STATUS_OK && sb_pcm_count == 1025);
+        verify_sb_deadline(); /* Servicing a live deadline must not recapture. */
         assert(QueryDMA(&actual) && actual.addr == 0x1000 && actual.count == 0x400);
         assert(!(ica_scan_irr(ICA_MASTER) & 0x80));
         if (scenario == 1 || scenario == 2) {
@@ -1224,7 +1241,9 @@ static void verify_sb_dma_read_ports(void)
         dma_word((io_addr)(channel * 2 + 1), StartingDmaCount);
         outb(0x0b, (half_word)(0x48 | channel | decrement * 0x20));
         assert(QueryDMA(&DmaInfo));
-        SBBlockSize = 0x400; DspMode = Single; DspVirtualInc = 64;
+        sb_pcm_budget = 0;
+        sb_start(0x400, 0);
+        DspVirtualInc = 64;
         DspNumberDmaQueries = PreviousWaveOutPos = 0;
         bDspActive = SbAnswerDMAPosition = bWriteBurstStarted = TRUE;
         outb(0x0c, 0);
@@ -1259,8 +1278,9 @@ static void verify_sb_position(void)
         outb(0x0c, 0); dma_word(2, StartingDmaAddr); dma_word(3, StartingDmaCount);
         outb(0x83, 2); outb(0x0b, (half_word)(0x49 | decrement * 0x20));
         assert(QueryDMA(&DmaInfo));
-        SBBlockSize = small ? 0xff : 0x400;
-        DspMode = automatic ? Auto : Single;
+        StopDspTransfer(TRUE); TimeConstant = 0xa6;
+        sb_pcm_budget = 0;
+        sb_start(small ? 0xff : 0x400, automatic);
         DspVirtualInc = small ? 16 : 64;
         PreviousWaveOutPos = DspNumberDmaQueries = 0;
         bDspActive = FALSE; SbAnswerDMAPosition = bWriteBurstStarted = TRUE;
@@ -1667,8 +1687,8 @@ static void verify_sb_archive(softpc_machine *machine, const char *write_path,
             assert(softpc_machine_write_physical(machine, 0x21000 + i, &sample, 1) == SOFTPC_MACHINE_OK);
         }
         sb_pcm_budget = prefix == 0 ? 7 : 64;
-        SBBlockSize = 63;
-        assert(StartDspTransfer(automatic ? Auto : Single));
+        sb_start(63, automatic);
+        assert(DspGetStatus() == LIB_STATUS_OK);
         sb_pcm_consumed = prefix == 2 ? 64 : 3;
         outb(0x224, MIXER_VOICE_VOLUME); outb(0x225, 0xa6);
         outb(0x388, 4); outb(0x389, 1);

@@ -126,6 +126,12 @@ WORD         Chan;
 
 #define COMPUTE_INTERRUPT_DELAY(sb)   (1000 * (sb + 1) / WaveFormat.wf.nAvgBytesPerSec + 1)
 
+typedef enum {
+    Auto,
+    Single,
+    None
+} DSP_MODE;
+
 DSP_MODE DspMode;
 
 static IU8 DspBuffer[65536];
@@ -144,6 +150,7 @@ static DWORD blockSize;
 static BYTE TableMungeData;
 static BOOL TableMungeFirstByte = TRUE; // munging first or second byte
 static void DspCompleteBlock(long unused);
+static IBOOL DmaDataToDsp(DSP_MODE mode);
 
 VOID
 ExitAutoMode(
@@ -193,7 +200,7 @@ static void AutoInitEoiHook(int irq, int count)
         DspServiceTransfer();
 }
 
-IBOOL StartDspTransfer(DSP_MODE mode)
+static IBOOL StartDspTransfer(DSP_MODE mode)
 {
     lib_status status;
     if ((mode != Single && mode != Auto) || DspTransferStatus != LIB_STATUS_OK)
@@ -384,7 +391,7 @@ static void DspCompleteBlock(long unused)
     DspTransferSize = DspTransferQueued = DspTransferConsumed = 0;
 }
 
-IBOOL DmaDataToDsp(DSP_MODE mode)
+static IBOOL DmaDataToDsp(DSP_MODE mode)
 {
     IU32 i;
     IU16 address;
