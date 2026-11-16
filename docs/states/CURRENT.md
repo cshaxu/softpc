@@ -62,6 +62,13 @@ budget and cleanup. Cached dual full builds/publication, complete background
 and native regression, actual-object equivalence, self-review, commit/push,
 then owner acceptance. Preserve user configuration/media and unrelated work.
 
+Owner approves P92 restoring proven nonsemantic nt_sbmid.c differences and
+rechecking every remaining diff. Baseline 11baea7f; own build/t100-s4-p92,
+two-hour/fifteen-minute no-progress budgets. Compile all affected x86/x64
+production/test object configurations; identical outputs require no tests or
+publication. Different outputs require full qualification/publication before
+delivery. Preserve all other sources, original helpers, assets and exclusions.
+
 ## M9 T100 S4 Packet
 
 | Field | Required record |
@@ -84,6 +91,17 @@ then owner acceptance. Preserve user configuration/media and unrelated work.
 | Similar-Issue Sweep | Audit the actual current universe rather than only historical patch IDs; read coupled consumers without advancing later files' audit status. |
 
 ## Current Technical Baseline
+
+S4 P92 restores nine original nt_sbmid.c indentation prefixes: +9/-9, with no
+non-whitespace or line-count change. All six actual x86/x64 production/unit/
+native object compilations match pre-edit SHA256 byte-for-byte. Under owner
+instruction, no tests/link/publication ran; published EXEs remain unchanged.
+x64 retains twelve original inactive-helper pointer warnings, x86 zero.
+XP diff reduces 18 lines to +275/-391; matching lines split 33 blocks into 37.
+Global inventory: 106 files,15751 blocks,+24585/-24014. All seven semantic IDs
+have explicit current-contract and bounded evidence; historical negative tests
+are not described as new runs. Await owner review; do not advance past order465.
+See [P92 evidence](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p92-restore-midi-switch-indentation-and-review-residual-evidence).
 
 Owner approves P90's nt_sbfm.c residuals. S4 P91 reviews order465 nt_sbmid.c
 at fb8d9df4: all 33 blocks,+284/-400 map to storage, lifetime/archive, parser

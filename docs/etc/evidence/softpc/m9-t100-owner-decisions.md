@@ -7737,3 +7737,54 @@ nor prior passing tests proves minimality of every new line or exact acoustic
 continuation. One voice per channel/key and approximate envelopes remain explicit
 limitations. The inactive original volume-return bug remains recorded, not fixed
 or used to justify active-path changes. No new TODO or production patch.
+
+
+## S4 P92: restore MIDI switch indentation and review residual evidence
+
+Owner authorizes all proven restorations in the current nt_sbmid.c review,
+with dual compilation and no tests/publication when outputs are identical.
+Baseline 11baea7f. Scope is this file's complete 33-block retained-content diff,
+not an unadmitted sweep of every other file. Exactly nine switch lines regain
+original indentation: production +9/-9, no test/source API or state change.
+Whole-file non-whitespace content and line count remain identical; CRLF and
+all conditional/line controls are preserved. No other pure-format restoration
+was identified in the full comparison. Original inactive helper bodies remain.
+
+Actual Ninja compilation covers every compile_commands entry for this source:
+production devices, unit MIDI fixture and native MIDI fixture on both widths.
+All six object SHA256 values match their pre-edit counterparts byte-for-byte:
+- all three x86 configurations: f9a2f8ae35866a35afccacc51650945865af3823eb7790900577b080f8d72e14
+- all three x64 configurations: 1c97f1f80ad185457106fc3fd72205a140ea1dada00611d4d27ac2c41c53a677
+No link/publication or test run is needed under the owner exception; both
+published EXE hashes remain unchanged. Compile exits are zero. x86 has zero
+warnings; x64 has twelve existing pointer-conversion warnings in preserved,
+inactive original native helpers across three compilations. They are not new
+shared-component warnings or evidence those helpers are safe for activation.
+
+Git Myers retained-content comparison: +284/-400 becomes +275/-391, reducing
+mirror difference lines by 18. Text blocks rise 33 to 37 because restored
+matching lines split the former switch hunk; no semantic difference is added.
+Current global inventory: 106 files,15751 blocks,+24585/-24014. The manifest
+updates only this source hash. Tests, EXEs, user configuration/media unchanged.
+
+Residual review (all seven existing IDs; no blanket per-line minimality claim):
+
+| ID | Necessary current contract and concrete evidence | Proof limit |
+| --- | --- | --- |
+| R0665 | Complete-message storage avoids original ULONG host-address truncation; P156 high-address original-body control faults. Current Lib validation requires explicit bounded messages. Pending realtime and SysEx overflow state have separate fixture cases. | Pointer failure alone does not prove every replacement field; fields also traced to parser consumers. |
+| R0667 | Original InitializeMidi allocates/opens its own native ring owner; current nt_sb/Compat owns Lib output. Original low-address ring control retains completed 90 3C 64 until another message arrives. Further experimental pointer/tail repairs still fail existing Lib message contracts. | Supports rejecting wholesale original restoration, not impossibility of a future larger redesign. |
+| R0668 | SB capture/restore and archive.c read/write actual parser prefixes, pending bytes, notes and pedals. Fixture resumes every channel prefix and partial SysEx, rejects malformed archives before mutation. P156 prefix withdrawal fails both widths. | Not exhaustive fuzzing of all corrupt files; no old-schema support. |
+| R0669 | Real SbSetRunning caller requires pause silence and approximate continuation. Note/reset withdrawals fail historical assertions; current fixture checks held notes, sustain/sostenuto, repeat pause and failed-prefix re-entry. | One voice per channel/key; no exact host envelope or overlapping-voice restoration. |
+| R0670 | Parser reset is called by real MPU/device reset and initialization. Fixture proves incomplete message/running status do not survive reset. Original InitializeMidi is native open/allocate, not equivalent reset. | Source and focused fixture contract, not every guest reset scenario. |
+| R0671 | nt_sb.c observes lib_status. Pending short/SysEx/realtime remain until accepted; explicit drain sends the final message once. Error-propagation withdrawal fails P156; paused service returns idle while direct paused byte submission rejects. | No universal host failure recovery claim. |
+| R0672 | Exact-message fixture covers channel lengths/running status, realtime interleaving, SysEx overflow and interruption. P156 materialization/overflow withdrawals fail both widths. Restoring implicit status or truncated SysEx violates actual Lib API. | Not proof that every conceivable MIDI implementation needs this parser. |
+
+The present pass freshly verifies source, consumers and test assertions; its
+fresh dynamic evidence is compilation/object equivalence only. P156 negative
+controls and P89 full regression remain explicitly historical. No remaining
+semantic point lacks a concrete current contract and supporting evidence, but
+that does not certify each added line as the unique shortest implementation.
+No new defect fix, compatibility layer or helper was introduced. Self-review
+confirms the actual diff is only approved whitespace plus manifest/evidence.
+Scratch evidence is promoted here and removed; S4 stays on order465 awaiting
+owner review, with no later-file approval inferred.

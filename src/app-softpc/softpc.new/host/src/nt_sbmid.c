@@ -536,17 +536,17 @@ Return Value:
             LastCommandLength = 0;
 
             switch (data) {
-            case 0xf0: // System Exclusive message
-                RunningStatus = data;
+                case 0xf0: // System Exclusive message
+                    RunningStatus = data;
                 MidiBuffer[NextData++] = data;
                 return LIB_STATUS_OK;
-            case 0xf1:
-            case 0xf3:
-                BytesLeft=2;
-                break;
-            case 0xf2:
-                BytesLeft=3;
-                break;
+                case 0xf1:
+                case 0xf3:
+                    BytesLeft=2;
+                    break;
+                case 0xf2:
+                    BytesLeft=3;
+                    break;
             case 0xf6:
                 BytesLeft = 1;
                 break;

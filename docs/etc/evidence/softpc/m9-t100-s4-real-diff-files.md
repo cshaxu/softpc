@@ -1,6 +1,6 @@
 # T100 S4 current real-difference file list
 
-Current source: S4 P89 DSP declaration/cast restoration from `afe8100b`.
+Current source: S4 P92 MIDI indentation restoration from `11baea7f`.
 Fixed XP SP1: `a2f6d7c93aa4f11efc51147566d5961c59a8ef89`.
 All paths are relative to `src/app-softpc/softpc.new/`.
 
@@ -160,8 +160,8 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 462 | `host/src/nt_sb.c` | 24 | +147 | -381 |
 | 463 | `host/src/nt_sbdsp.c` | 104 | +541 | -1002 |
 | 464 | `host/src/nt_sbfm.c` | 4 | +20 | -104 |
-| 465 | `host/src/nt_sbmid.c` | 33 | +284 | -400 |
+| 465 | `host/src/nt_sbmid.c` | 37 | +275 | -391 |
 | 466 | `host/src/nt_sbmxr.c` | 6 | +48 | -0 |
 | 467 | `host/src/nt_sound.c` | 12 | +7 | -80 |
 | 468 | `host/src/nt_vga.c` | 13 | +37 | -16 |
-| **Total** | **106 files** | **15747** | **+24594** | **-24023** |
+| **Total** | **106 files** | **15751** | **+24585** | **-24014** |
