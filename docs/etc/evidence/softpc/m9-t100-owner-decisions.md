@@ -7123,3 +7123,97 @@ DSP path, original DMA declarations reused, private helpers internal, and no
 copied private type or test-only export. Documentation, XP-manifest and
 whitespace gates are rerun after recording results; owned scratch is removed
 before delivery. S4 and T100 remain open.
+
+
+## S4 P86: nt_cga.c retained-difference proof
+
+Owner requests a fresh review of order457 nt_cga.c, restoration of differences
+without sufficient evidence, and cached dual build/publication/full regression,
+commit/push and self-review. Baseline 76b10b1e. Existing excluded bodies and
+line controls are outside the review, not new accounting entries. Fixed XP
+SP1 a2f6d7c93aa4f11efc51147566d5961c59a8ef89 remains the only source reference.
+
+Complete file comparison, matching original conditional paths and removing
+corresponding excluded bodies plus line controls, yields 10 Myers zero-context
+blocks, +22/-52, 74 changed lines. Seven semantic IDs were present at admission; R0588 was already restored.
+R0587 is now restored: the original conapi.h already includes dib_surface.h,
+which is required for the original Console DIB types. The added direct include
+is redundant, not a separate ownership boundary. No declaration is copied or
+new header introduced. The other six IDs have current evidence for retention
+under the owner's instruction. After restoration: nine blocks, +21/-52,
+73 changed lines, a reduction of one added line and one block. Production
++0/-1; test +0/-0. Current inventory totals decrease by the same amount.
+
+| Point | XP/local physical anchors | Size | Purpose and evidence |
+| --- | --- | --- | --- |
+| R0586 | after host_def.h / 22 | +1/-0 | Supported-build boundary. host_def.h defines BIGWIN; this file intentionally selects the standard painters. Removing the undef triggers existing excluded BIGWIN bodies under both actual compiler configurations. Host Window scaling remains outside these original big/huge painters. |
+| R0587 restored | after nt_det.h | +0/-0 | Original conapi.h already exposes dib_surface.h. Both actual compilers produce byte-identical objects with this added include removed. No implicit declaration or duplicated declaration remains. |
+| R0589 | nt_text source pointer and two original copy branches / 228,303-312 (pre-restoration) | +9/-48 | CHAIN2 layout and dynamic destination stride. gvi.h maps each four-byte logical cell to eight-byte interleaved spacing; original C-VID writes are the owner. Destination remains four bytes per cell with now_width stride. Restoring the original pointer and both original copy branches coherently fails independent byte-array assertions, rather than merely mismatching an isolated helper. |
+| R0590 | nt_text before clipping / 256-258 (pre-restoration) | +3/-0 | Empty/null/nonpositive input preserves existing storage and prevents copying invalid input. Removing the guard lets a zero-height update resize the surface, failing existing geometry assertions. Null and negative input safety also follows directly from the copy/index/loop contracts; those cases are not claimed as separate guest reproductions. |
+| R0591 | nt_text before clipping / 259-262 (pre-restoration) | +4/-0 | Standalone buffer ownership. Compat owns textBuffer capacity, no NT Console server allocates it. Negative coordinates/dimensions cannot form a valid destination. Preparation failure must return before writing. Removing preparation fails the real 100x5 nt_text resize assertion. No second surface or copy path is added. |
+| R0592 | trace after WriteRegion / 327 | +1/-1 | Compiler repair. debug.h sub_note_trace4 has six parameters; XP's trailing comma supplies seven. Restoring that comma fails both actual compilers even with PROD tracing compiled away. |
+| R0593 | medium CGA painter source and increment / 449-450,465 (pre-restoration) | +3/-3 | Same CHAIN2 mapping, not another renderer. Byte positions alternate +1/+7, hence XOR6; original +1/+3/XOR2 reads the wrong plane groups. Coherently restoring original pointer and increments fails mode04 incremental/full pixel comparisons. |
+
+Production chain is original gfx_updt dirty/update dispatch through nt_graph's
+standard colour table to nt_text or nt_cga_colour_med_graph_std, then Compat's
+text/DIB storage and existing driver publication. nt_cga.c is compiled in the
+softpc-machine-devices object group for both widths. The executable uses the
+same object path as the focused VGA fixture; this is not unused test-only code.
+
+The existing verify_text_stride fixture checks 40/80/100/132 columns, source
+padding, partial/full rows, destination offsets and unchanged surrounding bytes.
+The existing colour-resolution matrix checks original guest-memory writes,
+incremental and full repaint pixels. These assert content, not screenshots or
+only success strings. Fresh reverse experiments compile task-local copies with
+the exact architecture flags, link them before the unchanged machine archive,
+and run the existing fixture. They never replace a production object or EXE.
+Six candidates per width: BIGWIN and trace must fail compilation; preparation,
+empty-update guard, coherent XP text copy and coherent XP CGA addressing must
+fail assertions. The original current implementation is tested separately by
+the ordinary full suite. Negative experiments are diagnostic evidence, not
+product failures or production alternate paths.
+
+Similar-issue check is bounded to every retained hunk in this file and its
+actual mapping, allocation and trace owners. It removes the duplicate include and finds no duplicate declaration,
+extra painter, product-specific branch or removable explanatory comment in
+these retained changes. Adjacent painter files remain at the next ordered
+frontier; this does not approve their independent differences. No new guest
+manual reproduction is claimed, and this audit is not a proof of every possible
+malformed painter argument. Only that header include is restored; existing tests are sufficient. Manifest
+and current counts are updated. Exact object-equivalence probes use each actual
+compiler/flags, comparing the current source and a task-local same-basename
+copy with only that include removed. SHA256 of identical objects:
+x64 fda42ab8051409a0b82c9a23b2218aca8c826eff643a321d52c3625156097d82;
+x86 a4e96deb9bb722727dbfa3be51c6a66e03926bcce651dc73d54eda8351b7b29d.
+Fresh reverse probes: BIGWIN/trace each fail compilation on both widths; all
+four runtime restoration candidates fail their expected assertions on both
+widths (x64 abort exit3, x86 UCRT abort 0xc0000409). Runtime failures are tied to
+the assertion text, not inferred from exit status alone. Full qualification
+results follow below.
+
+Final qualification and actual-change review:
+
+- Cached dual builds/publication completed, first full background run x64
+  188/188 (191.07s), x86 188/188 (179.62s). Both native groups initially 7/8:
+  compact Console interrupted on x64; x86 reported stage3/error0 and child
+  0xc000013a. These occurred before the source restoration. They extend the
+  existing P2 observation, not a diagnosed CGA or RDP regression.
+- After the one-line restoration, both complete build presets were rerun and
+  published. The actual production nt_cga.c object hashes equal the pre-change
+  objects above on each width. Thus the full-suite behavior evidence applies
+  without another identical-object full run. Final vga_frame_smoke,
+  text_console_compat_smoke and XP-manifest tests pass 3/3 each. Isolated compact
+  Console reruns pass x64 8.19s and x86 7.74s against the final publications.
+  All 392 registered architecture/case pairs have a passing observation;
+  neither first native aggregate was clean. The separate P2 remains open.
+- Published timestamps: x64 Nov 15 2026 17:25:06; x86 Nov 15 2026 17:25:34.
+  SHA256 x64: 1bb22a144d3a23dccfce826ef175a74f4ac42ac523ba756da38c25720d164c7a.
+  SHA256 x86: 303c179bcc2cc9f5884ecbd7cb8e230f94b69f38926ba3f13cc57b315f9c733e.
+  Publication verifies the compiler literals. No new non-mirror warning.
+- Actual diff is exactly one removed mirror include, its normalized hash and
+  current inventory, approval/evidence/current status, existing P2 evidence,
+  and the two published EXEs. No guest, user configuration, media, snapshot,
+  shared component or test source change. Single rendering/storage ownership
+  is preserved. Documentation and whitespace checks pass after final records.
+  All owned jobs have completed; task-local negative candidates, EXEs and logs
+  are removed after evidence promotion. Await owner acceptance, S4/T100 open.

@@ -38,6 +38,13 @@ behavior or guest change. Baseline cb89ef52. Own scratch build/t100-s4-p85,
 two-hour job/fifteen-minute no-progress budget. Full cached dual build,
 publication, regression, review and commit/push, then await acceptance.
 
+Owner admits S4 P86 reviewing order457 host/src/nt_cga.c against fixed XP:
+prove each retained nonexcluded difference, restore unjustified differences,
+then cached dual build/publication/full regression, commit/push/self-review.
+Baseline 76b10b1e; own scratch build/t100-s4-p86, two-hour job and fifteen-minute
+no-progress budget. Preserve guest/media/configuration; do not advance beyond
+this file or change unrelated implementations. Await acceptance after delivery.
+
 ## M9 T100 S4 Packet
 
 | Field | Required record |
@@ -60,6 +67,17 @@ publication, regression, review and commit/push, then await acceptance.
 | Similar-Issue Sweep | Audit the actual current universe rather than only historical patch IDs; read coupled consumers without advancing later files' audit status. |
 
 ## Current Technical Baseline
+
+S4 P86 reviews order457 nt_cga.c completely outside existing exclusions.
+R0587 redundant include is restored through original conapi.h; exact dual-width
+objects are unchanged. R0586/R0589-R0593 retain current evidence. Production
++0/-1; tests unchanged; XP diff now nine blocks,+21/-52 (one fewer changed line).
+Fresh dual-width negative controls reproduce the compilation/text/CGA failures
+that require the other changes. Final dual publication succeeded. Background
+188/188 each; native 7/8 each initially, compact passes isolated on both widths;
+existing P2 remains open. Final focused/gate 3/3 each; production objects are
+byte-identical across the restoration. Await acceptance, S4/T100 remain open. See
+[P86 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p86-nt_cgac-retained-difference-proof).
 
 S4 P85 completes the owner-approved analogous cleanup: eleven nt_sb.h
 prototypes removed, private DMA record relocated, original local forwards reused;

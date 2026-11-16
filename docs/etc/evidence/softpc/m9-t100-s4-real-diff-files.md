@@ -1,6 +1,6 @@
 # T100 S4 current real-difference file list
 
-Current source: S4 P85 DSP/DMA internal-boundary cleanup from `cb89ef52`.
+Current source: S4 P86 nt_cga.c redundant-include restoration from `76b10b1e`.
 Fixed XP SP1: `a2f6d7c93aa4f11efc51147566d5961c59a8ef89`.
 All paths are relative to `src/app-softpc/softpc.new/`.
 
@@ -152,7 +152,7 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 444 | `host/inc/insignia.h` | 3 | +10 | -1 |
 | 453 | `host/inc/nt_graph.h` | 1 | +2 | -1 |
 | 455 | `host/inc/nt_sb.h` | 4 | +22 | -2 |
-| 457 | `host/src/nt_cga.c` | 10 | +22 | -52 |
+| 457 | `host/src/nt_cga.c` | 9 | +21 | -52 |
 | 458 | `host/src/nt_ega.c` | 9 | +33 | -12 |
 | 459 | `host/src/nt_graph.c` | 11 | +31 | -20 |
 | 460 | `host/src/nt_keycd.c` | 4 | +2 | -173 |
@@ -164,4 +164,4 @@ while the owner decision ledger tracks approval. No new runtime claim is made.
 | 466 | `host/src/nt_sbmxr.c` | 6 | +48 | -0 |
 | 467 | `host/src/nt_sound.c` | 12 | +7 | -80 |
 | 468 | `host/src/nt_vga.c` | 13 | +37 | -16 |
-| **Total** | **106 files** | **15748** | **+24597** | **-24019** |
+| **Total** | **106 files** | **15747** | **+24596** | **-24019** |

@@ -39,7 +39,6 @@
 #include "nt_cga.h"
 #include "nt_cgalt.h"
 #include "nt_det.h"
-#include "dib_surface.h"
 
 #ifdef MONITOR
 #error "Unsupported SoftPC mirror configuration: MONITOR"
