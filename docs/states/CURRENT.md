@@ -44,6 +44,12 @@ is unchanged.
 
 ## Current Technical Baseline
 
+S4 P83 records owner approval of R0571/R0573. nt_mouse.h matches XP;
+nt_sb.h has four real blocks,+52/-2 covering R0577-R0580 and diagnostic-profile
+define omission. Recommend retain, distinguishing necessary interfaces from
+R0580's measured placement tradeoff. No code/artifact change or fresh runtime
+claim. See [P83 review](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p83-approved-panning-declarations-and-sound-header-review).
+
 S4 P82 records owner approval of R0563/R0564. Eight intervening host headers
 have no retained differences. nt_graph.h has R0571/R0573, one block,+2/-1:
 scanline panning parameter and shared group-helper declaration. Recommend

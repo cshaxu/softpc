@@ -6907,3 +6907,62 @@ No production/test/artifact modification. Documentation/whitespace gate applies.
 Own hidden scratch build/t100-s4-p82 has two-hour/fifteen-minute no-progress
 budgets and is retired after gate completion. Next literal file follows
 nt_graph.h in frozen order. S4/T100 remain open.
+
+## S4 P83: approved panning declarations and sound header review
+
+Owner approves R0571/R0573. Atcdaf9928 fresh comparison confirms order454
+nt_mouse.h is XP-identical. Order455 nt_sb.h has four real blocks,+52/-2 after
+existing #error bodies and necessary #line are ignored: MIDI include+1,
+BufferMidi return+1/-1, REPORT_SB_MODE define removal-1, added tail+50.
+All retained differences are listed below; no excluded body is counted.
+
+| Group | Added/removed | Scope |
+| --- | --- | --- |
+| R0577 | +1/-1 | BufferMidi returns lib_status instead of VOID. |
+| R0578 | +29/-0 | MIDI include; remaining service/status, lifecycle, reset, port and mixer declarations plus tail separators. |
+| R0579 | +13/-0 | Eight-line original VDD_DMA_INFO record and five DMA entry declarations. |
+| R0580 | +9/-0 | Five-line DSP_MODE and PauseDMA/ContinueDMA/StartDspTransfer/DmaDataToDsp declarations. |
+| Diagnostic profile | +0/-1 | Omit #define REPORT_SB_MODE 1; existing diagnostic body stays excluded. |
+
+The semantic allocation counts tail separators in R0578; the reproducible raw
+block allocation is1+1+50 added and1+1 removed. R0575/R0576 original MM/port/
+BOOL declaration restorations are complete, not remaining approval points.
+
+R0577 actual VsbByteOut consumes BufferMidi status through MidiResult. Existing
+sb_midi_smoke verifies IO_ERROR, INVALID_STATE, capacity rejection and retained
+message service. VOID cannot convey these current supported outcomes. This is
+host adaptation, not proof XP's native-worker product was broken.
+R0578 platform.c checks SbGetStatus/SbService and activates SbSetRunning;
+nt_sb/nt_sbmid/nt_sbmxr/nt_sbdsp connect existing port/parser/mixer owners.
+The MIDI header also declares actual Compat host calls used by nt_sb.c.
+The shared executor supplies service and suspension; restoring native workers
+would change its ownership contract. No second mixer or controller is declared.
+Provider bodies are not blanket-approved by their declarations being used.
+
+R0579 keeps the original SDK record name and six fields: WORD addr/count/page,
+BYTE status/mode/mask. QueryDMA/SetDMACountAddr and other DMA functions use this
+record with the existing controller. P146 established supported SDKs lack the
+original vddsvc.h; local declaration avoids that unavailable dependency without
+importing NTVDM services. Original names and provider types were already restored
+coherently; SB_DMA_INFO alias is absent. Cross-file initialization is called by
+nt_sb.c. No new DMA simulation or native-handle reinterpretation is involved.
+
+R0580 placement is a constrained tradeoff, not architectural necessity:
+P146's coherent move of internal enum/declarations back into nt_sbdsp compiled
+and yielded equivalent EXEs but reduced header diff10 and increased provider
+diff11. It was reverted under the no-total-diff-increase rule. Keep it for now;
+revisit only with a demonstrably smaller coherent provider arrangement during
+that file's later audit. Do not duplicate the enum in tests or add API aliases.
+Diagnostic define removal selects the already-established no-reporting profile;
+restoring it would activate the existing unsupported REPORT_SB_MODE guard.
+Unlike the excluded body, the standalone define omission remains visible here.
+
+Recommend retaining the current header with the R0580 limitation stated. No
+new safe restoration candidate is proved. Historical P146 final sound tests
+passed8/8 per width and final EXEs matched a candidate qualified by188 background
+and4 related native tests per width. These are historical results, not this P's
+runtime runs or exhaustive guest audio qualification. Fresh work checks complete
+source diff, consumers and existing test assertions. No source/test/artifact
+change. Documentation/whitespace gate applies. Own hidden scratch
+build/t100-s4-p83 has two-hour/fifteen-minute no-progress budgets and is retired
+after gates. Next literal file is host/inc/nt_uis.h. S4/T100 remain open.
