@@ -414,3 +414,9 @@ exits, with only reusable Ninja/ccache roots retained.
 P7 softpc32.exe SHA-256: `2726a0cc1adda0f68266e0a6b4245f38db138f1c270491f9daa031cba1dae7c8`.
 
 P7 softpc64.exe SHA-256: `3b81d36cff48b27f05fd0dd1b07131d6ec67316e3836990ca1ee40b7f3586618`.
+
+## P8: owner closure
+
+Owner accepts all delivered work and closes S5. See the
+[closure record](../../../history/M9-T100-S5-compat-simplification.md).
+T100 remains open; no next S admitted. No source/test/artifact changes.
