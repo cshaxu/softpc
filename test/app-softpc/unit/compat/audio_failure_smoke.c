@@ -39,15 +39,16 @@ static unsigned event_create_count;
 static unsigned stream_create_step;
 static unsigned task_create_step;
 static unsigned signals;
+static unsigned cancel_waits;
 static unsigned task_destroys;
 static unsigned stream_destroys;
 static int shutdown_failure;
 static int scenario;
 static lib_u32 last_frame_count;
 static lib_i16 first_sample[2];
-static char event_storage[2];
+static char event_storage[1];
 static char task_storage;
-static base_sync_event *created_events[2];
+static base_sync_event *created_events[1];
 static void test_request_stop(void);
 
 static lib_status fake_stream_create(const lib_audio_pcm_stream_options *options,
@@ -65,7 +66,7 @@ static lib_status fake_event_create(base_sync_event_mode mode,
 {
     assert(mode == BASE_SYNC_EVENT_MANUAL_RESET);
     assert(event != NULL);
-    assert(event_create_count < 2u);
+    assert(event_create_count < 1u);
     *event = (base_sync_event *)&event_storage[event_create_count];
     created_events[event_create_count] = *event;
     ++event_create_count;
@@ -106,6 +107,7 @@ static lib_status fake_task_create(base_sync_task_entry function, void *context,
 static lib_status fake_task_destroy(base_sync_task *task)
 {
     assert(task == (base_sync_task *)&task_storage);
+    assert(cancelled && cancel_waits == task_destroys + 1u);
     ++task_destroys;
     return shutdown_failure ? LIB_STATUS_IO_ERROR : LIB_STATUS_OK;
 }
@@ -174,21 +176,21 @@ static lib_status fake_wait_writable(lib_audio_pcm_stream *stream)
 
 static lib_status fake_cancel_wait(lib_audio_pcm_stream *stream)
 {
-    assert(stream == (lib_audio_pcm_stream *)1);
+    assert(stream == (lib_audio_pcm_stream *)1 && cancelled);
+    ++cancel_waits;
     return LIB_STATUS_OK;
 }
 
 static base_sync_wait_result fake_wait(base_sync_event *const *events,
     lib_u32 count, const base_sync_task *task, lib_u32 timeout, lib_u32 *index)
 {
-    (void)events;
+    assert(events != NULL && events[0] == (base_sync_event *)2);
     (void)task;
-    assert(count == 2u);
+    assert(count == 1u && index == NULL);
     ++waits;
     if (fault == 2) return BASE_SYNC_WAIT_FAULT;
     if (waits == 1u) {
         assert(timeout == LIB_UINT32_MAX);
-        *index = 1u;
         return BASE_SYNC_WAIT_SIGNALED;
     }
     assert(timeout == LIB_UINT32_MAX);
@@ -203,7 +205,7 @@ static lib_status fake_reset(base_sync_event *event)
 
 static lib_status fake_signal(base_sync_event *event)
 {
-    assert(event == created_events[0] || event == created_events[1] ||
+    assert(event == created_events[0] ||
         event == (base_sync_event *)1 || event == (base_sync_event *)2);
     ++signals;
     return LIB_STATUS_OK;
@@ -268,12 +270,10 @@ int main(void)
     assert(stream_create_step != 0u && stream_create_step < task_create_step);
     assert(enqueues == 0u && flushes == 0u);
     softpc_speaker_task = NULL;
-    softpc_speaker_stop = NULL;
     softpc_speaker_wake = NULL;
     softpc_speaker_request_lock = NULL;
     softpc_speaker_stream = NULL;
 
-    softpc_speaker_stop = (base_sync_event *)1;
     softpc_speaker_wake = (base_sync_event *)2;
     softpc_speaker_request_lock = (base_sync_mutex *)1;
     softpc_speaker_stream = (lib_audio_pcm_stream *)1;
@@ -391,18 +391,17 @@ int main(void)
     fault = 0;
 
     softpc_speaker_task = (base_sync_task *)&task_storage;
-    softpc_speaker_stop = (base_sync_event *)1;
     softpc_speaker_wake = (base_sync_event *)2;
     softpc_speaker_request_lock = (base_sync_mutex *)1;
     softpc_speaker_stream = (lib_audio_pcm_stream *)1;
     shutdown_failure = 1;
-    task_destroys = stream_destroys = 0u;
+    cancel_waits = task_destroys = stream_destroys = signals = 0u;
     assert(softpc_platform_audio_shutdown() == LIB_STATUS_IO_ERROR);
     assert(softpc_speaker_task != NULL && softpc_speaker_stream != NULL &&
         task_destroys == 1u && stream_destroys == 0u);
     shutdown_failure = 0;
     assert(softpc_platform_audio_shutdown() == LIB_STATUS_OK);
     assert(softpc_speaker_task == NULL && softpc_speaker_stream == NULL &&
-        task_destroys == 2u && stream_destroys == 1u);
+        task_destroys == 2u && stream_destroys == 1u && signals == 0u);
     return 0;
 }

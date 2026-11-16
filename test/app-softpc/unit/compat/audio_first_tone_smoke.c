@@ -79,8 +79,6 @@ static lib_status fake_audio_destroy(lib_audio_pcm_stream **stream)
 #undef lib_audio_pcm_stream_enqueue
 #undef lib_audio_pcm_stream_create
 
-BOOL T2State;
-void PlaySound(BOOL pulsed_ppi) { (void)pulsed_ppi; }
 void fake_host_ppi_state(IU8 value) { (void)value; }
 
 int main(void)
@@ -92,6 +90,9 @@ int main(void)
     assert(base_sync_event_wait(first_submission, 1000u) ==
         BASE_SYNC_WAIT_SIGNALED);
     assert(enqueue_count >= 1u);
+    assert(softpc_platform_audio_shutdown() == LIB_STATUS_OK);
+    /* An idle worker must join using task cancellation alone. */
+    assert(softpc_platform_audio_start() == LIB_STATUS_OK);
     assert(softpc_platform_audio_shutdown() == LIB_STATUS_OK);
     base_sync_event_destroy(first_submission);
     return 0;

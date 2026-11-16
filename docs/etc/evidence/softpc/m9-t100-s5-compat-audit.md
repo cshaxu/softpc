@@ -107,3 +107,61 @@ that runtime qualification. Test line delta is not yet measured.
 
 Next ordered file is audio.h (13 lines). No source changes are approved or
 implemented merely by completing this audit entry.
+
+## P3: approved audio.c simplification
+
+Owner: "帮我做修改，老规矩五件号。" Baseline eb141ce7. Only file1
+implementation is admitted; the remaining49 ordered reviews remain pending.
+
+Removed the redundant stop event, its creation/rollback/release and extra shutdown
+signals. The existing Base task cancellation owns outer-wait termination; the
+existing PCM cancel_wait still interrupts PCM backpressure before joining. Reuse
+stop_request in start/shutdown to update the request and onset under one lock.
+Unused original-sound declarations and the already-proven frequency check are
+removed. Onset, generation, finite duration, accepted-prefix phase, native error
+reporting and failed-join/stream ownership remain unchanged.
+
+Actual production delta: one file +5/-29,net-24 (372 ->348 lines). The extra
+deleted line versus P2's estimate is the blank after removed declarations.
+Tests: three files +15/-17,net-2. No files, interfaces, mirror differences,
+shared packages, snapshot format, media or configuration changes.
+
+Existing failure fixture now requires one wake event, checks task cancellation
+before PCM cancellation before join, retains failed-join retry/ownership, and
+rejects redundant shutdown event signals. Existing real-Base first-tone fixture
+also starts/stops an idle speaker. Removed unused sound stubs in both real-Base
+fixtures. No new test executable or production test API.
+
+Similar-issue sweep: searched Compat for request_cancel/cancel_wait/speaker_stop
+and the affected fixtures for T2State/PlaySound. The speaker is the only Compat
+Base task cancellation owner; SB MIDI cancel_wait serves its separate native
+output and is retained. Original sound declarations/definitions elsewhere have
+real callers and are not removed. No later file is marked reviewed.
+
+Verification completed on both architectures using existing Ninja/ccache trees:
+
+| Architecture | Background (unit, gates, integration) | Native desktop/audio/package | Fresh EXE timestamp |
+| --- | --- | --- | --- |
+| x86 | 188/188 | 8/8 | Nov 15 2026 20:34:35 |
+| x64 | 188/188 | 8/8 | Nov 15 2026 20:37:43 |
+
+392/392 total. Both full build logs contain no compiler warning/error; package
+post-build validation verified timestamps. The existing PCM stream fixture also
+checks blocked native waits/cancellation; the speaker fixture checks its calling
+order with injected PCM, not real-device backpressure timing. Native lifecycle
+passed separately. No new manual guest listening claim.
+
+Actual-diff coordinator review: removed stop event is never consumed by the
+inner synthesis path; task cancellation is ordered first by Base wait_any.
+PCM cancellation and join-before-release remain. The stopped request fields and
+generation are unchanged, now written under one existing lock. No public API,
+second path, new state/lock/helper, polling or ownership regression identified.
+Review covers this bounded delivery, not all49 remaining Compat files.
+
+Frozen inventory keeps original lines/hashes; file1 status advances to delivered
+awaiting owner acceptance. S5/T100 remain open. Disposable logs are summarized
+here and removed after the owned runner finishes; reusable caches remain.
+
+Published softpc32.exe SHA-256: `1d5350eff04e64cf6b4cff2e2fd91552f6e18d99076e379b71129ec8ac76b628`.
+
+Published softpc64.exe SHA-256: `75060d81f370be37a0c3e5535a54f2f9040e456a975d5fb7eb70fac370178380`.

@@ -11,10 +11,6 @@
 /* Standalone audio is only a presentation sink.  nt_sound.c owns the
    original PPI/Timer2 state transitions and requests a frequency here. */
 #ifdef _WIN32
-#undef PlaySound
-extern BOOL T2State;
-extern void PlaySound(BOOL pulsed_ppi);
-
 ULONG GetPerfCounter(VOID)
 {
     lib_u64 milliseconds = 0u;
@@ -37,7 +33,6 @@ void host_disable_timer2_sound(void)
 #define SOFTPC_SPEAKER_SAMPLE_RATE 48000u
 #define SOFTPC_SPEAKER_BLOCK_FRAMES 512u
 static base_sync_event *softpc_speaker_wake;
-static base_sync_event *softpc_speaker_stop;
 static base_sync_task *softpc_speaker_task;
 static base_sync_mutex *softpc_speaker_request_lock;
 static lib_audio_pcm_stream *softpc_speaker_stream;
@@ -205,26 +200,21 @@ static void softpc_speaker_complete_finite(const softpc_speaker_tone *request)
 
 static void softpc_speaker_worker(void *unused, const base_sync_task *task)
 {
-    base_sync_event *waits[2];
-    lib_u32 event_index;
     lib_u32 phase;
     lib_audio_pcm_stream *stream;
     lib_status status = LIB_STATUS_OK;
     UNUSED(unused);
-    waits[0] = softpc_speaker_stop;
-    waits[1] = softpc_speaker_wake;
     phase = 0u;
     stream = softpc_speaker_stream;
     for (;;)
     {
-        base_sync_wait_result waited = base_sync_wait_any(waits, 2u, task,
-            UINT32_MAX, &event_index);
+        base_sync_wait_result waited = base_sync_wait_any(&softpc_speaker_wake, 1u, task,
+            UINT32_MAX, NULL);
         if (waited == BASE_SYNC_WAIT_CANCELLED) return;
         if (waited != BASE_SYNC_WAIT_SIGNALED) {
             status = LIB_STATUS_IO_ERROR;
             goto failed;
         }
-        if (event_index == 0u) return;
         status = base_sync_event_reset(softpc_speaker_wake);
         if (status != LIB_STATUS_OK) goto failed;
         for (;;) {
@@ -241,7 +231,7 @@ static void softpc_speaker_worker(void *unused, const base_sync_task *task)
                 if (status != LIB_STATUS_OK) goto failed;
                 break;
             }
-            if (request.frequency != 0u && request.duration != INFINITE) {
+            if (request.duration != INFINITE) {
                 status = softpc_speaker_submit_finite(stream, &request,
                     onset_pending == LIB_FALSE, &phase);
                 if (status != LIB_STATUS_OK) goto failed;
@@ -280,8 +270,7 @@ lib_status softpc_platform_audio_start(void)
 
     if (softpc_speaker_task != NULL) return LIB_STATUS_OK;
     if (softpc_speaker_stream != NULL) return LIB_STATUS_IO_ERROR;
-    softpc_speaker_write_request(0u, 0u);
-    softpc_speaker_cancel_onset();
+    softpc_speaker_stop_request();
     options.sample_rate = SOFTPC_SPEAKER_SAMPLE_RATE;
     options.channel_count = 1u;
     status = lib_audio_pcm_stream_create(&options, &softpc_speaker_stream);
@@ -290,19 +279,11 @@ lib_status softpc_platform_audio_start(void)
     if (status != LIB_STATUS_OK) goto fail_stream;
     status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &softpc_speaker_wake);
     if (status != LIB_STATUS_OK) goto fail_stream;
-    status = base_sync_event_create(BASE_SYNC_EVENT_MANUAL_RESET, &softpc_speaker_stop);
-    if (status != LIB_STATUS_OK) {
-        base_sync_event_destroy(softpc_speaker_wake);
-        softpc_speaker_wake = NULL;
-        goto fail_stream;
-    }
     status = base_sync_task_create(softpc_speaker_worker, NULL,
         &softpc_speaker_task);
     if (status != LIB_STATUS_OK) {
         base_sync_event_destroy(softpc_speaker_wake);
-        base_sync_event_destroy(softpc_speaker_stop);
         softpc_speaker_wake = NULL;
-        softpc_speaker_stop = NULL;
         goto fail_stream;
     }
     return LIB_STATUS_OK;
@@ -335,12 +316,9 @@ lib_status softpc_platform_audio_shutdown(void)
         if (status != LIB_STATUS_OK) return status;
         /* wait_writable blocks on native completion, not the task cancel
            event; clear the producer request before joining it. */
-        softpc_speaker_write_request(0u, 0u);
-        softpc_speaker_cancel_onset();
+        softpc_speaker_stop_request();
         lib_audio_pcm_stream *stream = softpc_speaker_stream;
         if (stream != NULL) (void)lib_audio_pcm_stream_cancel_wait(stream);
-        base_sync_event_signal(softpc_speaker_stop);
-        base_sync_event_signal(softpc_speaker_wake);
         status = base_sync_task_destroy(softpc_speaker_task);
         if (status != LIB_STATUS_OK) {
             fputs("softpcvm: cannot join audio worker\n", stderr);
@@ -356,9 +334,7 @@ lib_status softpc_platform_audio_shutdown(void)
         }
     }
     base_sync_event_destroy(softpc_speaker_wake);
-    base_sync_event_destroy(softpc_speaker_stop);
     softpc_speaker_wake = NULL;
-    softpc_speaker_stop = NULL;
     softpc_speaker_write_request(0u, 0u);
     base_sync_mutex_destroy(softpc_speaker_request_lock);
     softpc_speaker_request_lock = NULL;

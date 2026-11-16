@@ -114,8 +114,6 @@ lib_status audio_pcm_stream_platform_destroy(audio_pcm_stream_platform **platfor
 #include "lib/audio/pcm/stream.c"
 #include "compat/audio.c"
 
-BOOL T2State;
-void PlaySound(BOOL pulsed_ppi) { (void)pulsed_ppi; }
 void HostPpiState(IU8 value) { (void)value; }
 
 int main(void)

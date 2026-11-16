@@ -6,8 +6,10 @@ Owner admits M9 T100 S5: ordered Compat simplification audit. S1-S4 remain
 closed; T100 remains open. Baseline2464862d. Start with evidence and concrete
 removal/merge candidates; preserve behavior and existing ownership boundaries.
 [Progress](../etc/evidence/softpc/m9-t100-s5-compat-audit.md).
-S5 P2 completes source review of file1/50 audio.c: candidate +5/-28,net-23;
-no source modification or fresh build/test.49 files remain in fixed order.
+S5 P3 implements file1/50 audio.c: production +5/-29,net-24; tests
++15/-17,net-2. Cached dual builds/publication and392/392 full tests passed,
+including native desktop/audio/package. Self-review passed; delivery awaits
+owner acceptance.49 files remain in fixed order. No mirror/shared/schema change.
 
 The following admissions are retained historical records, not active work.
 
@@ -91,7 +93,7 @@ restoration candidate is withdrawn; no production change was made.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits a new S auditing Compat in fixed dir order to reduce code/file/line count. Initial source investigation, no blanket semantic rewrite approval. |
+| Admission And Approval | Owner admits a new S auditing Compat in fixed dir order to reduce code/file/line count. P3 owner approves the audio.c candidate and its existing regression adaptations; no blanket semantic rewrite approval. |
 | Objective | Audit every frozen Compat file for unnecessary code, duplicated owners/paths, thin wrappers and coherent file consolidation; favor fewer concepts and actual repository-wide reduction. |
 | Non-goals | No guest/configuration/media changes; no mirror diff growth, shared-package changes, new framework, alias, polling or second path merely to shrink Compat. No performance claims without measurement. |
 | Reference Baseline | SoftPC2464862d; existing in-tree XP mirror is comparison material, not a new import. |
@@ -100,7 +102,7 @@ restoration candidate is withdrawn; no production change was made.
 | Applicable Rules | docs/README.md reading set; execution, architecture, coding, documentation and source policies. |
 | Verification | Frozen dir order, hashes and tracked-file equality; per-file real callers and ownership proof. Documentation-only checks now; approved implementation uses cached dual builds and proportional/full regression, publication and review. |
 | Expected Markers | Every file has ordinal, lines/hash, finding, evidence and status; no missing file hidden by traversal changes. |
-| Asset Needs | Preserve assets/INI/media. If needed S5 owns only build/t100-s5, two-hour total and fifteen-minute no-progress budgets; hidden background jobs and delivery cleanup. No scratch currently created. |
+| Asset Needs | Preserve assets/INI/media. If needed S5 owns only build/t100-s5, two-hour total and fifteen-minute no-progress budgets; hidden background jobs and delivery cleanup. P3 owns scratch until delivery cleanup. |
 | Reporting Requirements | Per-file purpose, consumers, removable/merge candidates, exact or explicitly estimated source/test/file delta, mirror impact and proof limits. |
 | Stop Conditions | Unproved equivalence is an investigation item; do not remove required failure handling or add mirror differences to improve Compat metrics. |
 | Exit Criteria | Every frozen file reviewed and dispositioned; owner-approved changes qualified and delivered, unresolved candidates explicitly decided; self-review and clean workspace before owner closure. |
