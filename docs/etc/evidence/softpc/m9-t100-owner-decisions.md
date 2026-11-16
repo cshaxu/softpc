@@ -7835,3 +7835,42 @@ a concrete contract; this does not assert the original NTVDM product had the
 same host lifecycle. P89 remains latest full runtime qualification. P93 only
 changes the audit/approval record and CURRENT; no build/test/publication needed.
 All six additions await owner retention approval; do not advance past order466.
+
+
+## S4 P94: nt_sound.c current tone boundary audit
+
+Owner approves all nt_sbmxr.c differences and requests order467. Baseline
+bfbe3a59; fixed XP only. Whole-file current comparison is twelve textual blocks,
++7/-80. Existing excluded bodies are not reviewed or individually inventoried.
+Two added/two removed conditional scaffold lines arise from preserving the
+excluded PROD diagnostic framework after its enclosing native function omission;
+they are not a new semantic point. Substantive totals are +5/-78 below.
+
+| Point | Size | Current evidence | Recommendation |
+| --- | --- | --- | --- |
+| R0677 private includes | +0/-4 | nt.h/ntrtl.h/nturtl.h/ntddbeep.h belong to omitted NT device implementation; historical complete original build fails both toolchains on NT declarations. | retain |
+| R0678 PlaySound undef | +1/-0 | SDK name macro conflicts with original one-argument PlaySound; historical withdrawal fails both compilers. Original function/name remain. | retain |
+| R0680 lock macros | +2/-0 | Selected ica.c itself uses empty lock macros and host_ica_real_locks FALSE. Original calls/declarations remain; no linked lock functions exist. P158 withdrawal gives unresolved symbols. Device state belongs to executor; PCM worker receives synchronized requests only. | retain |
+| R0681 endpoint declaration | +1/-0 | Exact ULONG frequency/duration contract matches compat/audio.c definition and actual call; no existing duplicate header declaration found. | retain |
+| R0681 InitSound session wrapper | +0/-2 | Drops NtCurrentPeb SessionId gate around retained original cleanup; native session authority is unavailable. P158 event-handle control verifies cleanup without introducing production Beep activation. | retain |
+| R0681 native device opener | +0/-41 | OpenBeepDevice requires PEB, NT object/file/status APIs and private Beep device. Current sink has its own existing Lib resource owner; no current caller of original opener remains. Size excludes retained diagnostic scaffold. | retain |
+| R0681 LazyBeep native locals and assignments | +0/-4 | IO_STATUS_BLOCK/BEEP_SET_PARAMETERS only feed the removed native IOCTL. | retain |
+| R0681 tone dispatch | +1/-25 | Actual producer supplies INFINITE; original nonzero-session Beep waits synchronously, while Session0 requires NtDeviceIoControlFile. Compat queues frequency/duration, wakes its worker and returns. P158 finite Beep timing proves blocking; no infinite-call experiment is claimed. | retain |
+| R0681 periodic cleanup session wrapper | +0/-2 | Removes unavailable NtCurrentPeb condition, preserving original countdown/CloseHandle body. No production opener/countdown initialization exists. Historical disposable-handle test verifies cleanup, not an active second backend. | retain |
+
+Current calls are timer.c -> host_timer2_waveform, ppi.c -> HostPpiState, and
+compat/platform.c -> PlayContinuousTone. The original frequency/gate/duplicate
+suppression logic is preserved. sound_state_smoke includes the actual body and
+checks unchanged repeated tone suppression, PPI transitions, duration, out-of-range
+frequency, alarm and cleanup; machine sound and Compat tests cover downstream
+requests/errors. Historical P158 negative compile/link/timing evidence is distinct
+from this pass's fresh source/caller review. Latest complete runtime qualification
+remains P89; no new runtime or acoustic reproduction is claimed.
+
+No altered original indentation/comment/blank line or redundant added include
+was found to restore. Private declarations, unchanged legacy handle globals,
+original duplicate debug.h include and inactive cleanup stay intact. Changing
+endpoint architecture or adding native NT shims would create new implementation,
+not restore a proven equivalent original path. No source/test/EXE change; audit
+recommendations await approval. Disposable comparison files are removed after
+recording these results; S4 remains at order467.

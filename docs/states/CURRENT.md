@@ -92,6 +92,14 @@ delivery. Preserve all other sources, original helpers, assets and exclusions.
 
 ## Current Technical Baseline
 
+Owner approves nt_sbmxr.c R0674-R0676. S4 P94 audits order467 nt_sound.c at
+bfbe3a59: twelve comparison blocks,+7/-80, including two moved exclusion
+scaffold lines each way; substantive retained differences are +5/-78. Current
+Timer/PPI/service callers and Compat endpoint match the original-state/host-sink
+boundary. No justified restoration candidate; original cleanup/duplicate includes
+remain. No source/test/EXE changes or new dynamic claim. Await owner approval,
+do not advance. See [P94 audit](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p94-nt_soundc-current-tone-boundary-audit).
+
 Owner approves nt_sbmid.c residuals and P92 restoration. S4 P93 reviews
 order466 nt_sbmxr.c at 0e765b4f: six additions,+48/-0, with every original XP
 line preserved in original order. All additions map to archive state, actual
