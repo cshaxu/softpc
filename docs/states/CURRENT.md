@@ -92,6 +92,13 @@ delivery. Preserve all other sources, original helpers, assets and exclusions.
 
 ## Current Technical Baseline
 
+Owner approves nt_sound.c R0677/R0678/R0680/R0681. S4 P95 audits order468
+nt_vga.c at 7529e4d5: all thirteen retained blocks,+37/-16 map to four standard
+painter boundary/geometry contracts (R0683-R0686). Current real dispatch and
+fixture assertions corroborate historical original/guard-only negative controls.
+No restoration candidate, source/test/EXE change or fresh runtime claim. Await
+owner approval; do not advance. See [P95 audit](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p95-nt_vgac-retained-painter-differences).
+
 Owner approves nt_sbmxr.c R0674-R0676. S4 P94 audits order467 nt_sound.c at
 bfbe3a59: twelve comparison blocks,+7/-80, including two moved exclusion
 scaffold lines each way; substantive retained differences are +5/-78. Current

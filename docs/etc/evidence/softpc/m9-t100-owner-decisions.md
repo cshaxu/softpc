@@ -7874,3 +7874,44 @@ endpoint architecture or adding native NT shims would create new implementation,
 not restore a proven equivalent original path. No source/test/EXE change; audit
 recommendations await approval. Disposable comparison files are removed after
 recording these results; S4 remains at order467.
+
+
+## S4 P95: nt_vga.c retained painter differences
+
+Owner approves nt_sound.c residuals and requests order468. Baseline 7529e4d5.
+Fixed XP full retained-content comparison excludes existing MONITOR/BIGEND
+bodies and line controls. All thirteen real blocks,+37/-16, belong to four
+original standard painters; conversion loops and publication remain original.
+No source/test/EXE change or new runtime test is claimed.
+
+| ID | Function | Blocks | Size | Evidence and recommendation |
+| --- | --- | --- | --- | --- |
+| R0683 | nt_vga_graph_std | 4 | +9/-3 | Reject empty/negative requests and invalid byte offset/stride; clip destination without overflowing x+width and source rows to 4*EGA_PLANE_SIZE. Historical complete-original withdrawal fails zero height; nonempty-only variant still fails negative-x assertions. Retain. |
+| R0684 | nt_vga_med_graph_std | 3 | +12/-9 | Validate/clip in source units before doubling Y/height; source groups are DWORDs, limit EGA_PLANE_SIZE groups. Preserves original doubling and loop. Original zero-height and nonempty-only negative-x controls fail. Retain. |
+| R0685 | nt_vga_hi_graph_std | 4 | +8/-3 | Same nonempty/destination/source contract in this painter's units. Historical original fails zero height; guard-only variant fails last-source-group bounds. Retain. |
+| R0686 | nt_v7vga_hi_graph_std | 2 | +8/-1 | Replace hard 640x400 rejection with actual destination geometry and packed-byte source bounds. Actual BIOS/BOP mode67h 640x480 test fails dirty publication with original and nonempty-only variants. Retain. |
+
+Fresh current-source checks: nt_graph.c standard painter dispatch table names
+all four functions. vga_frame_smoke's verify_painter_bounds applies each real
+painter to normal, zero/negative, negative-offset, INT_MAX, clipped bottom-right,
+and last-source-unit cases with destination sentinels. It separately calls
+high painter with final source group and overlarge height, and uses actual V7
+mode dispatch for packed modes. No replacement renderer/test-only painter is
+involved. Source rows obey offset+(height-1)*stride+width<=capacity after clipping;
+packed capacity is bytes, planar capacity is groups, not host-window size.
+
+Evidence distinction: P159 records eighteen primary and twelve diagnostic
+runs, restoring each full original painter on both architectures, plus a
+nonempty-only intermediate control. This pass rechecks code/callers/assertions
+and uses those historical failures; it does not re-run those experiments.
+Original split-update can produce an empty first region by source reasoning.
+Negative coordinates and INT_MAX cases establish API boundary behavior, not a
+claim every such value has been observed in a guest. No specific Win3.1 visible
+bug attribution or universal rendering safety follows from these tests.
+
+No unrelated changed comment/indentation/blank line or unsupported semantic
+addition is present in the thirteen blocks. Moved vertical-doubling lines are
+necessary ordering, not formatting to restore independently. Existing comment
+text and conversion bodies remain untouched. All four IDs have bounded retention
+evidence; no safe exact-original restoration candidate found. Audit-only gates
+apply; all points await owner decision and S4 stays on order468.
