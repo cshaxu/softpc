@@ -1,20 +1,17 @@
-# Insignia SoftPC (revived from NTVDM)
+# Insignia SoftPC
 
-Insignia SoftPC is a standalone PC virtual machine revived from the original
-SoftPC machine source. It runs its fixed recovered machine configuration
-without an NTVDM, DOS/WOW, VDD, or Windows NT host process. The machine keeps
-its original ROM-level hardware behavior, including its narrow machine BOP
-table, but has no NTVDM x86-service dispatcher.
+A standalone PC emulator built from the recovered SoftPC source in Windows XP
+SP1. It runs the original software CPU, BIOS and device logic with a small
+compatibility host and shared runtime/UI components. It does not require an
+NTVDM host process or hardware virtualization.
 
-The machine shape is fixed: users provide boot media instead of choosing a
-machine profile. Project governance, target architecture, and the ordered
-recovery plan are in [docs/README.md](docs/README.md).
+The current application targets **32-bit and 64-bit Windows**. It has been used
+with MS-DOS, Windows 3.1 and Windows 95. There is one machine configuration;
+users select memory, media and presentation rather than a machine model.
 
 ## In use
 
-These are current captures of SoftPC running the bundled test media. They
-show the standalone window presentation, the Windows 3.1 load screen, and a
-Windows 3.1 Program Manager desktop.
+These existing captures show MS-DOS and Windows 3.1 running in SoftPC:
 
 ![SoftPC booted to MS-DOS](assets/readme/dos-boot.png)
 
@@ -22,218 +19,162 @@ Windows 3.1 Program Manager desktop.
 
 ![Windows 3.1 Program Manager in SoftPC](assets/readme/windows31-desktop.png)
 
-## Quick start
+## Run
 
-### Run the bundled package
+Clone the repository, then launch the checked-in package on Windows:
 
-On 64-bit Windows, clone the repository and run the checked-in package; no
-compiler or extra download is required for this route:
-
-```powershell
-git clone https://github.com/cshaxu/softpc.git
-Set-Location softpc
-.\assets\binary\softpc64.exe
-```
-
-The default adjacent `softpc.ini` safely attaches the bundled Windows 3.1
-image through an in-memory overlay. At the monitor prompt, enter `start` to
-boot it. Do not move the executable away from its adjacent INI, or alter the
-INI merely to try the bundled machine.
-
-### Build from source
-
-On Windows, double-click [`tools/Build.cmd`](tools/Build.cmd) to build and
-publish both `assets/binary/softpc32.exe` and `softpc64.exe`. Put CMake, Ninja,
-ccache and both MinGW toolchains on PATH: `gcc` must target x64 and
-`i686-w64-mingw32-gcc` must target x86, with their resource/binutils tools.
-The entry uses cmd.exe and the existing CMake presets, without PowerShell.
-It reuses `build/.ninja` and `build/.ccache`, refreshes the embedded build time,
-and preserves INI, snapshots and media. Close running package EXEs before
-building. A failure stops the build; an earlier architecture may already
-have been published. The window stays open to show the result.
-
-For automation, use `tools\Build.cmd --no-pause`; its exit code is zero only
-when both architectures succeed. Tests are a separate operation.
-
-The supported source-build environment is the [MSYS2 UCRT64
-shell](https://www.msys2.org/). Install MSYS2, open **MSYS2 UCRT64**, and run:
-
-```sh
-pacman -Syu
-# Restart the UCRT64 shell if MSYS2 asks you to do so, then run:
-pacman -S --needed git mingw-w64-ucrt-x86_64-toolchain mingw-w64-ucrt-x86_64-cmake
+```bat
 git clone https://github.com/cshaxu/softpc.git
 cd softpc
-cmake --preset mingw-gcc-x64-release
-cmake --build --preset package-x64
-./assets/binary/softpc64.exe
+assets\binary\softpc64.exe
 ```
 
-The first command may request that MSYS2 itself be updated and the shell
-restarted before package installation continues. The resulting package is
-still `assets/binary/softpc64.exe`, beside the user-owned `softpc.ini`.
+Use `softpc32.exe` for the 32-bit package. Both executables load the
+`softpc.ini` beside them and accept no command-line arguments. Relative media
+paths in the INI are resolved from its directory.
 
-To run the background regression suite instead of launching the VM:
+At the monitor prompt, enter `start`. The checked-in configuration attaches the
+bundled Windows 3.1 hard-disk image with `hard_disk_mode=overlay`, 16 MiB RAM,
+and `display=console`. Text appears in the Console; graphics open a separate
+window. Set `display=window` to use the window for both text and graphics.
 
-```sh
-cmake --build --preset tests-x64
-ctest --preset test-x64
+### Monitor and input
+
+Enter `help` for the command list. Common operations are:
+
+| Command | Effect |
+| --- | --- |
+| `start` | Cold-start the machine. |
+| `pause` / `resume` | Pause or continue guest execution. |
+| `reset` | Reset the machine, leaving it paused. |
+| `stop` | Stop the machine. |
+| `save <file>` | Save a running or paused machine and leave it paused. |
+| `load <file>` | Load a snapshot before starting or after stopping; then use `resume`. |
+| `floppy insert <readonly\|direct\|overlay> <image>` | Insert drive A media while stopped or paused. |
+| `floppy eject` | Eject drive A media while stopped or paused. |
+| `debug` | Enter the x86 debugger; machine access requires paused state. |
+| `exit` | Exit SoftPC. |
+
+While interacting with the guest, `Ctrl+Alt+P` pauses/resumes and `Ctrl+Alt+M`
+releases the captured mouse. `Ctrl+Alt+D`, `Ctrl+Alt+F` and `Ctrl+Alt+T` send
+Ctrl+Alt+Del, Alt+Enter and Alt+Tab respectively to the guest. These are guest
+view hotkeys, not cooked monitor commands. See [Product UI](docs/design/UI.md)
+for state rules, debugger commands and window sizing behavior.
+
+Snapshots use the current machine-state format; compatibility with snapshots
+from older builds is not guaranteed. Keep the matching guest media available.
+
+### Media and devices
+
+`softpc.ini` selects memory, floppy/hard-disk images, independent attachment
+modes, display and optional serial/printer output files. The floppy drive exists
+even when no image is inserted. Boot order is A: then C:.
+
+| Media mode | Guest writes |
+| --- | --- |
+| `readonly` | Rejected as write-protected. |
+| `direct` | Written to the source image. |
+| `overlay` | Kept in memory without modifying the source image; discarded when that medium is destroyed. |
+
+The original device paths include PIC, PIT, DMA, floppy/fixed disk, keyboard,
+Microsoft InPort mouse and CGA/EGA/VGA/Video7 presentation. Window rendering uses
+the guest bitmap fonts and supports text underline, split cursors and graphics;
+Console text uses a character mapping and cannot reproduce every scanline-level
+effect. Both are presentation backends, not replacement video controllers.
+
+Audio includes the PC speaker and Sound Blaster PCM playback through Lib Audio,
+plus MPU-401 MIDI playback through the host MIDI output. WAV playback working
+does not imply that the guest MIDI Mapper is configured. FM synthesis and the
+Sound Blaster DSP MIDI route are not supported playback routes. For Windows 3.1,
+see [MIDI configuration](docs/design/UI.md#windows-31-midi-playback), including
+its mouse IRQ conflict and MIDI Mapper setup.
+
+The original serial and printer controllers can write to files configured with
+`serial_output` and `printer_output`; unset paths retain virtual endpoints.
+
+## Build
+
+Double-click [tools/Build.cmd](tools/Build.cmd) to build and publish **both**
+`assets/binary/softpc32.exe` and `softpc64.exe`. The entry uses cmd.exe and CMake
+presets, without PowerShell. Its window stays open to show the result.
+
+The following tools must be available on the Windows PATH:
+
+- CMake, Ninja and ccache;
+- x64 MinGW GCC as `gcc`;
+- x86 MinGW GCC as `i686-w64-mingw32-gcc`;
+- the matching resource compiler and binutils for both toolchains.
+
+Close running package executables before building. The script preserves the
+adjacent INI, media and snapshots, and refreshes the embedded build timestamp.
+A failure stops the script; the earlier architecture may already be published.
+For automation:
+
+```bat
+tools\Build.cmd --no-pause
 ```
 
-### Optional 32-bit package
+Exit code zero means both packages built successfully. **This does not run tests.**
 
-Open **MSYS2 MINGW32** rather than UCRT64, install its toolchain and CMake,
-then use the existing x86 presets:
+For a direct cached build of one architecture:
 
-```sh
-pacman -S --needed git mingw-w64-i686-toolchain mingw-w64-i686-cmake
-git clone https://github.com/cshaxu/softpc.git
-cd softpc
-cmake --preset mingw-gcc-x86-release
-cmake --build --preset package-x86
-./assets/binary/softpc32.exe
+```bat
+cmake --preset ninja-ccache-gcc-x64-release
+cmake --build --preset ninja-ccache-package-x64
 ```
 
-The shell selects the matching GCC through `PATH`; no personal drive path or
-repository-specific toolchain variable is required.
+Replace `x64` with `x86` for the other architecture. The corresponding plain
+`ninja-gcc-*` / `ninja-package-*` presets are available without ccache.
+[CMakePresets.json](CMakePresets.json) is the exact command/configuration source.
 
-### Faster local Ninja route
+Reusable build trees are `build/.ninja/gcc-x86-release/` and
+`build/.ninja/gcc-x64-release/`; compiler cache is `build/.ccache/` with a 5 GB
+limit. Other build-directory content is disposable task output. See
+[build hygiene](docs/rules/EXECUTION.md#changed-path-accounting-and-build-hygiene)
+for cleanup ownership and the existing cleanup tool.
 
-The double-click entry uses the cached Ninja presets. For direct incremental
-builds without ccache, Ninja also has presets using the same compiler and
-Release flags:
+## Test
 
-```sh
-cmake --preset ninja-gcc-x64-release
-cmake --build --preset ninja-tests-x64
-ctest --preset ninja-test-x64
+Build the test targets, then run the background suite for each architecture:
+
+```bat
+cmake --preset ninja-ccache-gcc-x64-release
+cmake --build --preset ninja-ccache-tests-x64
+ctest --preset ninja-ccache-test-x64
 ```
 
-Use `ninja-gcc-x86-release`, `ninja-package-x86`, `ninja-tests-x86` and
-`ninja-test-x86` from an MSYS2 MINGW32 shell for the 32-bit route.  All checked
-in build and background-test presets use a bounded eight jobs; desktop tests
-remain serial and explicit.
+Again, replace `x64` with `x86` for the other package. These presets include
+unit tests, repository gates and background integration tests, but **exclude
+native desktop and audio tests**. To include the latter, keep an interactive
+Windows desktop or RDP session connected with the required audio/MIDI devices
+available, avoid competing keyboard/mouse input, and run separately:
 
-### Optional compiler cache
-
-When `ccache` is already available on `PATH`, the opt-in
-`ninja-ccache-gcc-x64-release` and `ninja-ccache-gcc-x86-release` configure
-presets use it as the C compiler launcher. Their matching build and test
-presets start with `ninja-ccache-`. The generated compiler launcher fixes
-storage to `build/.ccache/` (5 GB limit), including its temporary files, even
-when building directly without a preset. Plain and ccache Ninja presets reuse
-the same `build/.ninja/gcc-x64-release/` or `gcc-x86-release/` tree. The regular Ninja and
-Makefiles routes do not require or use ccache.
-For cache statistics, also set `CCACHE_DIR` to this repository's
-`build/.ccache`; bare `ccache --show-stats` may describe another user-wide cache.
-
-## Build and package details
-
-All generated build state belongs under the repository's single `build/`
-directory. Only `.ccache/` and `.ninja/` persist; Makefiles trees, task probes,
-scripts, logs and temporary media are disposable. After stopping owned jobs,
-preview `powershell -File tools/Clean-Build.ps1`, then pass exact child names
-with `-Entry <name> -Apply -Quiescent`. Run `-Check` before task closure.
-Never move/reuse an old CMake tree at a different path: configure a fresh one.
-See [execution rules](docs/rules/EXECUTION.md#changed-path-accounting-and-build-hygiene).
-The user-facing package is
-only `assets/binary/`; reusable boot media is in `assets/media/`. The
-selected original ROMs are embedded from
-`src/app-softpc/softpc.new/roms/`; `assets/roms/` does not exist. Do not
-create sibling `build-*` directories or place generated executables at the
-repository root. The fixed machine defaults are in the adjacent
-`assets/binary/softpc.ini`:
-
-```text
-cmake --preset mingw-gcc-x64-release
-cmake --build --preset package-x64 --parallel
-assets/binary/softpc64.exe
+```bat
+ctest --test-dir build/.ninja/gcc-x64-release -L "desktop|native_audio" -j 1 --output-on-failure
+ctest --test-dir build/.ninja/gcc-x86-release -L "desktop|native_audio" -j 1 --output-on-failure
 ```
 
-The x86 configure writes `assets/binary/softpc32.exe`; the native x64
-configure writes `assets/binary/softpc64.exe`. Both use the same adjacent
-`softpc.ini`.
+A complete dual-architecture run requires both background suites and both native
+suites. Native tests require their real host devices and session; the background
+suite alone is not a complete integration run.
 
-Run a width's complete regression with `cmake --build --preset tests-x64` then
-`ctest --preset test-x64`, or the corresponding `x86` presets from the
-matching MSYS2 MINGW32 shell. The presets validate that the selected compiler
-pointer width and package architecture agree.
+## Source and documentation
 
-`softpc.ini` configures memory, optional floppy/hard-disk media and attachment
-modes, display, Console control, and optional serial/printer endpoints.
-`display` is `console` or `window`. Both media keys may be
-set together, creating fixed `A:` and `C:` slots; the machine boots `A:`
-first, then `C:`. The launchers accept no command-line parameters and always
-load the `softpc.ini` beside themselves; relative image paths are relative to
-that file. The monitor accepts `start`, `pause`, `resume`, `stop`, `reset`,
-and floppy commands; `Esc` is not a monitor hotkey.
-The current
-core links the detached CCPU, SAS, I/O, PIC, event, original FDC/FLA/GFI,
-fixed-disk BIOS and V7 VGA packages through standalone host ports.  The
-original ROM reaches only machine-resident C services through its historical
-BOP instruction table; it has no NTVDM, DOS/WOW, VDD or x86-service
-dispatcher.  Fixed firmware, raw-media storage and console/Win32
-presentation are supplied by the standalone VM, not a x86 host.
+| Directory | Responsibility |
+| --- | --- |
+| `src/app-softpc/softpc.new/` | Preserved XP SP1 source subset and embedded firmware, with reviewed local differences. |
+| `src/app-softpc/compat/` | Host callbacks, media/audio/video adaptation and original ABI support. |
+| `src/app-softpc/machine/` | SoftPC driver, frame/input conversion, debugger and snapshot integration. |
+| `src/app-softpc/product/` | Configuration, composition and product commands. |
+| `src/lib/` | Shared platform mechanics, storage, input, PCM/MIDI and KVM presentation. |
+| `src/emulator/` | Shared executor, session and product/UI composition. |
+| `src/x86-debug/` | Shared x86 DEBUG and assembly/disassembly. |
+| `src/x86-ibmpc/` | Shared PC commands, hotkeys and entry. |
+| `test/` | Matching component unit tests and explicit integration suites. |
+| `tools/` | Build entry and source, package and governance checks. |
+| `assets/` | Published packages, guest media and README screenshots. |
 
-Set `floppy_mode` and `hard_disk_mode` independently to choose how each configured image is attached:
-`readonly` passes writes back to the original controller as write-protected,
-`direct` writes the source image files directly, and `overlay` loads both
-images into RAM at startup and directs all guest writes to those volatile
-copies. The distributed configuration uses `overlay` for safe experimentation.
-While stopped or paused, `floppy insert <readonly|direct|overlay> <image>`
-replaces drive A using the chosen policy; `floppy eject` removes it.
-
-The fixed machine has 16 MiB RAM by default (configurable through
-`memory_mb`), master and slave 8259 PICs, PIT channel 0, the original
-keyboard/mouse controller path, original FLA/GFI/FDC floppy path, original
-fixed-disk BIOS path, and original V7 VGA controller. The console presents
-text memory at `B800:0000`; the Win32 window presents that text path and the
-original CGA-compatible BIOS modes 04h/05h/06h, VGA mode 13h (320×200,
-256-colour) planes/DAC, and the EGA/VGA 4-plane BIOS modes 0Dh through 12h
-through RGB32 host surfaces. They are presentation front ends, not
-replacement video controllers.
-The Win32 window forwards relative pointer movement and its two buttons to
-the original Microsoft Bus Mouse adapter; it does not implement a second
-mouse device.
-
-The ROM and restored controllers provide their original BIOS/interrupt and
-I/O behavior.  The standalone host provides raw floppy and hard-disk image
-files plus a fixed 16-head/63-sector hard-disk compatibility geometry; it
-does not reinterpret partition BPBs as a second disk controller.
-
-Serial and printer controllers are original SoftPC code connected to idle
-standalone host endpoints. The original PPI and PIT channel 2 speaker path
-now drives a bounded asynchronous Win32 beep sink; it is stopped with the
-machine on reset or teardown. Graphical presentation remains host-front-end
-work, not a reason to substitute the original VGA controller.
-
-CTest's default `test-x64`/`test-x86` presets run background tests. Real native
-Window/Console and package tests have separate `test-desktop-x64`/`test-desktop-x86`
-presets; see [test execution](docs/design/CODING.md#build-output-layout).
-
-## Source layout
-
-- `assets/readme/` — owner-provided current x86 screenshots used by this
-  README; they are documentation assets, not guest media or runtime inputs.
-- `src/app-softpc/softpc.new/` — recovered original SoftPC machine, including the
-  embedded selected BIOS/VGA/CMOS ROM inputs, retained in its historical tree.
-- `src/app-softpc/softpc.new/` may contain narrow, reviewable compiler/host-ABI
-  source diffs at the affected point; it contains no new machine policy.
-- `src/app-softpc/compat/` — original SoftPC host callbacks, media/video surfaces and ABI support.
-- `src/app-softpc/machine/` — SoftPC backend adaptation to the existing Emulator machine contract.
-- `src/app-softpc/product/` — configuration, private machine composition and
-  SoftPC-specific command extensions;
-  only main consumes the VM public interface.
-- `src/emulator/` — shared machine executor, session control and UI composition.
-- `src/x86-debug/` — shared x86 debugger and assembly/disassembly components.
-- `src/x86-ibmpc/` — shared PC product commands, hotkeys and entry.
-- `src/lib/` — shared platform mechanics; unchanged by the app/VM/Compat refactor.
-- `test/lib/`, `test/emulator/`, `test/x86-debug/`, `test/x86-ibmpc/` — independently reusable
-  component suites.
-- `test/app-softpc/unit/`, `test/app-softpc/integration/` — SoftPC-specific
-  concrete unit and composed-runtime tests.
-- `tools/checks/` — repository source, build, package and documentation gates.
-
-The standalone core never accepts a x86-shell callback or selector
-service. Hardware and firmware behavior is machine-owned state and typed
-mechanical outcomes.
+Start at the [documentation guide](docs/README.md). The
+[architecture](docs/design/ARCHITECTURE.md), [source layout](docs/design/CODING.md)
+and [current task state](docs/states/CURRENT.md) own the detailed design and
+status. Read [CONTRIBUTING.md](CONTRIBUTING.md) before changing the project.

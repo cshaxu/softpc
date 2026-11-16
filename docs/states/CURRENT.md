@@ -3,9 +3,10 @@
 ## Current Work
 
 Owner accepts and closes M9 T100 S5. S1-S5 are closed; T100 remains open.
-No implementation subtask is active. Next unused identifier is S6; it is not
-admitted. See [S5 closure](../history/M9-T100-S5-compat-simplification.md).
-Open task awaiting owner: T100.
+No implementation subtask is active. Next unused numeric subtask is S6,
+not admitted. Open task awaiting owner: T100.
+Td S24 completes the requested README refresh; see its
+[record](../history/M9-Td-S24-readme-refresh.md).
 
 The following admissions are retained historical records, not active work.
 
@@ -942,6 +943,8 @@ did not admit S44 or a new implementation task.
 | T98 | [Completion audit](../history/M9-T98-completion-audit.md). |
 
 ## Recent Governance
+
+- **M9 Td S24:** [README refresh](../history/M9-Td-S24-readme-refresh.md) completed; documentation-only, current runtime/build/test statements verified.
 
 [Td S23 timestamp governance](../history/M9-Td-S23-build-timestamp.md) is closed.
 Task scratch is removed; reusable Ninja/ccache roots remain. Follow existing
