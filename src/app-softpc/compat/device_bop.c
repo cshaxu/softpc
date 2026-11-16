@@ -16,19 +16,6 @@
  * A ROM call can reach a handler only after that handler has been restored
  * and registered below.
  */
-IBOOL softpc_device_bop_dispatch IFN2(IU8, number, IU32, argument)
-{
-    void (*handler)();
-
-    UNUSED(argument);
-    handler = BIOS[number];
-    if (handler == 0) {
-        return FALSE;
-    }
-    (*handler)();
-    return TRUE;
-}
-
 void softpc_device_bop_register_machine_services IFN0()
 {
     extern void reset IPT0();
@@ -98,6 +85,7 @@ void softpc_device_bop_register_machine_services IFN0()
     BIOS[0x91] = bootstrap2;
     BIOS[0x92] = bootstrap3;
 }
+
 /* C4 C5..C7 has no provider in the selected firmware. Keep the original
  * executor contract explicit rather than dispatching an unsupported service. */
 void EDL_fast_bop(unsigned long immediate)

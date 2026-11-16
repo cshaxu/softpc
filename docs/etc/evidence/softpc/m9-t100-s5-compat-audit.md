@@ -240,7 +240,7 @@ P5 softpc64.exe SHA-256: `034d4eafbdb53b044802d68d806cd4944e4dffbfd785985fbc5f17
 ## P6: continuous ordered audit and first reduction batch
 
 Owner authorizes autonomous, evidence-backed simplification of all Compat.
-Baseline7a743d5e. No mirror/shared-package/configuration/media/schema changes.
+Baseline8ce56701. No mirror/shared-package/configuration/media/schema changes.
 The following ordered source review records minimum responsibilities, not a
 claim that every guest/platform scenario has been dynamically exercised.
 
@@ -346,3 +346,71 @@ mapping remains; removing unused names alone would leave mixed representations.
 P6 softpc32.exe SHA-256: `5ee5049e057cec3dc61c2162a5ca62a5d589bd95abff02b8ad3dc3e245d378bb`.
 
 P6 softpc64.exe SHA-256: `a18a2b79461fc72e187cc19f08abffd676aeba352e4b367482be2c679cd6c8d5`.
+
+## P7: complete the bounded simplification plan
+
+Baseline086a8cc2. P6 coordinator review confirmed the actual17 changed paths,
+qualification and unchanged mirror/shared trees. P7 implements the four recorded
+follow-ups; source +9/-47,net-38; existing tests +67/-69,net-2; no added file.
+
+- BOP dispatch has no production caller. Delete its13 lines, leaving original
+  BIOS registration and CCPU invocation. Two existing fixtures call BIOS entries
+  directly and check missing entries as null. Existing result, register and
+  memory assertions remain; no new test-only helper or production API.
+- V7 clear copies each clipped row from saved background. Destination stride
+  remains aligned surface width; source stride remains32. Left/top are clipped
+  nonnegative, right/bottom are inclusive and bounded; source/destination are
+  separate allocations. Generation and size guards still reject stale save-under.
+  Existing VGA tests check movement, one-pixel bottom/right clipping, rebind,
+  full-body repaint, enable transitions and monochrome compositing.
+- All ten removed CPU null checks are private functions called exclusively with
+  embedded fields of the publicly validated archive. Device map functions only
+  receive embedded fields, static field tables and validated stream callbacks.
+  Public argument validation, wire-content validation, I/O failure and allocation
+  cleanup are unchanged. No broad policy of removing error handling is implied.
+- Queue serialization retains quick entries followed by tick entries, with the
+  same seven fields per entry. It now uses the already-existing read traversal
+  shape. Current archive/checkpoint tests retain queue ordering, restore and
+  truncated/corrupt image checks. No format conversion or asset edit is needed.
+
+Similar-issue scan: deleted history/dispatch/counter/source-file names have no
+remaining source/test/build references. GPU slot mappings, original no-op hooks,
+clock wake/cancel semantics and explicit snapshot field maps remain necessary
+boundaries. No evidence-backed mirror restoration was identified in this pass;
+mirror diff is unchanged, not counted as a reduction.
+
+All50 frozen paths now have source-review dispositions;49 files remain,8851
+physical lines versus8957. Whole-S source delta against2464862d is +43/-149,
+net-106. This is measured footprint reduction, not a claim of mathematical
+minimality or new manual DOS/Windows guest acceptance. P7 qualification is complete.
+
+### P7 qualification and final review
+
+Cached dual builds and publication pass. Each architecture passes188 background
+and8 native tests,392/392 first run, without retries/skips. Background elapsed
+x86 160.14s/x64 180.79s; native24.08s/24.02s. Includes all public-component
+units, gates, App units/integration, native audio, Console and both package cases.
+Each build has89 warnings from unchanged mirror headers, zero non-mirror
+warnings and no error. Fresh published timestamps: x86 Nov15 2026 21:09:42;
+x64 Nov15 2026 21:12:34.
+
+Executor actual-diff review: all removed checks are dominated by public entry
+validation; failure returns and cleanup remain. V7 copy bounds and disjoint
+buffers are proven above. BOP table registration assertions and actual handler
+result assertions remain. Snapshot queue wire order and widths are unchanged.
+Source/test LF, documentation governance and whitespace checks pass. Frozen
+inventory reconciles exactly: only edl_fast_bop.c removed, no unlisted new file.
+Shared packages, mirrors and user configuration/media/snapshots are unchanged.
+
+Whole S5: production +43/-149 (net-106), tests +89/-86 (net+3), build wiring
++0/-1. The current continuous P6/P7 run accounts for net-81 production lines;
+the earlier accepted P3/P5 account for25. No mirror diff reduction is claimed.
+All identified safe candidates are delivered; further reductions have no proven
+behavior-preserving design from this audit. Preserve the recorded minimum
+responsibilities rather than replace them with a generic framework. S5 is ready
+for owner acceptance; T100 remains open. Raw scratch is removed after the runner
+exits, with only reusable Ninja/ccache roots retained.
+
+P7 softpc32.exe SHA-256: `2726a0cc1adda0f68266e0a6b4245f38db138f1c270491f9daa031cba1dae7c8`.
+
+P7 softpc64.exe SHA-256: `3b81d36cff48b27f05fd0dd1b07131d6ec67316e3836990ca1ee40b7f3586618`.

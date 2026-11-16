@@ -215,7 +215,6 @@ static lib_status snapshot_write_registers(const softpc_ccpu_register_state *sta
     softpc_snapshot_bytes_write write, void *context)
 {
     lib_status status; unsigned index;
-    if (state == NULL) return LIB_STATUS_INVALID_ARGUMENT;
     SNAPSHOT_WRITE(state->eax); SNAPSHOT_WRITE(state->ecx); SNAPSHOT_WRITE(state->edx); SNAPSHOT_WRITE(state->ebx);
     SNAPSHOT_WRITE(state->esp); SNAPSHOT_WRITE(state->ebp); SNAPSHOT_WRITE(state->esi); SNAPSHOT_WRITE(state->edi);
     SNAPSHOT_WRITE(state->eip); SNAPSHOT_WRITE(state->eflags); SNAPSHOT_WRITE(state->cr0); SNAPSHOT_WRITE(state->cr2);
@@ -238,7 +237,6 @@ static lib_status snapshot_read_registers(softpc_ccpu_register_state *state,
     softpc_snapshot_bytes_read read, void *context)
 {
     lib_status status; unsigned index;
-    if (state == NULL) return LIB_STATUS_INVALID_ARGUMENT;
     SNAPSHOT_READ(state->eax); SNAPSHOT_READ(state->ecx); SNAPSHOT_READ(state->edx); SNAPSHOT_READ(state->ebx);
     SNAPSHOT_READ(state->esp); SNAPSHOT_READ(state->ebp); SNAPSHOT_READ(state->esi); SNAPSHOT_READ(state->edi);
     SNAPSHOT_READ(state->eip); SNAPSHOT_READ(state->eflags); SNAPSHOT_READ(state->cr0); SNAPSHOT_READ(state->cr2);
@@ -261,7 +259,6 @@ static lib_status snapshot_write_execution(const softpc_ccpu_execution_state *st
     softpc_snapshot_bytes_write write, void *context)
 {
     lib_status status;
-    if (state == NULL) return LIB_STATUS_INVALID_ARGUMENT;
     status = softpc_snapshot_stream_write_u32_array(write, context,
         state->debug_registers, SOFTPC_CCPU_DEBUG_REGISTER_COUNT);
     if (status != LIB_STATUS_OK) return status;
@@ -276,7 +273,6 @@ static lib_status snapshot_read_execution(softpc_ccpu_execution_state *state,
     softpc_snapshot_bytes_read read, void *context)
 {
     lib_status status;
-    if (state == NULL) return LIB_STATUS_INVALID_ARGUMENT;
     status = softpc_snapshot_stream_read_u32_array(read, context,
         state->debug_registers, SOFTPC_CCPU_DEBUG_REGISTER_COUNT);
     if (status != LIB_STATUS_OK) return status;
@@ -291,7 +287,6 @@ static lib_status snapshot_write_debug(const softpc_ccpu_debug_state *state,
     softpc_snapshot_bytes_write write, void *context)
 {
     lib_status status; unsigned index;
-    if (state == NULL) return LIB_STATUS_INVALID_ARGUMENT;
     SNAPSHOT_WRITE(state->instruction_break_count); SNAPSHOT_WRITE(state->data_break_count);
     for (index = 0u; index < 4u; ++index) {
         SNAPSHOT_WRITE(state->instruction_breaks[index].linear_address);
@@ -310,7 +305,6 @@ static lib_status snapshot_read_debug(softpc_ccpu_debug_state *state,
     softpc_snapshot_bytes_read read, void *context)
 {
     lib_status status; unsigned index;
-    if (state == NULL) return LIB_STATUS_INVALID_ARGUMENT;
     SNAPSHOT_READ(state->instruction_break_count); SNAPSHOT_READ(state->data_break_count);
     if (state->instruction_break_count > 4u || state->data_break_count > 4u)
         return LIB_STATUS_INVALID_ARGUMENT;
@@ -331,7 +325,6 @@ static lib_status snapshot_write_tlb(const softpc_ccpu_tlb_state *state,
     softpc_snapshot_bytes_write write, void *context)
 {
     lib_status status; unsigned set, entry;
-    if (state == NULL) return LIB_STATUS_INVALID_ARGUMENT;
     for (set = 0u; set < SOFTPC_CCPU_TLB_SET_COUNT; ++set)
         for (entry = 0u; entry < SOFTPC_CCPU_TLB_ENTRY_COUNT; ++entry) {
             const softpc_ccpu_tlb_entry_state *item = &state->entries[set][entry];
@@ -349,7 +342,6 @@ static lib_status snapshot_read_tlb(softpc_ccpu_tlb_state *state,
     softpc_snapshot_bytes_read read, void *context)
 {
     lib_status status; unsigned set, entry;
-    if (state == NULL) return LIB_STATUS_INVALID_ARGUMENT;
     for (set = 0u; set < SOFTPC_CCPU_TLB_SET_COUNT; ++set)
         for (entry = 0u; entry < SOFTPC_CCPU_TLB_ENTRY_COUNT; ++entry) {
             softpc_ccpu_tlb_entry_state *item = &state->entries[set][entry];
@@ -368,7 +360,6 @@ static lib_status snapshot_write_fpu(const softpc_ccpu_fpu_state *state,
     softpc_snapshot_bytes_write write, void *context)
 {
     lib_status status; unsigned index;
-    if (state == NULL) return LIB_STATUS_INVALID_ARGUMENT;
     SNAPSHOT_WRITE(state->control); SNAPSHOT_WRITE(state->status);
     SNAPSHOT_WRITE(state->last_selector); SNAPSHOT_WRITE(state->last_offset);
     SNAPSHOT_WRITE(state->fea); SNAPSHOT_WRITE(state->fds); SNAPSHOT_WRITE(state->fip);
@@ -388,7 +379,6 @@ static lib_status snapshot_read_fpu(softpc_ccpu_fpu_state *state,
     softpc_snapshot_bytes_read read, void *context)
 {
     lib_status status; unsigned index;
-    if (state == NULL) return LIB_STATUS_INVALID_ARGUMENT;
     SNAPSHOT_READ(state->control); SNAPSHOT_READ(state->status);
     SNAPSHOT_READ(state->last_selector); SNAPSHOT_READ(state->last_offset);
     SNAPSHOT_READ(state->fea); SNAPSHOT_READ(state->fds); SNAPSHOT_READ(state->fip);

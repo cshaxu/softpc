@@ -5,6 +5,7 @@
 #include "../../fixture_cleanup.h"
 #include "insignia.h"
 #include "host_def.h"
+#include "bios.h"
 #include "xt.h"
 #include "gmi.h"
 #include "gfx_upd.h"
@@ -68,8 +69,6 @@ extern void nt_v7vga_hi_graph_std(int offset, int screen_x, int screen_y,
     int width, int height);
 extern void nt_text(int ScreenOffset, int ScreenX, int ScreenY, int len,
     int height);
-extern int softpc_device_bop_dispatch(unsigned char number,
-    unsigned int argument);
 extern void c_setAL(unsigned char value);
 extern void c_setAH(unsigned char value);
 extern void c_setBX(unsigned short value);
@@ -842,7 +841,7 @@ static void verify_cursor_disable(emulator_machine_driver *driver,
     /* Original mode programming, not a frontend override, restores visibility. */
     outb(0x3d4, 0x0a); outb(0x3d5, 0x22);
     c_setAH(0); c_setAL(3);
-    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    BIOS[0x42u]();
     for (unsigned tick = 0; tick < 4u; ++tick) host_timer_event();
     assert(!crt_controller.cursor_start.as_bfld.cursor_off);
     verify_cursor_output(driver, frame, console,
@@ -949,7 +948,7 @@ static void verify_driver_geometry(softpc_machine *machine)
         c_setAH(modes[index] >= 0x60 ? 0x6f : 0);
         c_setAL(modes[index] >= 0x60 ? 5 : (unsigned char)modes[index]);
         c_setBX((unsigned short)modes[index]);
-        assert(softpc_device_bop_dispatch(0x42u, 0u));
+        BIOS[0x42u]();
         host_timer_event();
         host_timer_event();
         assert(Currently_emulated_video_mode == modes[index]);
@@ -1292,7 +1291,7 @@ static void verify_snapshot_rebuilds_graphics_surface(softpc_machine *machine)
        this round trip from an actual BIOS-programmed controller instead. */
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
     c_setAH(0x6fu); c_setAL(5u); c_setBX(0x0060u);
-    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    BIOS[0x42u]();
     host_timer_event(); host_timer_event();
     saved_char_height = get_char_height();
     saved_offset = get_offset_per_line();
@@ -1308,7 +1307,7 @@ static void verify_snapshot_rebuilds_graphics_surface(softpc_machine *machine)
     assert(saved.graphics[8] == (getVideobit_prot_mask() & 0xff));
     assert(saved.dac_mask == get_DAC_mask());
     c_setAH(0x6fu); c_setAL(5u); c_setBX(0x0063u);
-    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    BIOS[0x42u]();
     host_timer_event(); host_timer_event();
     assert(softpc_machine_presentation_dib(machine, &bits, &info, &width, &height));
     assert(width == 1024u && height == 768u);
@@ -1353,7 +1352,7 @@ static void verify_v7_cpu_scanout(softpc_machine *machine)
 
     for (mode = 0; mode < 4; ++mode) {
         c_setAH(0x6f); c_setAL(5); c_setBX((unsigned short)modes[mode]);
-        assert(softpc_device_bop_dispatch(0x42, 0));
+        BIOS[0x42]();
         outb(0x3c4, 6); outb(0x3c5, 0xea);
         outb(0x3c4, 0xf9); outb(0x3c5, 0);
         /* Include the virtual pitch used by the captured 640-mode driver. */
@@ -1444,15 +1443,15 @@ static void verify_bios_cga_pixel_handoff(void)
 {
     for (unsigned mode = 4; mode <= 6; ++mode) {
         c_setAH(0); c_setAL((IU8)mode);
-        assert(softpc_device_bop_dispatch(0x42, 0));
+        BIOS[0x42]();
         for (unsigned y = 0; y < 3; ++y)
         for (unsigned x = 0; x < 20; ++x) {
             IU8 colour = (IU8)(mode == 6 ? 1 : 3);
             c_setAH(0x0c); c_setAL(colour); c_setBX(0);
             c_setCX((IU16)x); c_setDX((IU16)y);
-            assert(softpc_device_bop_dispatch(0x42, 0));
+            BIOS[0x42]();
             c_setAH(0x0d);
-            assert(softpc_device_bop_dispatch(0x42, 0));
+            BIOS[0x42]();
             assert((c_getAX() & 0xff) == colour);
         }
     }
@@ -1463,7 +1462,7 @@ static void verify_text_bios_aperture(void)
     extern sys_addr video_pc_low_regen, video_pc_high_regen;
     extern IU32 read_byte_ev_glue(IU32 address);
     c_setAH(0); c_setAL(3);
-    assert(softpc_device_bop_dispatch(0x42, 0));
+    BIOS[0x42]();
     /* Select the existing SAS path with unchained access, still at B8000.
        The cached physical-mode aperture must not override the BDA text mode. */
     outb(0x3c4, 4); outb(0x3c5, 6);
@@ -1472,19 +1471,19 @@ static void verify_text_bios_aperture(void)
     video_pc_low_regen = 0xa0000;
     video_pc_high_regen = 0xaffff;
     c_setAH(2); c_setBX(0); c_setDX(0);
-    assert(softpc_device_bop_dispatch(0x42, 0));
+    BIOS[0x42]();
     c_setAH(9); c_setAL('A'); c_setBX(7); c_setCX(1);
-    assert(softpc_device_bop_dispatch(0x42, 0));
+    BIOS[0x42]();
     assert((IU8)read_byte_ev_glue(0xb8000) == 'A');
     assert((IU8)read_byte_ev_glue(0xb8001) == 7);
     c_setAH(0x0a); c_setAL('B'); c_setBX(0); c_setCX(1);
-    assert(softpc_device_bop_dispatch(0x42, 0));
+    BIOS[0x42]();
     c_setAH(8);
-    assert(softpc_device_bop_dispatch(0x42, 0));
+    BIOS[0x42]();
     assert(c_getAX() == 0x0742);
     /* Full-width clear uses the text aperture's upper bound as well. */
     c_setAH(6); c_setAL(0); c_setBX(0x0700); c_setCX(0); c_setDX(79);
-    assert(softpc_device_bop_dispatch(0x42, 0));
+    BIOS[0x42]();
     assert((IU8)read_byte_ev_glue(0xb8000) == ' ');
     assert((IU8)read_byte_ev_glue(0xb809e) == ' ');
     video_pc_low_regen = 0xb8000;
@@ -1499,7 +1498,7 @@ static void verify_text_plane_handoff(void)
     extern void (*bios_ch2_word_wrt_fn)(ULONG value, ULONG offset);
     unsigned cell, plane;
     c_setAH(0); c_setAL(3);
-    assert(softpc_device_bop_dispatch(0x42, 0));
+    BIOS[0x42]();
     for (cell = 0; cell < 160; ++cell) {
         if (cell & 1u) {
             bios_ch2_word_wrt_fn(((1u + cell % 15u) << 8) | ('A' + cell % 26u), 2u * cell);
@@ -1537,7 +1536,7 @@ static void verify_mode2_plane_enable(void)
 {
     extern void (*bios_ch2_byte_wrt_fn)(ULONG value, ULONG offset);
     c_setAH(0); c_setAL(3);
-    assert(softpc_device_bop_dispatch(0x42, 0));
+    BIOS[0x42]();
     outb(0x3ce, 3); outb(0x3cf, 0);
     outb(0x3ce, 8); outb(0x3cf, 0xff);
     outb(0x3ce, 5); outb(0x3cf, 0x12);
@@ -1560,7 +1559,7 @@ static void verify_chain4_mode2_planes(void)
     extern void c_sas_storedw(IU32 address, IU32 value);
     const unsigned latch[4] = {0x12, 0x34, 0x56, 0x78};
     c_setAH(0); c_setAL(0x13);
-    assert(softpc_device_bop_dispatch(0x42, 0));
+    BIOS[0x42]();
     outb(0x3c4, 4); outb(0x3c5, 0x0e);
     outb(0x3ce, 5); outb(0x3cf, 0x42);
     for (unsigned planes = 7; planes <= 15; planes += 8)
@@ -1612,7 +1611,7 @@ static void verify_chain2_dirty_entries(void)
     unsigned marking, mode, entry, group;
 
     c_setAH(0x6f); c_setAL(5); c_setBX(0x63);
-    assert(softpc_device_bop_dispatch(0x42, 0));
+    BIOS[0x42]();
     host_timer_event(); host_timer_event();
     assert(EGA_CPU.chain == CHAIN2);
     saved_writer = c_ev_write_ptr;
@@ -1713,7 +1712,7 @@ static unsigned verify_colour_resolution_matrix(softpc_machine *machine)
        requests to mode 00h. Do not mistake their text surface for graphics. */
     for (index = 0; index < 2; ++index) {
         c_setAH(0); c_setAL(index ? 0x0f : 7);
-        assert(softpc_device_bop_dispatch(0x42, 0));
+        BIOS[0x42]();
         host_timer_event(); host_timer_event();
         assert(Currently_emulated_video_mode == 0);
         assert(!softpc_machine_presentation_is_graphics(machine));
@@ -1732,7 +1731,7 @@ static unsigned verify_colour_resolution_matrix(softpc_machine *machine)
         c_setAH(mode >= 0x60 ? 0x6f : 0);
         c_setAL(mode >= 0x60 ? 5 : (unsigned char)mode);
         c_setBX((unsigned short)mode);
-        assert(softpc_device_bop_dispatch(0x42, 0));
+        BIOS[0x42]();
         host_timer_event(); host_timer_event();
         assert(softpc_machine_presentation_dib(machine, &bits, &info, &width, &height));
         if (width != widths[entry] || height != heights[entry])
@@ -1849,28 +1848,28 @@ static void verify_preserved_v7_modes(void)
         if (mode == 0x46)
             mode = 0x60;
         c_setAH(0x6f); c_setAL(5); c_setBX((unsigned short)mode);
-        assert(softpc_device_bop_dispatch(0x42, 0));
+        BIOS[0x42]();
         assert(Currently_emulated_video_mode == mode);
         EGA_planes[0] = 0x5a;
         c_setAH(0x6f); c_setAL(5); c_setBX((unsigned short)(mode | 0x80));
-        assert(softpc_device_bop_dispatch(0x42, 0));
+        BIOS[0x42]();
         assert(Currently_emulated_video_mode == mode);
         if (mode >= 0x60)
             assert(EGA_planes[0] == 0x5a);
         /* Query the mode through the BIOS, not just its cached variable. */
         c_setAH(0x6f); c_setAL(4);
-        assert(softpc_device_bop_dispatch(0x42, 0));
+        BIOS[0x42]();
         assert((c_getAX() & 0xff) == mode);
         if (mode >= 0x60) {
             c_setAH(0x6f); c_setAL(5); c_setBX((unsigned short)mode);
-            assert(softpc_device_bop_dispatch(0x42, 0));
+            BIOS[0x42]();
             assert(EGA_planes[0] != 0x5a);
         }
     }
     /* A different preserved mode must actually activate, not silently retain
        the previous valid mode. This is the driver initialization failure. */
     c_setAH(0x6f); c_setAL(5); c_setBX(0xe7);
-    assert(softpc_device_bop_dispatch(0x42, 0));
+    BIOS[0x42]();
     assert(Currently_emulated_video_mode == 0x67);
     /* The requested packed mode must establish independent CPU banks too. */
     outb(0x3c4, 6); outb(0x3c5, 0xea);
@@ -1882,7 +1881,7 @@ static void verify_preserved_v7_modes(void)
     outb(0x3c4, 0xf9); outb(0x3c5, 0);
     assert(c_sas_hw_at(0xa0000) == 0x5a);
     c_setAH(0x6f); c_setAL(5); c_setBX(0xff);
-    assert(softpc_device_bop_dispatch(0x42, 0));
+    BIOS[0x42]();
     assert(Currently_emulated_video_mode == 0x67);
 }
 
@@ -1897,7 +1896,7 @@ static void verify_snapshot_video_writes(softpc_machine *machine)
 
     assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
     c_setAH(0x6f); c_setAL(5); c_setBX(0x60);
-    assert(softpc_device_bop_dispatch(0x42, 0));
+    BIOS[0x42]();
     outb(0x3c4, 6); outb(0x3c5, 0xea);
     for (mode = 0; mode < 4; ++mode) {
         for (mask = 0; mask < 2; ++mask) {
@@ -1955,7 +1954,7 @@ static void verify_bios_dac_block_and_state(void)
 
     c_setAH(0);
     c_setAL(0x13);
-    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    BIOS[0x42u]();
     (void)c_setES(0);
     for (unsigned i = 0; i < sizeof(expected); ++i) {
         expected[i] = (unsigned char)((i * 17u + i / 3u + 7u) & 63u);
@@ -1966,7 +1965,7 @@ static void verify_bios_dac_block_and_state(void)
     c_setBX(0);
     c_setCX(256);
     c_setDX((IU16)input);
-    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    BIOS[0x42u]();
 
     /* Full DAC save needs a counter wider than the byte-sized entry index.
        The BIOS state layout has a 32-byte header and three DAC metadata bytes. */
@@ -1976,7 +1975,7 @@ static void verify_bios_dac_block_and_state(void)
     c_setAL(1);
     c_setCX(4);
     c_setBX((IU16)saved);
-    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    BIOS[0x42u]();
     assert(c_sas_hw_at(saved - 1) == 0xa5);
     assert(c_sas_hw_at(saved + 35u + sizeof(expected)) == 0x5a);
     for (unsigned i = 0; i < sizeof(expected); ++i)
@@ -1991,13 +1990,13 @@ static void verify_bios_dac_block_and_state(void)
             c_setBX(0);
             c_setCX(256);
             c_setDX((IU16)input);
-            assert(softpc_device_bop_dispatch(0x42u, 0u));
+            BIOS[0x42u]();
         } else if (pass == 2) {
             c_setAH(0x1c);
             c_setAL(2);
             c_setCX(4);
             c_setBX((IU16)saved);
-            assert(softpc_device_bop_dispatch(0x42u, 0u));
+            BIOS[0x42u]();
         }
         c_sas_store(output - 1, 0xa5);
         c_sas_store(output + sizeof(expected), 0x5a);
@@ -2006,7 +2005,7 @@ static void verify_bios_dac_block_and_state(void)
         c_setBX(0);
         c_setCX(256);
         c_setDX((IU16)output);
-        assert(softpc_device_bop_dispatch(0x42u, 0u));
+        BIOS[0x42u]();
         assert(c_sas_hw_at(output - 1) == 0xa5);
         assert(c_sas_hw_at(output + sizeof(expected)) == 0x5a);
         for (unsigned i = 0; i < sizeof(expected); ++i)
@@ -2108,7 +2107,7 @@ static void verify_text_geometry_capacity(softpc_machine *machine)
         unsigned extent = rows[i] - 1;
         assert(softpc_machine_reset(machine) == SOFTPC_MACHINE_OK);
         c_setAH(0); c_setAL(3);
-        assert(softpc_device_bop_dispatch(0x42, 0));
+        BIOS[0x42]();
         outb(0x3d4, 0x11); inb(0x3d5, &protect);
         outb(0x3d5, protect & 0x7f);
         if (i == 0) {
@@ -2152,7 +2151,7 @@ static void verify_text_geometry_capacity(softpc_machine *machine)
     outb(0x3c4, 6); outb(0x3c5, 0xea);
     outb(0x3c4, 0xf6); outb(0x3c5, 0);
     c_setAH(0); c_setAL(3);
-    assert(softpc_device_bop_dispatch(0x42, 0));
+    BIOS[0x42]();
     host_timer_event(); host_timer_event();
 }
 
@@ -2201,7 +2200,7 @@ int main(void)
        any host-side surface allocation. */
     c_setAH(0x6fu);
     c_setAL(7u);
-    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    BIOS[0x42u]();
     assert(c_getAX() == 0x826fu);
     assert(c_getBX() == 0x7070u);
     assert(c_getCX() == 0u);
@@ -2270,7 +2269,7 @@ int main(void)
     c_setAH(0x6fu);
     c_setAL(5u);
     c_setBX(0x0060u);
-    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    BIOS[0x42u]();
     assert(c_getAX() == 0x6f05u);
     assert(c_getBX() == 0x0060u);
     assert(Currently_emulated_video_mode == 0x60u);
@@ -2304,7 +2303,7 @@ int main(void)
     c_setAH(0x6fu);
     c_setAL(5u);
     c_setBX(0x0063u);
-    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    BIOS[0x42u]();
     assert(c_getAX() == 0x6f05u);
     assert(c_getBX() == 0x0063u);
     assert(Currently_emulated_video_mode == 0x63u);
@@ -2322,7 +2321,7 @@ int main(void)
     c_setAH(0x6fu);
     c_setAL(5u);
     c_setBX(0x0065u);
-    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    BIOS[0x42u]();
     assert(Currently_emulated_video_mode == 0x65u);
     host_timer_event();
     host_timer_event();
@@ -2358,7 +2357,7 @@ int main(void)
     c_setAH(0x6fu);
     c_setAL(5u);
     c_setBX(0x0066u);
-    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    BIOS[0x42u]();
     assert(Currently_emulated_video_mode == 0x66u);
     host_timer_event();
     host_timer_event();
@@ -2379,7 +2378,7 @@ int main(void)
     c_setAH(0x6fu);
     c_setAL(5u);
     c_setBX(0x0067u);
-    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    BIOS[0x42u]();
     assert(Currently_emulated_video_mode == 0x67u);
     host_timer_event();
     host_timer_event();
@@ -2415,7 +2414,7 @@ int main(void)
     c_setAH(0x6fu);
     c_setAL(5u);
     c_setBX(0x0068u);
-    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    BIOS[0x42u]();
     assert(Currently_emulated_video_mode == 0x68u);
     host_timer_event();
     host_timer_event();
@@ -2426,7 +2425,7 @@ int main(void)
     c_setAH(0x6fu);
     c_setAL(5u);
     c_setBX(0x0069u);
-    assert(softpc_device_bop_dispatch(0x42u, 0u));
+    BIOS[0x42u]();
     assert(Currently_emulated_video_mode == 0x69u);
     host_timer_event();
     host_timer_event();

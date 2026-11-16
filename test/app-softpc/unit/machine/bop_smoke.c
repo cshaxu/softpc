@@ -23,7 +23,6 @@ enum {
     SOFTPC_TIMER_HIGH_BDA = 0x46e
 };
 
-extern IBOOL softpc_device_bop_dispatch(IU8 number, IU32 argument);
 extern void c_setAL(IU8 value);
 extern void c_setAH(IU8 value);
 extern void c_setAX(IU16 value);
@@ -148,18 +147,18 @@ int main(void)
     assert(BIOS[0x92] == bootstrap3);
 
     /* BOP 01 is the original BIOS dummy interrupt, not a product service. */
-    assert(softpc_device_bop_dispatch(BIOS_DUMMY_INT, 0u) == TRUE);
-    assert(softpc_device_bop_dispatch(BIOS_TIMER_INT, 0u) == FALSE);
+    BIOS[BIOS_DUMMY_INT]();
+    assert(BIOS[BIOS_TIMER_INT] == NULL);
 
     /* INT 15h stays an original SoftPC BIOS handler: under the selected PM
        profile it returns the original CMOS-backed extended-memory value. */
     c_setAH(INT15_EMS_DETERMINE);
-    assert(softpc_device_bop_dispatch(BIOS_CASSETTE_IO, 0u) == TRUE);
+    BIOS[BIOS_CASSETTE_IO]();
     assert(c_getAX() == 0x3c00u); /* 16 MiB fixed RAM less the first MiB */
 
     /* The original reset BOP reinitialises machine controllers, not a
        session/product shell.  The raw-image GFI attachment survives it. */
-    assert(softpc_device_bop_dispatch(BIOS_RESET, 0u) == TRUE);
+    BIOS[BIOS_RESET]();
     assert(gfi_drive_type(0) == GFI_DRIVE_TYPE_144);
 
     /* INT 11h and INT 12h are the original BIOS-data-area handlers.  The
@@ -173,9 +172,9 @@ int main(void)
         assert(softpc_machine_write_physical(machine, MEMORY_VAR,
             memory_word, sizeof(memory_word)) == SOFTPC_MACHINE_OK);
     }
-    assert(softpc_device_bop_dispatch(BIOS_EQUIPMENT, 0u) == TRUE);
+    BIOS[BIOS_EQUIPMENT]();
     assert(c_getAX() == 0xa55au);
-    assert(softpc_device_bop_dispatch(BIOS_MEMORY_SIZE, 0u) == TRUE);
+    BIOS[BIOS_MEMORY_SIZE]();
     assert(c_getAX() == 0x0280u);
 
     /* INT 1Ah's original set-time service owns the BIOS timer fields and
@@ -183,7 +182,7 @@ int main(void)
     c_setAH(0x01u);
     c_setCX(0x1234u);
     c_setDX(0x5678u);
-    assert(softpc_device_bop_dispatch(BIOS_TIME_OF_DAY, 0u) == TRUE);
+    BIOS[BIOS_TIME_OF_DAY]();
     {
         const unsigned char expected_low[2] = { 0x78u, 0x56u };
         const unsigned char expected_high[2] = { 0x34u, 0x12u };
@@ -199,12 +198,12 @@ int main(void)
 
     /* BOP 18 is original ROM BASIC fallback firmware, unlike product
        selectors intentionally absent from the standalone machine table. */
-    assert(softpc_device_bop_dispatch(BIOS_BASIC, 0u) == TRUE);
+    BIOS[BIOS_BASIC]();
 
     c_setAL(1u);
     c_setDS(0u);
     c_setCX(0x600u);
-    assert(softpc_device_bop_dispatch(0x21u, 0u) == TRUE);
+    BIOS[0x21u]();
     {
         unsigned char name[5];
         assert(softpc_machine_read_physical(machine, 0x600u, name,
@@ -220,20 +219,20 @@ int main(void)
        status and read functions consume. */
     c_setAH(0x05u);
     c_setCX(0x1e61u); /* scan code 1Eh, ASCII 'a' */
-    assert(softpc_device_bop_dispatch(BIOS_KEYBOARD_IO, 0u) == TRUE);
+    BIOS[BIOS_KEYBOARD_IO]();
     assert(c_getAX() == 0u);
     c_setAH(0x01u);
-    assert(softpc_device_bop_dispatch(BIOS_KEYBOARD_IO, 0u) == TRUE);
+    BIOS[BIOS_KEYBOARD_IO]();
     assert(c_getAX() == 0x1e61u);
     c_setAH(0x00u);
-    assert(softpc_device_bop_dispatch(BIOS_KEYBOARD_IO, 0u) == TRUE);
+    BIOS[BIOS_KEYBOARD_IO]();
     assert(c_getAX() == 0x1e61u);
 
     /* INT 14h remains the original ROM BOP service over the original UART
        controller. Its status result must agree with the direct UART ports. */
     c_setDX(0u);
     c_setAH(3u);
-    assert(softpc_device_bop_dispatch(BIOS_RS232_IO, 0u) == TRUE);
+    BIOS[BIOS_RS232_IO]();
     {
         half_word line_status;
         half_word modem_status;
@@ -247,14 +246,14 @@ int main(void)
     }
     c_setAH(1u);
     c_setAL(0x41u);
-    assert(softpc_device_bop_dispatch(BIOS_RS232_IO, 0u) == TRUE);
+    BIOS[BIOS_RS232_IO]();
     assert((c_getAX() & 0x6000u) == 0x6000u);
 
     /* INT 17h likewise remains a ROM BOP over the original parallel
        controller. BIOS formatting of the status byte must match the port. */
     c_setDX(0u);
     c_setAH(2u);
-    assert(softpc_device_bop_dispatch(BIOS_PRINTER_IO, 0u) == TRUE);
+    BIOS[BIOS_PRINTER_IO]();
     {
         half_word raw_status;
         inb(SOFTPC_LPT1_PORT + 1u, &raw_status);
@@ -262,18 +261,18 @@ int main(void)
     }
     c_setAH(0u);
     c_setAL(0x41u);
-    assert(softpc_device_bop_dispatch(BIOS_PRINTER_IO, 0u) == TRUE);
+    BIOS[BIOS_PRINTER_IO]();
 
     /* Product-shell selectors must remain unreachable in the standalone
        machine even though the historical BOP instruction remains its ROM-to-C
        firmware bridge. */
-    assert(softpc_device_bop_dispatch(0x25u, 0u) == FALSE); /* VDD */
-    assert(softpc_device_bop_dispatch(0x2bu, 0u) == FALSE); /* DOS command */
-    assert(softpc_device_bop_dispatch(0x30u, 0u) == FALSE); /* DPMI */
-    assert(softpc_device_bop_dispatch(0x50u, 0u) == FALSE); /* NTVDM reserved */
-    assert(softpc_device_bop_dispatch(0x52u, 0u) == FALSE); /* XMS */
-    assert(softpc_device_bop_dispatch(0x78u, 0u) == FALSE); /* WORM service */
-    assert(softpc_device_bop_dispatch(0x79u, 0u) == FALSE); /* WORM service */
+    assert(BIOS[0x25u] == NULL); /* VDD */
+    assert(BIOS[0x2bu] == NULL); /* DOS command */
+    assert(BIOS[0x30u] == NULL); /* DPMI */
+    assert(BIOS[0x50u] == NULL); /* NTVDM reserved */
+    assert(BIOS[0x52u] == NULL); /* XMS */
+    assert(BIOS[0x78u] == NULL); /* WORM service */
+    assert(BIOS[0x79u] == NULL); /* WORM service */
 
     /* The original incompatible-driver BOP is not a standalone product
        service.  It reports through the finite host-error endpoint and

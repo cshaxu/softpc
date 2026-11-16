@@ -12,10 +12,17 @@ including native desktop/audio/package. Owner accepted P3 and requested the next
 file. P5 corrects audio.h ownership wording and removes platform.c's unused
 include: production +2/-3,net-1; no test/mirror/API changes. Cached dual full
 builds/publication and392/392 tests passed; self-review passed. Mirror-header
-warnings only. Owner accepts continued execution. P6 reviews all50 files and delivers
-production +27/-70,net-43, one source file removed; tests +7/-0. Both cached
-builds/publication and392/392 full tests pass. Zero non-mirror warnings. Four
-bounded follow-ups remain for P7; see the evidence plan. T100/S5 stay open.
+warnings only. Owner accepts continued execution. P6 delivered086a8cc2 and P7 completes
+all50 frozen Compat reviews and safe simplifications.49 files remain:8957 ->
+8851 lines; whole-S production +43/-149,net-106, tests +89/-86,net+3; one
+source file removed and one build-list line removed. No mirror/shared/schema
+or user-asset changes. P6 and P7 each pass cached dual builds/publication and
+392/392 full tests; final builds have zero non-mirror warnings. Actual-diff
+self-review and inventory reconciliation pass. Scratch cleaned; S5 is ready
+for owner acceptance, T100 stays open. Detailed proof and retained boundaries
+are in the linked evidence. P7 uses the original BIOS table in tests, row-copy
+V7 restore, dominated private archive-check removal and unified queue traversal.
+
 
 The following admissions are retained historical records, not active work.
 

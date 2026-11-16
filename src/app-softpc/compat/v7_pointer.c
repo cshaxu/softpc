@@ -1,3 +1,4 @@
+#include "lib/types/types_interface.h"
 #include "mirror_types.h"
 #include "host_def.h"
 
@@ -60,18 +61,10 @@ word y;
     pixels = (unsigned char *)surface;
     stride = (width + 3u) & ~3u;
     for (row = softpc_v7_pointer_top; row <= softpc_v7_pointer_bottom; ++row)
-    {
-        long column;
-        for (column = softpc_v7_pointer_left;
-             column <= softpc_v7_pointer_right; ++column)
-        {
-            unsigned long saved = (unsigned long)(row - softpc_v7_pointer_top) *
-                SOFTPC_V7_POINTER_WIDTH +
-                (unsigned long)(column - softpc_v7_pointer_left);
-            pixels[(unsigned long)row * stride + (unsigned long)column] =
-                softpc_v7_pointer_background[saved];
-        }
-    }
+        lib_memory_copy(pixels + (unsigned long)row * stride + softpc_v7_pointer_left,
+            softpc_v7_pointer_background + (row - softpc_v7_pointer_top) *
+                SOFTPC_V7_POINTER_WIDTH,
+            (lib_size)(softpc_v7_pointer_right - softpc_v7_pointer_left + 1));
     {
         SMALL_RECT dirty;
         dirty.Left = (SHORT)softpc_v7_pointer_left;

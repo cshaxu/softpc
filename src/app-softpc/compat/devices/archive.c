@@ -279,8 +279,6 @@ device_write_map(const void *object, const softpc_device_wire_field *fields,
     const lib_u8 *base = (const lib_u8 *)object;
     lib_size field_index;
 
-    if (object == NULL || fields == NULL || write == NULL)
-        return LIB_STATUS_INVALID_ARGUMENT;
     for (field_index = 0u; field_index < field_count; ++field_index) {
         const softpc_device_wire_field *field = &fields[field_index];
         const lib_u8 *bytes = base + field->offset;
@@ -329,8 +327,6 @@ device_read_map(void *object, const softpc_device_wire_field *fields,
     lib_u8 *base = (lib_u8 *)object;
     lib_size field_index;
 
-    if (object == NULL || fields == NULL || read == NULL)
-        return LIB_STATUS_INVALID_ARGUMENT;
     for (field_index = 0u; field_index < field_count; ++field_index) {
         const softpc_device_wire_field *field = &fields[field_index];
         lib_u8 *bytes = base + field->offset;
@@ -695,14 +691,9 @@ device_write_queue(const softpc_device_archive *archive,
     QUEUE_U32(state->quick_entries); QUEUE_U32(state->tick_entries);
     for (index = 0u; index < 16u; ++index) { QUEUE_U32(state->quick_hash_head[index]); }
     for (index = 0u; index < 16u; ++index) { QUEUE_U32(state->tick_hash_head[index]); }
-    for (index = 0u; index < state->quick_entries; ++index) {
-        const Q_EVENT_SNAPSHOT_ENTRY *entry = &archive->quick_entries[index];
-        QUEUE_U32(entry->time_from_last); QUEUE_U32(entry->original_time);
-        QUEUE_U32(entry->handle); QUEUE_U32(entry->param); QUEUE_U32(entry->event_type);
-        QUEUE_U32(entry->callback_id); QUEUE_U32(entry->hash_next_index);
-    }
-    for (index = 0u; index < state->tick_entries; ++index) {
-        const Q_EVENT_SNAPSHOT_ENTRY *entry = &archive->tick_entries[index];
+    for (index = 0u; index < state->quick_entries + state->tick_entries; ++index) {
+        const Q_EVENT_SNAPSHOT_ENTRY *entry = index < state->quick_entries ?
+            &archive->quick_entries[index] : &archive->tick_entries[index - state->quick_entries];
         QUEUE_U32(entry->time_from_last); QUEUE_U32(entry->original_time);
         QUEUE_U32(entry->handle); QUEUE_U32(entry->param); QUEUE_U32(entry->event_type);
         QUEUE_U32(entry->callback_id); QUEUE_U32(entry->hash_next_index);
