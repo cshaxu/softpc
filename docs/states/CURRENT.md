@@ -54,6 +54,14 @@ outside that boundary. Own build/t100-s4-p87, two-hour/fifteen-minute no-progres
 budgets. Cached dual build/publication, full regression, actual diff review,
 commit/push, await owner acceptance; do not approve unrelated later-file diffs.
 
+Owner approves S4 P89 implementing P88's five exact restorations in nt_sbdsp.c:
+two original-position forwards and three original USHORT spellings. Baseline
+afe8100b. No DSP/DMA behavior, public API, snapshot schema, guest or other
+source change. Own build/t100-s4-p89, two-hour job/fifteen-minute no-progress
+budget and cleanup. Cached dual full builds/publication, complete background
+and native regression, actual-object equivalence, self-review, commit/push,
+then owner acceptance. Preserve user configuration/media and unrelated work.
+
 ## M9 T100 S4 Packet
 
 | Field | Required record |
@@ -77,15 +85,20 @@ commit/push, await owner acceptance; do not approve unrelated later-file diffs.
 
 ## Current Technical Baseline
 
-S4 P88 audits all 103 current nt_sbdsp.c retained-content diff blocks at
-075dc4b0; no production/test/EXE/asset changes. Six blocks contain confirmed
-restoration candidates (two forwards and three original cast spellings).
-Isolated dual-width production-command compiles are byte-identical to current
-cached objects; existing SB DMA/commands/archive tests pass 3/3 per width.
-The combined candidate reduces XP changed lines by 14, but is not installed.
-Other 97 blocks have explicitly bounded source/alignment/historical-test
-evidence, not 97 independent runtime reproductions. Await owner decision on
-this file; do not advance. See [complete block ledger](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p88-exhaustive-current-nt_sbdsp-retained-diff-audit).
+S4 P89 implements the five owner-approved nt_sbdsp.c restorations from P88:
+two original-position forwards and three original USHORT spellings. Source
++13/-9, tests unchanged. Actual cached DSP objects are byte-identical on x86
+and x64; published EXEs have refreshed build timestamps. Full cached builds
+are warning/error-free; all 392 tests pass first-try (196 per architecture,
+including native desktop/audio and both package cases). Self-review confirms
+no behavior/API/schema change, preserved CRLF and conditional/line controls.
+Git numstat corrects the P88 estimate: XP diff +541/-1006 becomes +541/-1002,
+four fewer changed lines, not fourteen; alignment produces 104 vs 103 blocks.
+The unchanged nt_sb.c inventory row separately corrects five missed deletions.
+Current global inventory: 106 files,15747 blocks,+24594/-24021. Other 97 P88
+blocks retain bounded source/alignment/historical evidence, not independent
+runtime reproductions. Await P89 acceptance; do not advance. S4/T100 remain
+open. See [P89 evidence](../etc/evidence/softpc/m9-t100-owner-decisions.md#s4-p89-restore-approved-dsp-declarations-and-cast-spelling).
 
 S4 P87 removes exactly two mirror-added duplicate includes in nt_graph.c and
 nt_sbmid.c after scanning 467 mirror C/H files (74 added include occurrences).

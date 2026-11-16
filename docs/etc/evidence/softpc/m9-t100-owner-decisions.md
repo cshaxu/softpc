@@ -7418,8 +7418,11 @@ conclusion is withdrawn. No unexplained block is silently skipped.
 3. Restore original USHORT in increment/count update casts and final count
    assignment of SbGetDMAPosition. Keep all wrap/direction changes.
 
-Declaration-only candidate: 104 blocks,+543/-994, 10 fewer changed lines.
-Combined candidate: 104 blocks,+541/-992, 14 fewer changed lines. The extra
+P89 correction using Git --numstat: declaration-only candidate is 104 blocks,
++543/-1004 (unchanged total changed-line count). Combined candidate is 104
+blocks,+541/-1002 (four fewer changed lines). The initial P88 custom counter
+incorrectly discarded deleted comment terminators beginning --- as file headers;
+its -994/-992 and 10/14-line reduction claims are withdrawn. The extra
 text block is alignment, not an added semantic point. No helper, state, API,
 thread or guest behavior is added. Production source remains unchanged.
 
@@ -7555,3 +7558,53 @@ helpers are not cleanup candidates merely because they are old or inactive.
 | H103 | 2957 | 2443 | +1 | -0 | R / EOI | `DspEoiRegistered = FALSE;` |
 
 Total: 103 blocks,+541/-1006; 97 retained recommendations and six full/partial restoration candidates. S4 stays on this file pending owner decision.
+
+
+## S4 P89: restore approved DSP declarations and cast spelling
+
+Owner approves the five P88 restorations with cached dual build/publication,
+full tests, commit/push and self-review. Baseline afe8100b. Exactly one source
+file changes: +13/-9, net +4; tests unchanged. Restore original ExitAutoMode
+forward position, original-position multiline DmaDataToDsp forward retaining
+static IBOOL, and three original USHORT spellings in SbGetDMAPosition. There
+is no function-body algorithm, state, interface or archive-layout change.
+
+The installed source matches the isolated P88 combined candidate. Mirror CRLF
+and existing conditional structure/line controls remain unchanged. Whole-file
+sweep distinguishes remaining IU16 uses in added direction/wrap expressions
+from the three changed original cast sites; original declarations and inactive
+helpers remain intact. Both forwards are unique and precede their real calls.
+
+Accounting correction: use Git --numstat, not a custom line-prefix counter.
+P88 mistakenly treated removed --*/ comment terminators as --- file headers.
+The correctly reproduced XP retained-content comparison is +541/-1006 before
+and +541/-1002 after: four fewer changed lines, not fourteen. Text blocks
+increase from 103 to 104 through alignment, not a new semantic point. Source
+line growth restores original multiline formatting and is not mirror-diff growth.
+The nt_sb.c row is separately corrected from -376 to -381 after direct Myers
+numstat; that file is unchanged. Current global total reconciles to 106 files,
+15747 blocks,+24594/-24021. The net total ledger movement includes this five-line
+accounting correction; the actual code restoration reduces mirror diff by four.
+
+Fresh qualification: cached x86/x64 configure and full builds succeed without
+compiler warnings/errors. Each architecture passes 188 background, six native
+desktop/audio, and two separately invoked package cases: 196/196 per width,
+392/392 total, all first-pass. Background elapsed times are 238.19s and 208.90s.
+Separate package invocations preserve existing scheduling; the unrelated
+same-runner package P2 is not claimed fixed.
+
+Actual cached DSP objects remain byte-identical to baseline on both widths:
+- x86: e9cc87f89ec9f06de1f7cd2e95b5d84d19845ceb761ee78bac417fefa23f22aa
+- x64: a0a5ebbd30a7d155ae5fa632ff45ef8e01e3a265d6f1f9e23cf03d1f7e6dd03b
+
+Published build banners are Nov 15 2026 18:46:03 (x86) and 18:50:42 (x64).
+EXE SHA256:
+- softpc32.exe: 3c14a60507ac715867f1c5aba3d1f5fecb38fb1631585d5f755d276b92a210d7
+- softpc64.exe: eb6d22aebc92210e2a7453a2202dcf2b9d1ea23c28ed409967177053b4bee2cf
+
+Independent review of the actual diff confirms only the five approved source
+restorations. Reversing precisely those edits reproduces the baseline source;
+no new API/state/helper, changed ownership, conditional or line-control change.
+No test source change or new guest/manual acceptance claim. Manifest and current
+inventory reconcile. Disposable P89 evidence is summarized here before cleanup;
+reusable Ninja/ccache trees remain. Await owner acceptance; S4/T100 stay open.

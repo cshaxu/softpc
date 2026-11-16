@@ -159,7 +159,6 @@ static DWORD blockSize;
 static BYTE TableMungeData;
 static BOOL TableMungeFirstByte = TRUE; // munging first or second byte
 static void DspCompleteBlock(long unused);
-static IBOOL DmaDataToDsp(DSP_MODE mode);
 
 //
 //
@@ -287,6 +286,11 @@ SetDMAStatus(
     BOOL tc
     );
 
+static IBOOL
+DmaDataToDsp(
+    DSP_MODE mode
+    );
+
 BOOL
 StartDspDmaThread(
     DSP_MODE mode
@@ -302,6 +306,11 @@ DspThreadEntry(
     LPVOID context
     );
 
+VOID
+ExitAutoMode(
+    VOID
+    );
+
 BOOL
 GetWaveOutPosition(
     PULONG pPos
@@ -311,11 +320,6 @@ static lib_status DspProcessBlock(void);
 static lib_status DspPrepareOutput(void);
 static lib_status DspArmCompletion(IU32 rate);
 static void DspCancelTransfer(void);
-
-VOID
-ExitAutoMode(
-    VOID
-    );
 
 void StopDspTransfer(IBOOL reset)
 {
@@ -2198,8 +2202,8 @@ Return Value:
                 if (DmaInfo.mode & 0x20)
                     DmaInfo.addr -= (IU16)DspVirtualInc;
                 else
-                    DmaInfo.addr += (IU16)DspVirtualInc;
-                DmaInfo.count -= (IU16)DspVirtualInc;
+                    DmaInfo.addr += (USHORT)DspVirtualInc;
+                DmaInfo.count -= (USHORT)DspVirtualInc;
                 dprintf3(("virt addr = %x, count = %x", DmaInfo.addr, DmaInfo.count));
                 SetDMACountAddr(&DmaInfo);
             } else {
@@ -2263,7 +2267,7 @@ Return Value:
 
         DmaInfo.addr = (DmaInfo.mode & 0x20) ?
             StartingDmaAddr - (IU16)offset : StartingDmaAddr + (IU16)offset;
-        DmaInfo.count = StartingDmaCount - (IU16)offset;
+        DmaInfo.count = StartingDmaCount - (USHORT)offset;
 
         SetDMACountAddr(&DmaInfo);
         dprintf3(("INB: AFT Cnt= %x, Addr= %x\n", DmaInfo.count, DmaInfo.addr));
