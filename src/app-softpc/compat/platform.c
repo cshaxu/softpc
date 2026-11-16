@@ -518,12 +518,9 @@ void host_timer_init(void)
 quick_event_delays host_delays = {0, 0, 0, 0, 0, 0, 25000};
 void host_set_hw_int(void)
 {
-    static unsigned long softpc_hardware_interrupts;
-
     /* ica.h's historical CPU_HW_INT macro is the PIC bitmap bit (zero),
        whereas CCPU's CPU_INT_TYPE hardware-interrupt enum is value two.
        Keep the machine port on the executor ABI rather than the PIC macro. */
-    ++softpc_hardware_interrupts;
     c_cpu_interrupt((CPU_INT_TYPE)2, 0);
 }
 

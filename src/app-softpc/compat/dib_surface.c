@@ -35,9 +35,7 @@ static int softpc_dib_pending_dirty_valid;
 static int softpc_dib_ready;
 static unsigned long softpc_dib_update_depth;
 static unsigned long softpc_dib_generation;
-#define SOFTPC_DIB_PALETTE_HISTORY 8u
-static RGBQUAD softpc_dib_palette_history[SOFTPC_DIB_PALETTE_HISTORY][16];
-static unsigned long softpc_dib_palette_history_count;
+static unsigned long softpc_dib_palette_updates;
 
 static void softpc_standalone_dib_set_default_geometry(void)
 {
@@ -56,17 +54,11 @@ static void softpc_standalone_dib_set_default_geometry(void)
 
 static void softpc_standalone_dib_record_palette(void)
 {
-    unsigned long slot = softpc_dib_palette_history_count %
-        SOFTPC_DIB_PALETTE_HISTORY;
-
-    if (softpc_dib_info == NULL) return;
-    lib_memory_copy(softpc_dib_palette_history[slot], softpc_dib_info->bmiColors,
-        sizeof(softpc_dib_palette_history[slot]));
-    softpc_dib_palette_history_count++;
+    ++softpc_dib_palette_updates;
     if (getenv("SOFTPC_PALETTE_TRACE") != NULL) {
-        const RGBQUAD *palette = softpc_dib_palette_history[slot];
+        const RGBQUAD *palette = softpc_dib_info->bmiColors;
         fprintf(stderr, "softpc palette[%lu] 1=%02x%02x%02x 4=%02x%02x%02x\n",
-            softpc_dib_palette_history_count - 1u,
+            softpc_dib_palette_updates - 1u,
             (unsigned int)palette[1].rgbRed,
             (unsigned int)palette[1].rgbGreen,
             (unsigned int)palette[1].rgbBlue,
@@ -484,12 +476,6 @@ void softpc_standalone_dib_set_palette_entries(const PALETTEENTRY *entries,
     softpc_standalone_dib_damage_all();
 }
 
-unsigned long softpc_standalone_dib_palette_history(const RGBQUAD **entries)
-{
-    if (entries == NULL) return 0u;
-    *entries = &softpc_dib_palette_history[0][0];
-    return softpc_dib_palette_history_count;
-}
 int softpc_standalone_dib_take_dirty(long *left, long *top, long *right,
     long *bottom)
 {

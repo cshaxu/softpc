@@ -20,7 +20,6 @@
 
 #define KBUFFER_SIZE 1024
 #define HIGH_WATER 1020
-#define DIRECT_ACCESS_HIGH_WATER 1020
 #define SOFTPC_LPT_OUTPUT_PATH_MAX 1024
 
 typedef struct {
@@ -187,8 +186,7 @@ static SHORT host_lpt_open(int adapter, boolean direct_access)
         }
     }
     lpt->bytes_in_buffer = 0;
-    lpt->flush_threshold = direct_access ? DIRECT_ACCESS_HIGH_WATER :
-        HIGH_WATER;
+    lpt->flush_threshold = HIGH_WATER;
     lpt->port_status = 0;
     lpt->inactive_counter = 0;
     lpt->inactive_trigger = 0;
@@ -242,7 +240,7 @@ boolean host_set_lpt_direct_access(int adapter, boolean direct_access)
 
 UCHAR host_read_printer_status_port(int adapter)
 {
-    if (!host_set_lpt_direct_access(adapter, TRUE)) return 0;
+    (void)host_set_lpt_direct_access(adapter, TRUE);
     return 0;
 }
 

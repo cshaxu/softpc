@@ -111,23 +111,20 @@ static int softpc_gfi_transfer(softpc_gfi_image_drive *drive,
     unsigned int head = get_c0_hd(command);
     unsigned int sector = get_c0_sector(command);
     unsigned int size_code = get_c0_N(command);
-    unsigned int sector_bytes;
+    const unsigned int sector_bytes = SOFTPC_GFI_SECTOR_BYTES;
     unsigned int count;
     unsigned int index;
-    char buffer[8192];
+    char buffer[SOFTPC_GFI_SECTOR_BYTES];
 
     /* A raw .img medium is an IBM 512-byte sector stream.  Unlike a
        controller image, it has no per-sector size metadata, so accepting a
        different N here would misaddress the file. */
     if (size_code != 2u) return 0;
-    sector_bytes = 128u << size_code;
-    if (sector_bytes > sizeof(buffer) ||
-        drive->medium == NULL ||
+    if (drive->medium == NULL ||
         cylinder >= drive->cylinders || head >= drive->heads ||
         sector == 0u || sector > drive->sectors) return 0;
     dma_enquire(DMA_DISKETTE_CHANNEL, &ignored_address, &dma_count);
     count = ((unsigned int)dma_count + 1u + sector_bytes - 1u) / sector_bytes;
-    if (count == 0u) count = 1u;
     for (index = 0u; index < count; ++index) {
         unsigned int current_sector = sector + index;
         unsigned long offset;
@@ -165,17 +162,16 @@ static int softpc_gfi_format(softpc_gfi_image_drive *drive,
 {
     unsigned int cylinder = drive->cylinder;
     unsigned int head = get_c3_head(command);
-    unsigned int sector_bytes;
+    const unsigned int sector_bytes = SOFTPC_GFI_SECTOR_BYTES;
     unsigned int count = get_c3_SC(command);
     unsigned int index;
     char id[4];
-    char filler[8192];
+    char filler[SOFTPC_GFI_SECTOR_BYTES];
 
     if (drive->medium == NULL ||
-        drive->mode == LIB_STORAGE_MEDIUM_READONLY || get_c3_N(command) > 6u)
+        drive->mode == LIB_STORAGE_MEDIUM_READONLY || get_c3_N(command) != 2u)
         return 0;
-    sector_bytes = 128u << get_c3_N(command);
-    if (sector_bytes != SOFTPC_GFI_SECTOR_BYTES || count == 0u ||
+    if (count == 0u ||
         count > drive->sectors || cylinder >= drive->cylinders ||
         head >= drive->heads)
         return 0;
@@ -265,9 +261,7 @@ static SHORT softpc_gfi_command(FDC_CMD_BLOCK *command,
     }
 }
 
-static SHORT softpc_gfi_drive_on IFN1(UTINY, drive)
-{ UNUSED(drive); return SUCCESS; }
-static SHORT softpc_gfi_drive_off IFN1(UTINY, drive)
+static SHORT softpc_gfi_drive_idle IFN1(UTINY, drive)
 { UNUSED(drive); return SUCCESS; }
 static SHORT softpc_gfi_high IFN2(UTINY, drive, half_word, rate)
 { UNUSED(drive); UNUSED(rate); return SUCCESS; }
@@ -296,8 +290,8 @@ static SHORT softpc_gfi_reset IFN2(FDC_RESULT_BLOCK *, result, UTINY, drive)
 static void softpc_gfi_install(UTINY drive)
 {
     gfi_function_table[drive].command_fn = softpc_gfi_command;
-    gfi_function_table[drive].drive_on_fn = softpc_gfi_drive_on;
-    gfi_function_table[drive].drive_off_fn = softpc_gfi_drive_off;
+    gfi_function_table[drive].drive_on_fn = softpc_gfi_drive_idle;
+    gfi_function_table[drive].drive_off_fn = softpc_gfi_drive_idle;
     gfi_function_table[drive].reset_fn = softpc_gfi_reset;
     gfi_function_table[drive].high_fn = softpc_gfi_high;
     gfi_function_table[drive].drive_type_fn = softpc_gfi_drive_type;

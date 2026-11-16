@@ -548,9 +548,9 @@ Prefer original functionality when equivalent, but do not increase mirror diff
 or silently undo S4-approved boundaries. Needed platform/ABI/failure handling
 remains even without a recorded customer failure.
 
-This admission starts investigation and review, not unreviewed wholesale deletion.
+Owner subsequently authorizes continuous execution across the frozen inventory.
 Proceed in frozen order; dependent-file reads do not advance their audit status.
-Present each reviewed file's findings before semantic implementation. Approved
+Record each reviewed file's evidence before semantic implementation. Proven
 changes receive cached dual builds, relevant/full regression and publication as
 required, actual-diff review and commit/push. Audit-only work gets documentation,
 whitespace and inventory checks; never invent new runtime results. Completion

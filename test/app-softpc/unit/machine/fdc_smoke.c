@@ -306,6 +306,13 @@ int main(void)
     put_c3_N(format_command, 2u);
     put_c3_SC(format_command, 1u);
     put_c3_filler(format_command, 0xe5u);
+    for (unsigned n = 0u; n <= 255u; ++n) {
+        if (n == 2u) continue;
+        put_c3_N(format_command, n);
+        assert(gfi_fdc_command(format_command, format_result) == SUCCESS);
+        assert(get_r1_ST1_no_data(format_result) != 0u);
+    }
+    put_c3_N(format_command, 2u);
     assert(gfi_fdc_command(format_command, format_result) == SUCCESS);
     assert(get_r0_ST0(format_result) == 0u);
     assert(get_r0_ST1(format_result) == 0u);

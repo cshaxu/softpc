@@ -165,7 +165,6 @@ static lib_status capture_slot(media_slot *slot, const softpc_media_view *view)
     lib_memory_copy(slot->path, view->path, lib_text_length(view->path) + 1u);
     size = lib_storage_medium_byte_count(source); slot->size = size;
     if (view->mode == LIB_STORAGE_MEDIUM_OVERLAY) {
-        if (view->path == NULL) return LIB_STATUS_INVALID_ARGUMENT;
         status = lib_storage_medium_open(view->path, LIB_STORAGE_MEDIUM_READONLY, &base);
         if (status != LIB_STATUS_OK) return status;
         if (lib_storage_medium_byte_count(base) != size) {

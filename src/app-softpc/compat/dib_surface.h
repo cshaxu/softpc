@@ -45,7 +45,6 @@ int softpc_standalone_text_surface_write_cell(unsigned long column,
     unsigned long row, unsigned long byte_offset, unsigned char value);
 void softpc_standalone_dib_set_palette_entries(const PALETTEENTRY *entries,
     int count);
-unsigned long softpc_standalone_dib_palette_history(const RGBQUAD **entries);
 int softpc_standalone_dib_take_dirty(long *left, long *top, long *right,
     long *bottom);
 void softpc_standalone_dib_invalidate_all(void);

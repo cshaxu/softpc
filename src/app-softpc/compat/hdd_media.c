@@ -74,12 +74,7 @@ int softpc_platform_hdd_attach(const char *hard_disk_path, lib_storage_medium_mo
        Removable media is attached separately through original FLA/GFI/FDC. */
     if (!softpc_hdd_attach_media(&softpc_hdd_media[0], hard_disk_path, mode))
         return 0;
-    if (!softpc_hdd_attach_media(&softpc_hdd_media[1], NULL, mode))
-    {
-        lib_storage_medium_destroy(&softpc_hdd_media[0].medium);
-        softpc_hdd_media[0].path[0] = '\0';
-        return 0;
-    }
+    (void)softpc_hdd_attach_media(&softpc_hdd_media[1], NULL, mode);
     return 1;
 }
 

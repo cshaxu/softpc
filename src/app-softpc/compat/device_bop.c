@@ -6,6 +6,7 @@
 #include "sas.h"
 #include TypesH
 #include CpuH
+#include <stdio.h>
 
 
 /*
@@ -96,4 +97,13 @@ void softpc_device_bop_register_machine_services IFN0()
     BIOS[0x90] = bootstrap1;
     BIOS[0x91] = bootstrap2;
     BIOS[0x92] = bootstrap3;
+}
+/* C4 C5..C7 has no provider in the selected firmware. Keep the original
+ * executor contract explicit rather than dispatching an unsupported service. */
+void EDL_fast_bop(unsigned long immediate)
+{
+    fprintf(stderr,
+        "SoftPC: unsupported fast BOP 0x%08lx from this firmware profile\n",
+        immediate);
+    abort();
 }

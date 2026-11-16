@@ -12,7 +12,10 @@ including native desktop/audio/package. Owner accepted P3 and requested the next
 file. P5 corrects audio.h ownership wording and removes platform.c's unused
 include: production +2/-3,net-1; no test/mirror/API changes. Cached dual full
 builds/publication and392/392 tests passed; self-review passed. Mirror-header
-warnings only. Delivery awaits acceptance.2/50 files reviewed,48 remain.
+warnings only. Owner accepts continued execution. P6 reviews all50 files and delivers
+production +27/-70,net-43, one source file removed; tests +7/-0. Both cached
+builds/publication and392/392 full tests pass. Zero non-mirror warnings. Four
+bounded follow-ups remain for P7; see the evidence plan. T100/S5 stay open.
 
 The following admissions are retained historical records, not active work.
 
@@ -96,20 +99,20 @@ restoration candidate is withdrawn; no production change was made.
 | Field | Required record |
 | --- | --- |
 | Identifier Mode | Continuation |
-| Admission And Approval | Owner admits a new S auditing Compat in fixed dir order to reduce code/file/line count. P3 owner approves the audio.c candidate and its existing regression adaptations; P5 approves audio.h ownership comment and unused platform.c include removal; no blanket semantic rewrite approval. |
+| Admission And Approval | Owner admits a new S auditing Compat in fixed dir order to reduce code/file/line count. P3 owner approves the audio.c candidate and its existing regression adaptations; P5 approves audio.h ownership comment and unused platform.c include removal; Owner now authorizes continuous ordered audit and evidence-backed behavior-preserving simplification across all Compat, with batched complete deliveries; do not stop for per-file approval. |
 | Objective | Audit every frozen Compat file for unnecessary code, duplicated owners/paths, thin wrappers and coherent file consolidation; favor fewer concepts and actual repository-wide reduction. |
 | Non-goals | No guest/configuration/media changes; no mirror diff growth, shared-package changes, new framework, alias, polling or second path merely to shrink Compat. No performance claims without measurement. |
 | Reference Baseline | SoftPC2464862d; existing in-tree XP mirror is comparison material, not a new import. |
 | Candidate Proposal | [S5 ordered Compat audit](../proposals/m9-xp-mirror-original-first-audit.md#s5-ordered-compat-simplification-audit). |
-| Files And ABI Surface | src/app-softpc/compat plus read-only caller/build/test inspection. Proposed interface or source changes must identify all consumers before implementation. |
+| Files And ABI Surface | src/app-softpc/compat plus read-only caller/build/test inspection. Approved changes must identify all consumers before implementation; evidence-backed mirror diff reduction is allowed without adding a second path. |
 | Applicable Rules | docs/README.md reading set; execution, architecture, coding, documentation and source policies. |
 | Verification | Frozen dir order, hashes and tracked-file equality; per-file real callers and ownership proof. Documentation-only checks now; approved implementation uses cached dual builds and proportional/full regression, publication and review. |
 | Expected Markers | Every file has ordinal, lines/hash, finding, evidence and status; no missing file hidden by traversal changes. |
-| Asset Needs | Preserve assets/INI/media. If needed S5 owns only build/t100-s5, two-hour total and fifteen-minute no-progress budgets; hidden background jobs and delivery cleanup. P3 owns scratch until delivery cleanup. |
+| Asset Needs | Preserve assets/INI/media. If needed S5 owns only build/t100-s5, two-hour total and fifteen-minute no-progress budgets; hidden background jobs and delivery cleanup. Each batch owns scratch until delivery cleanup. |
 | Reporting Requirements | Per-file purpose, consumers, removable/merge candidates, exact or explicitly estimated source/test/file delta, mirror impact and proof limits. |
 | Stop Conditions | Unproved equivalence is an investigation item; do not remove required failure handling or add mirror differences to improve Compat metrics. |
 | Exit Criteria | Every frozen file reviewed and dispositioned; owner-approved changes qualified and delivered, unresolved candidates explicitly decided; self-review and clean workspace before owner closure. |
-| Original Owner Request | 现在准入一个新s 按照dir固定顺序审计compat 目标是精简compat代码规模 减少文件数和行数。 |
+| Original Owner Request | 现在准入一个新s 按照dir固定顺序审计compat 目标是精简compat代码规模 减少文件数和行数。追加：自行设定目标连续执行，统一架构，尽可能减少 Compat 自主实现 footprint；有证据时顺带减少镜像 diff。 |
 | Similar-Issue Sweep | Trace matching redundancy across consumers without advancing unreviewed file status; distinguish original required adaptation from accidental duplication. |
 
 ## Current Technical Baseline

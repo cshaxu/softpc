@@ -9,7 +9,8 @@ Frozen50 files,8957 physical lines (including comments/blanks), all
 tracked files under src/app-softpc/compat. Source of order is literal Windows
 dir /a /b /s output with directory entries filtered; no sorting. The
 [file ledger](m9-t100-s5-compat-files.tsv) includes sizes,
-hashes and per-file status. Frontier: file1 audio.c source review complete, candidate awaiting owner decision;49 files pending.
+hashes and per-file status. Current progress is recorded in the latest P entry
+below; earlier frontiers and approval requests are historical.
 No production/test/configuration/artifact changes in admission P1.
 
 ## File1 audio.c: preliminary source findings
@@ -235,3 +236,113 @@ owner acceptance,48 files still pending; platform.c remains pending full review.
 P5 softpc32.exe SHA-256: `a13e4b002193c8e8898fe56b8cecdab9d001f20ebdf82fbe7eba2ebe925396f0`.
 
 P5 softpc64.exe SHA-256: `034d4eafbdb53b044802d68d806cd4944e4dffbfd785985fbc5f1766a1799b1a`.
+
+## P6: continuous ordered audit and first reduction batch
+
+Owner authorizes autonomous, evidence-backed simplification of all Compat.
+Baseline7a743d5e. No mirror/shared-package/configuration/media/schema changes.
+The following ordered source review records minimum responsibilities, not a
+claim that every guest/platform scenario has been dynamically exercised.
+
+| Order | File | Minimum responsibility and disposition |
+| --- | --- | --- |
+| 3 | conapi.h | Retain original nt_graph/nt_cga/nt_ega/nt_vga API redirection to the detached surface. Real host Console calls are not equivalent. |
+| 4 | device_bop.c | Retain original BIOS table registration; consolidate the separate unsupported fast-BOP endpoint here. Test-only dispatch wrapper is a follow-up removal candidate. |
+| 5 | dib_surface.c | Retain surface ownership, monochrome conversion, update transaction and body-ready generation. Delete unconsumed palette history; preserve existing trace output from the current palette. |
+| 6 | dib_surface.h | Remove unused history declaration; retain actual original painter and machine interfaces. |
+| 7 | edl_fast_bop.c | Merge unchanged failure behavior into device_bop.c and remove the source/build entry. Original CCPU still needs the symbol. |
+| 8 | eoi.c | Retain original PIC/SB callback registration and delayed IRQ ownership; cancellation and serialized IDs are distinct obligations. |
+| 9 | eoi.h | Retain declarations consumed by original PIC/SB and archive glue. |
+| 10 | gfi_image.c | Retain raw-medium adapter under original FLA/GFI/FDC. Use existing 512-byte format invariant for buffers/checks; unify identical motor callbacks. |
+| 11 | graphics_console_compat.c | Retain logical Console geometry and original painter adaptation; replacing it with the current presentation surface conflates distinct state. |
+| 12 | hdd_media.c | Retain original fixed-disk transport and CHS addressing. Remove impossible failure rollback when initializing the explicitly empty second slot. |
+| 13 | hdd_media.h | Retain narrow media attachment declarations used by platform and snapshot. |
+| 14 | keyboard.c | Retain original keyboard callback table and key translation. Empty callbacks have different signatures and are not merged. |
+| 15 | media_snapshot.c | Retain medium identity, overlay payload and transactional validation. Remove repeated path-null check after unconditional validation. |
+| 16 | media_snapshot.h | Retain copied-media archive boundary used by machine snapshot. |
+| 17 | memory.c | Retain SAS RAM lifetime and physical-access adapter; direct memory copying would bypass original SAS semantics. |
+| 18 | mirror_types.h | Retain original insignia declarations and removal of its pre-ANSI const macro. |
+| 19 | nt_graph.h | Retain selected single-executor graphics mutex/header adaptation; no second rendering owner. |
+| 20 | parallel.c | Retain partial-write buffering and snapshot restrictions. Unify identical thresholds and remove branch with identical result; preserve direct-access state. |
+| 21 | platform.c | Retain clock/pending-event distinction and joined lifecycle. Delete never-read interrupt counter; actual CCPU interrupt remains. |
+| 22 | platform.h | Retain machine-facing lifecycle/media/video declarations; no independent implementations. |
+| 23 | sb_midi.c | Retain native-output ownership, cancellation coordination and optional device-wide volume restoration. It is not PC speaker synthesis. |
+| 24 | sb_midi.h | Retain original SB MIDI host-boundary declarations. |
+| 25 | sb_pcm.c | Retain unsigned-8 to signed-16 conversion, gain and completion/cancellation adapter; raw Lib stream calls are not equivalent. |
+| 26 | sb_pcm.h | Retain original DSP host-output declarations. |
+| 27 | serial.c | Retain UART host endpoint and immediate byte-output semantics. COM/LPT merging would conflate different buffering, flush and archive contracts. |
+| 28 | snapshot_stream.c | Retain explicit little-endian field encoding and callback failures; raw struct serialization is not an equivalent reduction. |
+| 29 | snapshot_stream.h | Retain shared byte-stream contract for CPU/device/media archives. |
+| 30 | v7_pointer.c | Retain original-controller pattern compositing, clipping and generation-checked save-under. Follow-up: replace restore's inner byte loop with existing memory copy per row. |
+| 31 | video.c | Retain original font banks, underline/cursor state and presentation rebuild; no alternate video-device authority. |
+| 32 | bios/host_def.h | Retain selected original-reset LIM header override; removing it changes original reset compilation. |
+| 33 | ccpu/abi.h | Retain original accessor widths/signatures at the CCPU boundary; avoids leaking original CPU macros into driver. |
+| 34 | ccpu/archive.c | Retain captured CPU/RAM/TLB/FPU state and explicit encoding. Follow-up: private field functions redundantly recheck nonnull embedded state after public validation. |
+| 35 | ccpu/archive.h | Retain archive ownership used by machine save/load/checkpoint. |
+| 36 | ccpu/cfpu_def.h | Retain native floating-point environment adaptation required by original FPU. |
+| 37 | ccpu/facade.c | Retain original video installation and address/descriptor accessor glue; no duplicate CPU implementation. |
+| 38 | ccpu/lifecycle.c | Retain original simulation-depth authority, TLS checkpoint and atomic exit handoff. No second depth counter to remove. |
+| 39 | ccpu/lifecycle.h | Retain actual original CCPU and driver lifecycle declarations. |
+| 40 | ccpu/snapshot.h | Retain fixed-width copied CPU state, distinct from padded native structs and on-disk encoding. |
+| 41 | cmos/port.h | Retain fixed-disk topology query consumed by original CMOS. |
+| 42 | cvidc/gdp_rule_access.h | Retain generated-rule address translation boundary for native pointer width. |
+| 43 | cvidc/gdp_slots.h | Retain uniform generated GDP macro overrides; partial removal would restore fixed-base accesses for some fields. No new generator/framework. |
+| 44 | cvidc/gdp_state.c | Retain stable separately allocated native slots and original-offset mapping to shared VGA fields. Reallocating a flat byte array would invalidate retained pointers. |
+| 45 | cvidc/gdp_state.h | Retain GDP ownership and slot declarations consumed by original C-VID glue. |
+| 46 | devices/archive.c | Retain callback IDs, ordered device restore and fixed-width field map. Follow-up: queue write traversal can use the read side's existing quick-then-tick traversal shape. |
+| 47 | devices/archive.h | Retain opaque device archive ownership; do not expose legacy pointer-bearing state. |
+| 48 | devices/snapshot.h | Retain explicit controller transfer records and archive hooks; native layouts are not portable snapshot bytes. |
+| 49 | keymouse/cpu4.h | Retain original keyboard's interrupt-map accessor and selected reset bit boundary. |
+| 50 | system/error.h | Retain original Base error-header lookup despite colliding NT header guard; no independent error framework. |
+
+P6 source changes: +27/-70,net-43 and one source file removed. Build source list
+-1 line; existing FDC fixture +7 lines checks every byte-sized N except2 returns
+no-data before retaining normal format/readback. Each transfer/format stack
+buffer falls from8192 to512 bytes. Removed palette storage is512 bytes; trace
+sequence/output remains. No whole-program performance claim.
+
+Proof: transfer already rejects N!=2; format's previous N<=6 then128<<N==512
+admits only2. DMA count is16-bit, so ceil((count+1)/512) is always1..128.
+The two GFI motor callbacks have identical signatures/body and only invocation
+consumers. Empty HDD attach resets the slot and returns1 before I/O. Media path
+is checked before copying. LPT thresholds are both1020. The interrupt counter
+has no read. Repository search finds no palette-history consumer. Fast-BOP
+symbol, argument, diagnostic and abort are unchanged after relocation.
+
+P6 validation completed: cached x86/x64 builds and publication pass; each
+architecture passes188 background plus8 native tests,392/392 first run, no
+retries/skips. Background elapsed185.89s/190.11s; native24.58s/24.05s. Both
+builds emit358 warnings, all unchanged mirror headers, zero non-mirror warnings.
+Published timestamps: x86 Nov15 2026 20:59:59; x64 Nov15 2026 21:03:24.
+Actual-diff self-review confirms the evidence above, no additional state or
+production path, no weakening of meaningful I/O failure handling. Documentation
+and whitespace checks pass. This does not claim new manual guest verification.
+
+### Remaining bounded implementation plan
+
+P7 will finish the four follow-up rows after P6 delivery. No second dispatcher,
+test helper, archive interpreter or renderer will be added:
+
+- device_bop.c: delete the test-only dispatch function. Existing bop_smoke and
+  vga_frame_smoke invoke the original BIOS table directly; absent-selector tests
+  assert the table entry is null. Guest dispatch remains in original CCPU.
+- v7_pointer.c: replace the restore-only inner byte loop with one memory copy
+  per clipped row; retain generation, dimensions, saved row stride and dirty
+  rectangle. Paint's mask/XOR operation still requires its pixel loop.
+- ccpu/archive.c: remove ten private embedded-state null checks. Public read/
+  write validation dominates every sole call; all serialized-content checks and
+  callback failures remain. Do not unify capture and restore order.
+- devices/archive.c: queue writing uses the same quick-then-tick iteration
+  shape already used when reading. Remove private map argument rechecks whose
+  only calls pass embedded archive fields, static maps and validated callbacks.
+
+Expected production reduction roughly35-45 lines, no added files, no schema/
+mirror/shared change. Existing BOP/VGA/frame/queue/archive and transaction
+regressions will run in the complete dual-architecture suite. The692 generated
+GDP overrides were structurally checked: every definition is paired with its
+undef and uses the sole slot allocator, with no exceptional body. Uniform ABI
+mapping remains; removing unused names alone would leave mixed representations.
+
+P6 softpc32.exe SHA-256: `5ee5049e057cec3dc61c2162a5ca62a5d589bd95abff02b8ad3dc3e245d378bb`.
+
+P6 softpc64.exe SHA-256: `a18a2b79461fc72e187cc19f08abffd676aeba352e4b367482be2c679cd6c8d5`.

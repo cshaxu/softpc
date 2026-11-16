@@ -241,7 +241,6 @@ add_library(softpc-machine-devices OBJECT
     src/app-softpc/softpc.new/host/src/nt_munge.c
     src/app-softpc/softpc.new/host/src/nt_cga.c
     src/app-softpc/softpc.new/host/src/nt_vga.c
-    src/app-softpc/compat/edl_fast_bop.c
     src/app-softpc/compat/graphics_console_compat.c
     src/app-softpc/compat/dib_surface.c
     src/app-softpc/compat/video.c
