@@ -556,3 +556,98 @@ required, actual-diff review and commit/push. Audit-only work gets documentation
 whitespace and inventory checks; never invent new runtime results. Completion
 requires every ledger row to have evidence and final disposition, and all approved
 implementation candidates to be qualified or explicitly deferred by the owner.
+
+## S6 Monitor argument ownership
+
+Original admission: 准入S6修复路径引号解析，save/load这些类似的路径入口也一起审计，极简统一处理，补必要测试。引号内就允许空格的存在了。老规矩编译双EXE、发布、全量测试、提交推送、自审后等我验收。
+Owner amendment: 统一由 Emulator Monitor 解析参数，不再让各 App 命令重复处理引号。
+Owner clarification: x86-debug和emulator组件仍然各自负责解析各自的参数列表。
+
+Baseline e3e75612. The owner supersedes the initial App-level solution: Monitor
+owns all lexical splitting; App owns argument counts, keywords and business
+meaning. DEBUG retains its own parser. INI changes from the initial solution are
+withdrawn. In-flight old-plan jobs finished without interruption; their passed
+results are not qualification of this new ABI. One old-plan config expectation
+missed the changed filename and was corrected/retested; that fixture edit is now
+also withdrawn with INI changes.
+
+Design: one bounded 1024-byte Monitor copy, at most 512 word pointers, no heap or
+per-argument allocation. The complete line is parsed before dispatch. The fixed
+callback receives a counted read-only argument view; extension receives name and
+the same view. Borrowed strings/view live until synchronous callback return;
+retaining consumers must copy. Existing synchronous snapshot I/O finishes before
+the callback returns. No queues/threads change. The old public raw-tail parser is
+removed, not wrapped. Space/Tab delimit tokens, whole double quotes preserve
+bytes, empty quotes are an empty argument, malformed/concatenated quotes reject
+without partial dispatch. Unquoted spaces now separate arguments deliberately.
+
+Estimate before implementation: production +100..150/-120..170; tests
++100..160/-60..100. Remove App splitting/unquoting/line-copy paths and the INI
+helper exposure; retain file cleanup, failure protection and command state rules.
+
+### Finite entry and migration audit
+
+Coverage unit: host file-path grammar plus every Monitor callback/parser consumer.
+Complete when each row has implementation/disposition and test proof. This is
+not an audit of guest DOS filename syntax or external downstream applications.
+
+| Entry | Owner and disposition | Proof |
+| --- | --- | --- |
+| All Monitor commands | Emulator Product lexes once; no raw-tail fallback. | Existing Monitor test covers both callbacks, whitespace, UTF-8, empty arguments, invalid quotes/concatenation, capacity and no effects. |
+| X86 IBMPC routing | Monitor complete-line input retained; callbacks forward name/list without parsing. | Existing command fixture receives spaced paths and mode tokens. |
+| App floppy | Counts/keywords/mode/nonempty path only. Existing case-insensitive keywords retained. | Extension test runs real Monitor dispatch, all three modes and exact UTF-8 path bytes. |
+| App save/load | Exactly one nonempty path; existing state and file ownership/protection retained. | Monitor to App to real Storage roundtrip using space/CJK/emoji filename; capture/open failures and invalid-argument no-effects. |
+| DEBUG N/L/W | Own tokenizer/string decoder; quoted N reuses scanlist. | Real W/L roundtrip and rejected names preserve previous selection. |
+| INI disk/COM/LPT | Existing private configuration grammar unchanged. | Original config tests retained. |
+| Startup | Adjacent INI, no argv command grammar. | Product source/UI contract. |
+
+Search monitor_parse, submit_fixed, submit_extension, submit_snapshot and
+command_extension_submit across src/test; changed consumers are Monitor tests,
+X86 IBMPC command/tests and App extensions/tests. Review Storage open call sites
+in App Product and DEBUG; neither file API nor mirror changes. No NXVM reads,
+changes or synchronization claim. Shared manifests accompany changed corpora.
+
+### S6 P1 delivery evidence
+
+Final cached Ninja/ccache builds publish both EXEs. x86 and x64 each pass all
+188 background tests and all eight native tests (five desktop, three audio):
+392/392. Final full-suite runs have no failures. Background elapsed: x86 182.70s,
+x64 194.32s; native elapsed: x86 24.38s, x64 24.29s. Final compilation has zero
+warnings/errors. Publication verifies embedded build timestamps: x86 Nov 18 2026
+21:34:07; x64 Nov 18 2026 21:37:17. A final test-only addition asserts successful
+uppercase FLOPPY EJECT, alongside existing extra-argument rejection; only that
+target was rebuilt and retested on both architectures, 1/1 each, with no EXE change.
+
+Against e3e75612, git diff --numstat on tracked C/H reports production +110/-119,
+net -9 (App extensions, Emulator monitor C/H, X86 IBMPC command C/H, DEBUG command).
+Tests +153/-75, net +78 (App extensions and three owning shared command fixtures).
+Root CMake +2/-2 removes the config test-source dependency and links the existing
+Emulator Product target for real Monitor dispatch. Metadata/docs/manifests and
+binary artifacts are excluded from source/test counts. Mirror diff is unchanged.
+
+Self-review checked actual source/test diffs: one lexer and dispatch path;
+whole-line validation before side effects; pointer-array bound derived from the
+1023-byte limit; borrowed view lifetime; callback forwarding without copies;
+case-preserving arguments; App count/mode/state validation; existing deferred
+snapshot writer/reader cleanup and error behavior; DEBUG bounded decode without
+replacing the previous filename on failure. Near-capacity token input, malformed
+quotes, all media modes, normal eject, extra arguments and file roundtrips pass.
+Source/test LF, all changed shared manifests, dependency/naming/boundary and
+documentation gates pass. No new test API, allocation framework, compatibility
+callback or thread/queue change. Existing separate package-startup TODO remains
+unproven; this passing run does not resolve it.
+
+Downstream migration: fixed and snapshot callbacks replace raw tail strings with
+const emulator_product_monitor_arguments pointers. Extension callbacks replace
+raw lines with command name plus that view. Validate counts/keywords, do not parse
+quotes again, and copy values if retaining beyond the callback. The old public
+monitor_parse API is gone. Import Emulator, X86 IBMPC and DEBUG source/test corpora
+with their manifests; adapt external App callbacks. NXVM was neither read nor
+updated. No manual guest/media roundtrip is claimed beyond recorded automated
+regressions; user acceptance remains pending.
+
+Artifact SHA-256:
+- softpc32.exe: B11C4719CD779A608EF55E3F57663145912C3DB7EE9F7F2C721F19B07C960F94
+- softpc64.exe: 0DE1F625928133B2C7828D219482286BD043A24FB27E8343AC905676E5755B3B
+
+S6 is verified and awaits owner acceptance after commit/push. T100 remains open.

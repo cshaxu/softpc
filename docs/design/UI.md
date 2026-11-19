@@ -17,6 +17,18 @@ small fixed command set:
 - `help` and `exit` are local monitor commands.
 - `debug` enters the debugger CLI without changing machine state.
 
+Monitor splits all commands into arguments once, using space and Tab outside
+whole double-quoted arguments. Repeated separators produce no empty arguments;
+`""` produces one empty argument. Quoted bytes retain spaces, case, backslashes
+and UTF-8; there is no escaping or expansion. Unclosed quotes, quotes embedded
+in bare arguments and `"abc"def` concatenation reject the entire line before
+any command callback. Unquoted spaces separate arguments, never a joined path.
+`save`/`load` require one nonempty path; `floppy insert` requires mode and
+nonempty path after the operation; `floppy eject` accepts no further arguments.
+DEBUG keeps its independent single-token/quoted-string grammar. Its `N` command
+preserves quoted filename case and spaces for subsequent `L`/`W` operations.
+INI retains its separate configuration grammar.
+
 Commands enqueue requests and receive a published result. They never directly
 call a CPU, controller, BOP, or renderer function.
 

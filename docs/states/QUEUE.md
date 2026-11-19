@@ -13,8 +13,8 @@ allocates a numeric task identifier.
 
 T100 remains open after owner closure of S5. Its mirror review is
 retained in the [T100 proposal](../proposals/m9-xp-mirror-original-first-audit.md#remaining-work-after-s3-owner-closure),
-completed through S4; S5 Compat simplification is also closed. No next S is
-admitted. This is not another T candidate.
+completed through S4; S5 Compat simplification is also closed. S6 quoted-path repair is
+admitted in CURRENT. This is not another T candidate.
 
 Owner closes Td S22 [build-cache governance](../history/M9-Td-S22-build-cache-governance.md).
 It is not an outstanding candidate or active task.

@@ -3,9 +3,6 @@
 #include "lib/storage/file_interface.h"
 
 #include "extensions.h"
-#include "config.h"
-
-#define SOFTPC_EXTENSION_PATH_CAPACITY 1024u
 
 static void softpc_extension_message(emulator_session_command_result *out,
     const char *message)
@@ -20,38 +17,14 @@ static const emulator_product_help_row softpc_extension_help[] = {
     {"floppy eject", "eject drive A media while stopped/paused"}
 };
 
-static char *softpc_extension_trim(char *text)
+static lib_bool softpc_extension_keyword(const char *text, const char *word)
 {
-    char *end;
-
-    while (*text == ' ' || *text == '\t') ++text;
-    end = text + lib_text_length(text);
-    while (end != text && (end[-1] == ' ' || end[-1] == '\t')) --end;
-    *end = '\0';
-    return text;
-}
-
-static void softpc_extension_lower(char *text)
-{
-    while (*text != '\0') {
-        if (*text >= 'A' && *text <= 'Z')
-            *text = (char)(*text + ('a' - 'A'));
-        ++text;
+    while (*text != '\0' && *word != '\0') {
+        char value = *text++;
+        if (value >= 'A' && value <= 'Z') value = (char)(value + ('a' - 'A'));
+        if (value != *word++) return LIB_FALSE;
     }
-}
-
-static lib_bool softpc_extension_split(char *text, char **out_command,
-    char **out_arguments)
-{
-    char *arguments = text;
-
-    while (*arguments != '\0' && *arguments != ' ' && *arguments != '\t')
-        ++arguments;
-    if (*arguments != '\0') *arguments++ = '\0';
-    *out_command = text;
-    *out_arguments = softpc_extension_trim(arguments);
-    softpc_extension_lower(*out_command);
-    return **out_command != '\0';
+    return *text == '\0' && *word == '\0';
 }
 
 typedef struct softpc_snapshot_output {
@@ -139,77 +112,68 @@ static void softpc_extension_load(emulator_machine *machine,
 }
 
 static void softpc_extension_floppy(emulator_machine *machine,
-    emulator_session_machine_state state, char *arguments,
+    emulator_session_machine_state state,
+    const emulator_product_monitor_arguments *arguments,
     emulator_session_command_result *out)
 {
-    char *operation;
-    char *rest;
-    char *mode;
-    lib_storage_medium_mode medium_mode;
+    lib_storage_medium_mode mode;
+    const char *const *values = arguments->values;
 
     if (state == EMULATOR_SESSION_MACHINE_RUNNING) {
         softpc_extension_message(out, "Cannot change floppy media now.");
         return;
     }
-    if (!softpc_extension_split(arguments, &operation, &rest)) {
-        softpc_extension_message(out,
-            "Usage: floppy insert <readonly|direct|overlay> <image> | eject");
-        return;
-    }
-    if (lib_text_compare(operation, "eject") == 0 && *rest == '\0') {
+    if (arguments->count == 1u && softpc_extension_keyword(values[0], "eject")) {
         softpc_extension_message(out,
             emulator_machine_set_removable_media(machine, LIB_NULL,
                 LIB_STORAGE_MEDIUM_OVERLAY) ? "Floppy ejected." : "Cannot eject floppy.");
         return;
     }
-    if (lib_text_compare(operation, "insert") != 0 ||
-        !softpc_extension_split(rest, &mode, &rest) || *rest == '\0' ||
-        !app_parse_media_mode(mode, &medium_mode)) {
-        softpc_extension_message(out,
-            "Usage: floppy insert <readonly|direct|overlay> <image> | eject");
-        return;
-    }
+    if (arguments->count != 3u || !softpc_extension_keyword(values[0], "insert") ||
+        *values[2] == '\0') goto usage;
+    if (softpc_extension_keyword(values[1], "readonly")) mode = LIB_STORAGE_MEDIUM_READONLY;
+    else if (softpc_extension_keyword(values[1], "direct")) mode = LIB_STORAGE_MEDIUM_DIRECT;
+    else if (softpc_extension_keyword(values[1], "overlay")) mode = LIB_STORAGE_MEDIUM_OVERLAY;
+    else goto usage;
     softpc_extension_message(out,
-        emulator_machine_set_removable_media(machine, rest, medium_mode) ?
+        emulator_machine_set_removable_media(machine, values[2], mode) ?
         "Floppy inserted." : "Cannot insert floppy.");
+    return;
+usage:
+    softpc_extension_message(out,
+        "Usage: floppy insert <readonly|direct|overlay> <image> | eject");
 }
 
 static lib_bool softpc_extension_submit_snapshot(void *context,
     emulator_machine *machine, emulator_product_monitor_command command,
-    emulator_session_machine_state state, const char *arguments,
+    emulator_session_machine_state state,
+    const emulator_product_monitor_arguments *arguments,
     emulator_session_command_result *out)
 {
+    const char *path;
     (void)context;
     if (machine == LIB_NULL || arguments == LIB_NULL || out == LIB_NULL)
         return LIB_FALSE;
+    path = arguments->count == 1u ? arguments->values[0] : "";
     *out = (emulator_session_command_result){0};
     if (command == EMULATOR_PRODUCT_MONITOR_COMMAND_SAVE)
-        softpc_extension_save(machine, state, arguments, out);
+        softpc_extension_save(machine, state, path, out);
     else if (command == EMULATOR_PRODUCT_MONITOR_COMMAND_LOAD)
-        softpc_extension_load(machine, state, arguments, out);
+        softpc_extension_load(machine, state, path, out);
     else return LIB_FALSE;
     return LIB_TRUE;
 }
 
 static lib_bool softpc_extension_submit(void *context, emulator_machine *machine,
-    emulator_session_machine_state state, const char *line,
+    emulator_session_machine_state state, const char *name,
+    const emulator_product_monitor_arguments *arguments,
     emulator_session_command_result *out)
 {
-    char buffer[SOFTPC_EXTENSION_PATH_CAPACITY];
-    char *command;
-    char *arguments;
-    lib_size length;
-
     (void)context;
-    if (machine == LIB_NULL || line == LIB_NULL || out == LIB_NULL)
-        return LIB_FALSE;
-    length = lib_text_length(line);
-    if (length >= sizeof(buffer)) return LIB_FALSE;
-    lib_memory_copy(buffer, line, length + 1u);
-    if (!softpc_extension_split(softpc_extension_trim(buffer), &command, &arguments))
+    if (machine == LIB_NULL || name == LIB_NULL || arguments == LIB_NULL || out == LIB_NULL)
         return LIB_FALSE;
     *out = (emulator_session_command_result){0};
-    if (lib_text_compare(command, "floppy") == 0) {
+    if (softpc_extension_keyword(name, "floppy")) {
         softpc_extension_floppy(machine, state, arguments, out);
         return LIB_TRUE;
     }

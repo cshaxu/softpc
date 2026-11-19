@@ -2,11 +2,29 @@
 
 ## Current Work
 
-Owner accepts and closes M9 T100 S5. S1-S5 are closed; T100 remains open.
-No implementation subtask is active. Next unused numeric subtask is S6,
-not admitted. Open task awaiting owner: T100.
-Td S24 completes the requested README refresh; see its
-[record](../history/M9-Td-S24-readme-refresh.md).
+Owner admits M9 T100 S6 quoted-path repair. S1-S5 remain closed; T100 open.
+S6 is verified, with full regression and dual publication complete; delivery awaits owner acceptance.
+
+## M9 T100 S6 Packet
+
+| Field | Required record |
+| --- | --- |
+| Identifier Mode | Continuation |
+| Admission And Approval | Owner explicitly admits quoted-path repair and full delivery. |
+| Objective | Monitor alone lexes command and all arguments; fixed and extension callbacks consume borrowed argument lists. DEBUG retains its own grammar. |
+| Non-goals | No mirror, Lib, guest, snapshot schema, INI, threading or queue changes. |
+| Reference Baseline | e3e75612; clean main worktree. |
+| Candidate Proposal | [T100](../proposals/m9-xp-mirror-original-first-audit.md). |
+| Files And ABI Surface | Emulator Monitor and X86 IBMPC callback ABI; App extensions, DEBUG N, corresponding tests/CMake/docs/manifests. INI remains unchanged. |
+| Applicable Rules | Execution, Coding, Architecture, Documentation; source policy and UI. |
+| Verification | Cached x86/x64 builds, dual publication, focused and full background/native regression; actual-diff self-review. |
+| Expected Markers | All tests pass; one Monitor lexer; no raw-tail callback; malformed syntax has no effects; quoted UTF-8 preserved; unquoted spaces delimit arguments. |
+| Asset Needs | Test-generated disposable files only; preserve original INI/media/snapshots. |
+| Reporting Requirements | Actual production/test diff, entry audit, counts, artifact hashes, pushed commit and limitations. |
+| Stop Conditions | Protect unrelated changes. Executor owns build/t100-s6 scratch/cleanup; two-hour job and fifteen-minute no-progress budgets. |
+| Exit Criteria | Verified, published, reviewed, committed, pushed, clean worktree; await owner acceptance. |
+| Original Owner Request | Admit S6 to fix quoted paths including save/load, allow spaces within quotes, minimal unified repair and necessary tests; dual build, publish, full tests, commit/push, self-review and await acceptance. |
+| Similar-Issue Sweep | Freeze monitor floppy/save/load, DEBUG N/L/W, INI floppy/hard_disk/serial_output/printer_output and startup arguments; record dispositions. |
 
 The following admissions are retained historical records, not active work.
 
@@ -86,6 +104,15 @@ Owner subsequently approves uniform ABI retention and S4 closure. The P97
 restoration candidate is withdrawn; no production change was made.
 
 ## Current Technical Baseline
+
+S6 P1 qualifies the single Monitor lexer and counted callback arguments, with
+independent DEBUG grammar and unchanged INI/mirror/snapshot format. Both cached
+architectures pass 188 background +8 native tests each (392/392); the added
+normal-eject assertion also passes on both. Production +110/-119 (net -9), tests
++153/-75 (net +78). Current EXEs contain Nov 18 21:34:07 /21:37:17 timestamps.
+[Evidence and downstream migration](../proposals/m9-xp-mirror-original-first-audit.md#s6-p1-delivery-evidence).
+S6 remains open for owner acceptance; no next S is admitted.
+
 
 S5 accepted delivery b9c903ab: Compat49 files,8851 physical lines; production
 +43/-149,net-106 against2464862d. Cached dual builds/publication and392/392
