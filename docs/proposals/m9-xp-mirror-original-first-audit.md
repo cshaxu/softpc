@@ -644,10 +644,11 @@ quotes again, and copy values if retaining beyond the callback. The old public
 monitor_parse API is gone. Import Emulator, X86 IBMPC and DEBUG source/test corpora
 with their manifests; adapt external App callbacks. NXVM was neither read nor
 updated. No manual guest/media roundtrip is claimed beyond recorded automated
-regressions; user acceptance remains pending.
+regressions; owner subsequently accepts and closes S6.
 
 Artifact SHA-256:
 - softpc32.exe: B11C4719CD779A608EF55E3F57663145912C3DB7EE9F7F2C721F19B07C960F94
 - softpc64.exe: 0DE1F625928133B2C7828D219482286BD043A24FB27E8343AC905676E5755B3B
 
-S6 is verified and awaits owner acceptance after commit/push. T100 remains open.
+S6 delivery 4cd56d01 is owner-accepted and closed; T100 remains open.
+See the [closure record](../history/M9-T100-S6-monitor-arguments.md).
