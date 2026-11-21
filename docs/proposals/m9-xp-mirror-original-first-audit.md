@@ -652,3 +652,104 @@ Artifact SHA-256:
 
 S6 delivery 4cd56d01 is owner-accepted and closed; T100 remains open.
 See the [closure record](../history/M9-T100-S6-monitor-arguments.md).
+
+## S7 verbatim shared import
+
+Owner request: 批准，准入S7原样导入nxvm最新公共八组件，老规矩，编译双EXE、发布、跑全量测试、提交推送、自审代码质量，确保工作区干净后等我验收。
+
+Baseline SoftPC 549714c167c41c83c1836e20af0d0988c638668c. Import pinned NXVM
+f45c34b85f01587aad1d830def04551a781bdc13; its shared tree identities equal the
+previously audited 8018a03dd. Later upstream App/profiling work and uncommitted
+upstream documentation are excluded. Origin and destination are the same eight
+src/test paths: lib, emulator, x86-debug, x86-ibmpc. Existing repository-maintained
+shared provenance/notices remain unchanged; no new third-party material or
+license/redistribution claim is introduced. Owner authorization above admits
+this exact import, with no external build/runtime dependency.
+
+Only X86 IBMPC differs: optional borrowed App hotkeys join the five built-ins
+in one registration/help table. KVM registry/matcher owns chord matching;
+Product configures registrations, rejects identifier/chord conflicts and owns
+action dispatch; Session remains the sole event consumer. Help-only rows retain
+an existing App input route without registering an additional action. SoftPC
+supplies zero-initialized extension additions, preserving its five bindings.
+Removed helper names have no App consumer. No App, mirror or snapshot change.
+Estimate: six production files +89/-37, two tests +71/-14, two manifests +8/-8.
+
+Finite convergence ledger: universe is 296 files at the pinned eight-tree
+revision; units are exact file bytes, manifests and all affected real callers.
+Complete when all eight trees match, all registered local tests pass on both
+architectures, dual published EXEs match fresh builds, actual-diff review is
+complete and owned scratch is removed. Dispositions are unchanged (286 files)
+or exact import (10 files); qualification is local, never inferred from NXVM.
+
+| Boundary | Required proof |
+| --- | --- |
+| Eight shared trees | Complete path/byte equality to pinned Git blobs and manifest checks. |
+| Registration and dispatch | Existing command fixture uses real matcher; duplicate chord/identifier reject before startup; no old-helper production callers. |
+| Entry and lifetime | Entry fixture forwards same help/registry; borrowed extension lifetime covers synchronous run and teardown. |
+| SoftPC integration | Existing extension initialization leaves additions zero; local full dual builds and all background/native tests. |
+| Delivery | Fresh embedded timestamps and matching EXE hashes; reviewed pushed diff; protected inputs unchanged and task scratch removed. |
+
+Execution uses existing cached Ninja/ccache presets and tools/build.cmd, with
+captured background logs and serial native tests. No alternate build runner or
+production source patch is added. Existing package-startup TODO remains separate;
+a retry, if needed, must be reported without disguising first-pass failure.
+
+### S7 P1 delivery evidence
+
+Exact-import verification passes for all 296 files against pinned Git blobs:
+source counts Lib 123, Emulator 28, X86 DEBUG 15, X86 IBMPC 13; corresponding
+test counts 78, 23, 9 and 7. All 288 manifest entries match. No missing/extra
+paths or local shared patches; only the ten planned files differ from SoftPC's
+baseline. Other upstream working-tree changes are neither imported nor modified.
+
+Local cached Ninja/ccache Release builds and publication complete on both widths.
+The CMD package entry runs first, followed by complete test builds; both rebuild
+the timestamp object with unchanged source, bypassing its compiler launcher.
+Each publication check verifies fresh compiler literals against the object and
+EXE. Final timestamps are Nov 21 2026 11:22:52 (x86) and 11:22:57 (x64).
+No build warnings or errors. Independent PE checks confirm 014Ch/8664h.
+
+| Local qualification | Result | Elapsed seconds |
+| --- | --- | --- |
+| x86 full background | 188/188 | 111.70 |
+| x64 full background | 188/188 | 167.41 |
+| x86 serial native | 8/8 (five desktop, three audio) | 24.92 |
+| x64 serial native | 8/8 (five desktop, three audio) | 24.99 |
+
+All 392 cases pass first attempt, without assertion/timeout/registration changes
+or retries. This includes shared unit suites, manifest/types/dependency/naming/
+source/test gates, App Monitor/snapshot/worker regressions and real package,
+Console, Window, PCM/MIDI tests. No manual guest-experience or downstream-product
+acceptance claim is made. Existing package-startup TODO is not declared resolved.
+
+Actual git diff --numstat against 549714c1: six production C/H files +89/-37,
+net +52; two test C files +71/-14, net +57; two manifests +8/-8. Thus shared
+source/test/manifest total +168/-59. No root build/test infrastructure, App,
+Compat, mirror, snapshot, INI or media change. Mirror diff remains unchanged.
+
+Executor actual-diff review checks the imported source and tests, inward C11/
+Lib Types dependencies, copied registration/borrowed help lifetimes, failure
+before Debug allocation, normal reverse teardown, identifier/chord conflict
+rejection, sole matcher/provider route and unchanged default five bindings.
+Search across all src/test for keyboard_hotkeys, keyboard_hotkey_help,
+keyboard_configure, command_extensions and submit_hotkey finds no obsolete
+helper consumers. App's designated initializer zeroes all new optional fields;
+no compatibility alias, wrapper, test-only production API or local fork needed.
+Existing command tests exercise a real matcher and both conflicts; entry tests
+verify registry/help forwarding. No blocking quality defect was found.
+
+The owned CMD qualification job exited zero and all child tests completed.
+Concise evidence/hashes are retained here; disposable task logs/scripts are
+removed before delivery, leaving only reusable build caches. S7 remains verified
+and awaits owner acceptance; T100 stays open.
+
+Published artifact SHA-256:
+- softpc32.exe: `76d64c1f5df0c3acbc5d73d128c73bfbcdd9e4dec89f4b18c7a40e9aca31440b` (3473771 bytes).
+- softpc64.exe: `43afcce9acf66067879888316c9abfcee52c9d72c75336a4bb0e61251b118af8` (3092966 bytes).
+
+Qualification log SHA-256 (raw disposable logs are not retained):
+- background-x86: `b2beae14859d22f91c4ad768850907797a30bb23749d8654c3c19bad2a3898d3`.
+- background-x64: `d2ac9a284a2c3a8ba1c5355c2f2464cd0253310de5fa215e2fbc44c236fcf5cf`.
+- native-x86: `d57e0912fefa1fdc6f0a98551f61b2ea56468206340a7b9075de5543e8f6e3b8`.
+- native-x64: `eba2b9a1d16c72a2f400f8d216ec666ed994575f94e6522b62d6700d63e72b40`.
