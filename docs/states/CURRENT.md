@@ -2,30 +2,10 @@
 
 ## Current Work
 
-Owner admits M9 T100 S7: verbatim import of the latest reviewed NXVM shared
-source/test eight trees. S1-S6 remain closed; T100 remains open. S7 is active,
-implementation and qualification are complete; S7 awaits owner acceptance.
-
-## M9 T100 S7 Packet
-
-| Field | Required record |
-| --- | --- |
-| Identifier Mode | Continuation |
-| Admission And Approval | Owner explicitly approves import, dual EXEs, publication, full tests, commit/push, quality review and clean worktree; wait for acceptance. |
-| Objective | Import the eight shared trees byte-for-byte from pinned NXVM, preserving SoftPC behavior; qualify local products independently. |
-| Non-goals | No NXVM writes, App/mirror/guest/configuration/snapshot changes, new hotkey bindings, alternative implementation or S/T closure. |
-| Reference Baseline | SoftPC 549714c167c41c83c1836e20af0d0988c638668c; NXVM f45c34b85f01587aad1d830def04551a781bdc13, whose eight trees equal reviewed 8018a03dd. |
-| Candidate Proposal | [S7 import brief](../proposals/m9-xp-mirror-original-first-audit.md#s7-verbatim-shared-import). |
-| Files And ABI Surface | src/test pairs lib, emulator, x86-debug, x86-ibmpc; only six X86 IBMPC production files, two tests and two manifests differ. Optional borrowed hotkey extensions replace old separate help/registration helpers; existing SoftPC initializers remain valid. |
-| Applicable Rules | Execution, architecture, coding, documentation, source/research policy and linked governance skills; single-session executor then coordinator actual-diff review. |
-| Verification | Exact eight-tree bytes/manifests; real command matcher and entry tests; cached x86/x64 full builds, all background gates/unit/integration tests and serial desktop/native-audio tests; timestamp/publication hashes; final diff and ownership audit. |
-| Expected Markers | All eight trees equal pinned source; unchanged default five hotkeys; no new non-mirror warnings; all local registered tests pass; fresh matching dual publications; clean pushed worktree. |
-| Asset Needs | Existing immutable guest/media and owner INI only; refresh assets/binary EXEs. Own disposable build/t100-s7; two-hour job, fifteen-minute no-progress, 1 GiB scratch budget; this session owns jobs/logs and cleanup. |
-| Reporting Requirements | Source revision, exact path/line accounting, interface compatibility, actual local tests versus upstream reports, hashes/timestamps, self-review and limitations. |
-| Stop Conditions | Unexpected shared drift, overlapping SoftPC build, unidentified user edits, incompatible callers, failed qualification or publication; investigate without modifying sibling checkout or claiming success. |
-| Exit Criteria | Implemented/verified delivery committed and pushed; jobs joined, temporary outputs cleaned, worktree clean; await owner acceptance without closing S7/T100. |
-| Original Owner Request | 批准，准入S7原样导入nxvm最新公共八组件，老规矩，编译双EXE、发布、跑全量测试、提交推送、自审代码质量，确保工作区干净后等我验收。 |
-| Similar-Issue Sweep | Enumerate all eight trees and all extension/helper callers; verify sole KVM registry/matcher, Product dispatch/help ownership, no App parsing duplication or old helper references, safe borrowed lifetimes and duplicate rejection. |
+Owner accepts and closes M9 T100 S7. S1-S7 are closed; T100 remains open.
+No implementation subtask is active. Next unused numeric subtask is S8,
+not admitted. Open task awaiting owner: T100.
+[Accepted S7 record](../history/M9-T100-S7-shared-import.md).
 
 The following admissions are retained historical records, not active work.
 
@@ -113,15 +93,15 @@ Nov 21 2026 11:22:52 (x86) /11:22:57 (x64) timestamps. Both widths pass
 188 background +8 native tests each, 392/392 first attempt; no build warnings.
 App/mirror/INI/media/snapshot remain unchanged. See
 [S7 delivery evidence](../proposals/m9-xp-mirror-original-first-audit.md#s7-p1-delivery-evidence).
-S7 is verified and awaiting owner acceptance; T100 remains open.
+S7 delivery cd218746 is owner-accepted and closed; T100 remains open.
 
 S6 P1 qualifies the single Monitor lexer and counted callback arguments, with
 independent DEBUG grammar and unchanged INI/mirror/snapshot format. Both cached
 architectures pass 188 background +8 native tests each (392/392); the added
 normal-eject assertion also passes on both. Production +110/-119 (net -9), tests
-+153/-75 (net +78). Current EXEs contain Nov 18 21:34:07 /21:37:17 timestamps.
++153/-75 (net +78). S6 EXEs contained Nov 18 21:34:07 /21:37:17 timestamps.
 [Evidence and downstream migration](../proposals/m9-xp-mirror-original-first-audit.md#s6-p1-delivery-evidence).
-S6 is owner-accepted and closed; S7 is admitted above.
+S6 and S7 are owner-accepted and closed.
 
 
 S5 accepted delivery b9c903ab: Compat49 files,8851 physical lines; production

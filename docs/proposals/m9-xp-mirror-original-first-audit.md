@@ -741,8 +741,8 @@ verify registry/help forwarding. No blocking quality defect was found.
 
 The owned CMD qualification job exited zero and all child tests completed.
 Concise evidence/hashes are retained here; disposable task logs/scripts are
-removed before delivery, leaving only reusable build caches. S7 remains verified
-and awaits owner acceptance; T100 stays open.
+removed before delivery, leaving only reusable build caches. Owner subsequently
+accepts and closes S7; T100 stays open.
 
 Published artifact SHA-256:
 - softpc32.exe: `76d64c1f5df0c3acbc5d73d128c73bfbcdd9e4dec89f4b18c7a40e9aca31440b` (3473771 bytes).
@@ -753,3 +753,6 @@ Qualification log SHA-256 (raw disposable logs are not retained):
 - background-x64: `d2ac9a284a2c3a8ba1c5355c2f2464cd0253310de5fa215e2fbc44c236fcf5cf`.
 - native-x86: `d57e0912fefa1fdc6f0a98551f61b2ea56468206340a7b9075de5543e8f6e3b8`.
 - native-x64: `eba2b9a1d16c72a2f400f8d216ec666ed994575f94e6522b62d6700d63e72b40`.
+
+S7 delivery cd218746a12dd6e5a6e66d1551ddc4177015b151 is owner-accepted and closed.
+See the [closure audit](../history/M9-T100-S7-shared-import.md). No next S is admitted.

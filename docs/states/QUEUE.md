@@ -11,10 +11,10 @@ allocates a numeric task identifier.
 
 ## Previously admitted
 
-T100 remains open after owner closure of S6. Its mirror review is
+T100 remains open after owner closure of S7. Its mirror review is
 retained in the [T100 proposal](../proposals/m9-xp-mirror-original-first-audit.md#remaining-work-after-s3-owner-closure),
 completed through S4; S5 Compat simplification and S6 Monitor argument repair
-are closed. S7 shared import is admitted in CURRENT. This is not another T candidate.
+and S7 shared import are closed. No next S is admitted. This is not another T candidate.
 
 Owner closes Td S22 [build-cache governance](../history/M9-Td-S22-build-cache-governance.md).
 It is not an outstanding candidate or active task.
